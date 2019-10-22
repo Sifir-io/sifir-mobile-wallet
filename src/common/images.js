@@ -1,0 +1,17 @@
+export default {
+  icon_indicator: require('./../assets/images/back.png'),
+  icon_header: require('./../assets/images/head.png'),
+  img_shadow: require('./../assets/images/shadow.png'),
+  icon_setting: require('./../assets/images/setting.png'),
+  icon_add: require('./../assets/images/add.png'),
+  icon_add_clicked: require('./../assets/images/add1.png'),
+  icon_light_clicked: require('./../assets/images/light1.png'),
+  icon_light: require('./../assets/images/light.png'),
+  icon_back: require('./../assets/images/back.png'),
+  icon_bitcoin: require('./../assets/images/bitcoin_white.png'),
+  icon_send: require('./../assets/images/up_cir.png'),
+  icon_receive: require('./../assets/images/down_cir.png'),
+  icon_chanel: require('./../assets/images/light_cir.png'),
+  icon_up_arrow: require('./../assets/images/up_arrow.png'),
+  icon_down_arrow: require('./../assets/images/down_arrow.png'),
+};
