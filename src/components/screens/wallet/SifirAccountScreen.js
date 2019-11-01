@@ -7,14 +7,12 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
-  Animated,
 } from 'react-native';
-import {connect} from 'react-redux';
 
-import Images from '../../../common/images';
-import AppStyle from '../../../common/AppStyle';
+import {connect} from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
-import Constants from '../../../common/constants';
+
+import {Images, AppStyle, Constants} from '@common';
 
 class SifirAccountScreen extends Component {
   constructor(props, context) {
@@ -23,30 +21,32 @@ class SifirAccountScreen extends Component {
 
   state = {
     btnStatus: 0,
-    SlideInLeft: new Animated.Value(0),
   };
 
   render() {
-    const backTitle = Constants.MY_WALLET;
     const {navigate} = this.props.navigation;
     const {transactions} = this.props;
     const {btnStatus} = this.state;
-    const SCREEN_WIDTH = Constants.SCREEN_WIDTH / 2;
+    const BTN_WIDTH = Constants.SCREEN_WIDTH / 2;
 
     return (
       <View style={styles.mainscreen}>
-        <TouchableOpacity>
-          <View
-            style={styles.backNavStyle}
-            onTouchEnd={() => navigate('AccountsList')}>
-            <Image source={Images.icon_back} style={styles.image} />
-            <Text style={styles.backTextStyle}>{backTitle}</Text>
-          </View>
-        </TouchableOpacity>
+        <View style={{flex: 0.7}}>
+          <TouchableOpacity>
+            <View
+              style={styles.backNavStyle}
+              onTouchEnd={() => navigate('AccountsList')}>
+              <Image source={Images.icon_back} style={styles.image} />
+              <Text style={styles.backTextStyle}>
+                {Constants.STR_My_Wallets}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
         <View style={styles.topContStyle}>
           <LinearGradient
-            height={SCREEN_WIDTH - 50}
-            width={SCREEN_WIDTH - 50}
+            height={BTN_WIDTH - 50}
+            width={BTN_WIDTH - 40}
             colors={['#52d4cd', '#54a5b1', '#57658c']}
             style={styles.linearGradient}>
             <View>
@@ -56,8 +56,8 @@ class SifirAccountScreen extends Component {
             </View>
           </LinearGradient>
           <View
-            height={SCREEN_WIDTH - 30}
-            width={SCREEN_WIDTH - 30}
+            height={BTN_WIDTH - 30}
+            width={BTN_WIDTH - 30}
             style={{
               flex: 5,
               flexDirection: 'column-reverse',
@@ -97,7 +97,7 @@ class SifirAccountScreen extends Component {
                 marginBottom: -5,
                 marginLeft: 5,
               }}>
-              {Constants.CUR_BALANCE}
+              {Constants.STR_Cur_Balance}
             </Text>
           </View>
         </View>
@@ -106,14 +106,18 @@ class SifirAccountScreen extends Component {
           <TouchableWithoutFeedback
             style={{flex: 1}}
             onPressIn={() => this.setState({btnStatus: 1})}
-            onPressOut={() => this.setState({btnStatus: 0})}>
+            onPressOut={() => {
+              this.setState({btnStatus: 0});
+              console.log('get address');
+              navigate('GetAddress');
+            }}>
             <View
               style={[
                 styles.transBtnStyle,
                 btnStatus === 1 ? {backgroundColor: 'black', opacity: 0.7} : {},
               ]}>
               <Text style={{color: 'white', fontSize: 15}}>
-                {Constants.SEND}
+                {Constants.STR_SEND}
               </Text>
               <Image
                 source={Images.icon_up_arrow}
@@ -130,15 +134,15 @@ class SifirAccountScreen extends Component {
                 styles.transBtnStyle,
                 {
                   borderRightColor: 'transparent',
-                  borderTopRightRadius: 15,
-                  borderBottomRightRadius: 15,
+                  borderTopRightRadius: 10,
+                  borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 0,
                   borderTopLeftRadius: 0,
                 },
                 btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
               ]}>
               <Text style={[{color: 'white', fontSize: 15}]}>
-                {Constants.RECEIVE}
+                {Constants.STR_RECEIVE}
               </Text>
               <Image
                 source={Images.icon_down_arrow}
@@ -172,8 +176,8 @@ class SifirAccountScreen extends Component {
         <View style={styles.listStyle}>
           <FlatList
             data={transactions}
-            width={SCREEN_WIDTH * 2 - 50}
-            height="100%"
+            width={BTN_WIDTH * 2 - 50}
+            style={{height: 200}}
             renderItem={({item}) => (
               <TouchableOpacity>
                 <View
@@ -212,10 +216,38 @@ class SifirAccountScreen extends Component {
 }
 
 const styles = StyleSheet.create({
+  mainscreen: {
+    flex: 1,
+    backgroundColor: AppStyle.backgroundColor,
+  },
+  topContStyle: {
+    flex: 3,
+    marginTop: 0,
+    marginLeft: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  btnStyle: {
+    flex: 1,
+    flexDirection: 'row',
+    borderColor: AppStyle.mainColor,
+    borderWidth: 1,
+    borderRadius: 7,
+    height: 55,
+    marginLeft: 26,
+    marginRight: 26,
+    marginTop: 30,
+  },
+  listStyle: {
+    flex: 3,
+    height: '100%',
+    marginBottom: 20,
+    marginLeft: 25,
+  },
   btcTxtStyle: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 28,
+    fontSize: 27,
     marginLeft: 13,
     marginBottom: -10,
   },
@@ -227,20 +259,12 @@ const styles = StyleSheet.create({
     height: 43,
     opacity: 0.6,
   },
-  topContStyle: {
-    marginTop: -50,
-    marginLeft: 20,
-    flex: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
   backNavStyle: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginTop: 0,
     marginLeft: 13,
-    height: 100,
   },
   backTextStyle: {
     fontFamily: AppStyle.mainFontBold,
@@ -257,38 +281,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 2,
   },
-  mainscreen: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: AppStyle.backgroundColor,
-  },
+
   linearGradient: {
-    flex: 4,
+    flex: 4.6,
     borderRadius: 5,
     borderWidth: 1,
     borderRadius: 15,
-  },
-  btnStyle: {
-    flexDirection: 'row',
-    borderColor: AppStyle.mainColor,
-    borderWidth: 1,
-    borderRadius: 7,
-    height: 55,
-    marginLeft: 30,
-    marginRight: 30,
-    marginTop: 30,
   },
   item: {
     padding: 10,
     fontSize: 18,
     height: 44,
     color: 'white',
-  },
-  listStyle: {
-    flex: 3,
-    height: '100%',
-    marginBottom: 20,
-    marginLeft: 25,
   },
   transBtnStyle: {
     flex: 1,
@@ -300,8 +304,8 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
     height: '100%',
     borderWidth: 1,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
     alignItems: 'center',
   },
   activeBtnStyle: {

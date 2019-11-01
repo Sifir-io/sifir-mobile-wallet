@@ -1,9 +1,9 @@
 import React from 'react';
 import {createAppContainer} from 'react-navigation';
 import {View} from 'react-native';
-import SifirHeader from '../components/elements/SifirHeader';
-import AppStyle from '../common/AppStyle';
 
+import {AppStyle} from '@common';
+import SifirHeader from '@elements/SifirHeader';
 import WalletStack from './WalletStack';
 import ChatStack from './ChatStack';
 import ShopStack from './ShopStack';

@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import {View, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {connect} from 'react-redux';
 
-import Images from '../../../common/images';
-import SifirAccountButton from '../../elements/SifirAccountButton';
-import AppStyle from '../../../common/AppStyle';
-import constants from '../../../common/constants';
+import SifirAccountButton from '@elements/SifirAccountButton';
+
+import {Images, AppStyle, Constants} from '@common';
 
 class SifirAccountsListScreen extends Component {
   constructor(props, context) {
@@ -13,7 +12,7 @@ class SifirAccountsListScreen extends Component {
   }
 
   render() {
-    const CARD_SIZE = constants.SCREEN_WIDTH / 2 - 40;
+    const CARD_SIZE = Constants.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
     const {accounts} = this.props;
 

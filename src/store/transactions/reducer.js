@@ -1,5 +1,4 @@
-// import types from '../actions/types';
-import Images from '../../common/images';
+import {Images} from '@common';
 
 const defaultState = {
   data: [

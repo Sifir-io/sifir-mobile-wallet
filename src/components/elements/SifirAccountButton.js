@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 
-import AppStyle from '../../common/AppStyle';
+import {AppStyle} from '@common';
 
 export default class SifirAccountButton extends Component {
   state = {isClicked: false};

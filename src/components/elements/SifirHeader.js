@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import Images from '../../common/images';
-import AppStyle from '../../common/AppStyle';
-import Constants from '../../common/constants';
+
+import {Images, AppStyle, Constants} from '@common';
 
 export default class SirFirHeader extends Component {
   state = {curMenu: 0};
@@ -17,9 +16,9 @@ export default class SirFirHeader extends Component {
 
   render() {
     const menus = [
-      Constants.MENU_WALLET,
-      Constants.MENU_CHAT,
-      Constants.MENU_SHOP,
+      Constants.STR_WALLET,
+      Constants.STR_CHAT,
+      Constants.STR_SHOP,
     ];
     const {curMenu} = this.state;
     const {switchPage} = this.props;

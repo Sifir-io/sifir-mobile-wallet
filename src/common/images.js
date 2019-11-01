@@ -1,4 +1,4 @@
-export default {
+export default Images = {
   icon_indicator: require('./../assets/images/back.png'),
   icon_header: require('./../assets/images/head.png'),
   img_shadow: require('./../assets/images/shadow.png'),
@@ -13,5 +13,18 @@ export default {
   icon_receive: require('./../assets/images/down_cir.png'),
   icon_chanel: require('./../assets/images/light_cir.png'),
   icon_up_arrow: require('./../assets/images/up_arrow.png'),
+  icon_up_blue: require('./../assets/images/uparrow_blue.png'),
   icon_down_arrow: require('./../assets/images/down_arrow.png'),
+  icon_btc_cir: require('./../assets/images/bitcoin_blue.png'),
+  img_camera: require('./../assets/images/camera.png'),
+  icon_up_dark: require('./../assets/images/uparrow_dark.png'),
+  icon_done: require('./../assets/images/check.png'),
+  icon_funds: require('./../assets/images/bag.png'),
+  icon_clock: require('./../assets/images/clock.png'),
+  icon_dollar: require('./../assets/images/dollar.png'),
+  icon_close: require('./../assets/images/close.png'),
+  icon_dialog_arrow: require('./../assets/images/arrow.png'),
+  icon_back_trans: require('./../assets/images/back_trans.png'),
+  icon_torch: require('./../assets/images/ic_flashlight.png'),
+  icon_gallery: require('./../assets/images/ic_gallery.png'),
 };
