@@ -1,9 +1,9 @@
 import {combineReducers} from 'redux';
 
-import accountsReducer from './accounts/reducer';
-import transactionsReducer from './transactions/reducer';
+import accountsListReducer from './accountsList/reducer';
+import accountReducer from './account/reducer';
 
 export default combineReducers({
-  accounts: accountsReducer,
-  transactions: transactionsReducer,
+  accountsList: accountsListReducer,
+  account: accountReducer,
 });

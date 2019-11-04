@@ -28,7 +28,7 @@ const defaultState = {
   ],
 };
 
-export default accounts = (state = defaultState, action) => {
+export default accountsList = (state = defaultState, action) => {
   switch (action.type) {
     default:
       return state;

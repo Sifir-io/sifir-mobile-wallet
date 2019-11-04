@@ -25,95 +25,63 @@ class SifirAccountScreen extends Component {
 
   render() {
     const {navigate} = this.props.navigation;
-    const {transactions} = this.props;
+    const {
+      txnData,
+      walletName,
+      walletType,
+      balanceAmount,
+      balanceType,
+    } = this.props;
     const {btnStatus} = this.state;
     const BTN_WIDTH = Constants.SCREEN_WIDTH / 2;
 
     return (
-      <View style={styles.mainscreen}>
+      <View style={styles.mainView}>
         <View style={{flex: 0.7}}>
           <TouchableOpacity>
             <View
-              style={styles.backNavStyle}
+              style={styles.backNavView}
               onTouchEnd={() => navigate('AccountsList')}>
-              <Image source={Images.icon_back} style={styles.image} />
-              <Text style={styles.backTextStyle}>
-                {Constants.STR_My_Wallets}
-              </Text>
+              <Image source={Images.icon_back} style={styles.backImg} />
+              <Text style={styles.backNavTxt}>{Constants.STR_My_Wallets}</Text>
             </View>
           </TouchableOpacity>
         </View>
-        <View style={styles.topContStyle}>
+        <View style={styles.headerView}>
           <LinearGradient
             height={BTN_WIDTH - 50}
             width={BTN_WIDTH - 40}
             colors={['#52d4cd', '#54a5b1', '#57658c']}
-            style={styles.linearGradient}>
+            style={styles.gradient}>
             <View>
-              <Image source={Images.icon_bitcoin} style={styles.btcStyle} />
-              <Text style={styles.btcTxtStyle}>GHASSANS</Text>
-              <Text style={styles.btcTxtStyle}>WALLET</Text>
+              <Image source={Images.icon_bitcoin} style={styles.boxImage} />
+              <Text style={styles.boxTxt}>{walletName}</Text>
+              <Text style={styles.boxTxt}>{walletType}</Text>
             </View>
           </LinearGradient>
           <View
             height={BTN_WIDTH - 30}
             width={BTN_WIDTH - 30}
-            style={{
-              flex: 5,
-              flexDirection: 'column-reverse',
-              marginLeft: 25,
-              paddingBottom: 15,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
-              <Text
-                style={{
-                  color: 'white',
-                  fontFamily: AppStyle.mainFont,
-                  fontSize: 50,
-                }}>
-                14.51
-              </Text>
-              <Text
-                style={{
-                  color: 'white',
-                  fontSize: 26,
-                  fontFamily: AppStyle.mainFont,
-                  textAlignVertical: 'bottom',
-                  marginBottom: 7,
-                  marginLeft: 5,
-                }}>
-                SAT
-              </Text>
+            style={styles.balanceView}>
+            <View style={{flexDirection: 'row'}}>
+              <Text style={styles.balAmountTxt}>{balanceAmount}</Text>
+              <Text style={styles.satTxt}>{balanceType}</Text>
             </View>
-            <Text
-              style={{
-                color: AppStyle.mainColor,
-                fontFamily: AppStyle.mainFont,
-                fontSize: 16,
-                textAlignVertical: 'bottom',
-                marginBottom: -5,
-                marginLeft: 5,
-              }}>
-              {Constants.STR_Cur_Balance}
-            </Text>
+            <Text style={styles.balanceTxt}>{Constants.STR_Cur_Balance}</Text>
           </View>
         </View>
 
-        <View style={styles.btnStyle}>
+        <View style={styles.btnAreaView}>
           <TouchableWithoutFeedback
             style={{flex: 1}}
             onPressIn={() => this.setState({btnStatus: 1})}
             onPressOut={() => {
               this.setState({btnStatus: 0});
-              console.log('get address');
               navigate('GetAddress');
             }}>
             <View
               style={[
-                styles.transBtnStyle,
+                styles.txnBtnView,
                 btnStatus === 1 ? {backgroundColor: 'black', opacity: 0.7} : {},
               ]}>
               <Text style={{color: 'white', fontSize: 15}}>
@@ -128,17 +96,14 @@ class SifirAccountScreen extends Component {
           <TouchableWithoutFeedback
             style={{flex: 1}}
             onPressIn={() => this.setState({btnStatus: 2})}
-            onPressOut={() => this.setState({btnStatus: 0})}>
+            onPressOut={() => {
+              this.setState({btnStatus: 0});
+              navigate('BtcReceiveTxn', {address: '#Temp Address'});
+            }}>
             <View
               style={[
-                styles.transBtnStyle,
-                {
-                  borderRightColor: 'transparent',
-                  borderTopRightRadius: 10,
-                  borderBottomRightRadius: 10,
-                  borderBottomLeftRadius: 0,
-                  borderTopLeftRadius: 0,
-                },
+                styles.txnBtnView,
+                styles.leftTxnBtnView,
                 btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
               ]}>
               <Text style={[{color: 'white', fontSize: 15}]}>
@@ -151,21 +116,8 @@ class SifirAccountScreen extends Component {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            marginLeft: 26,
-            marginTop: 30,
-          }}>
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 23,
-              fontWeight: 'bold',
-            }}>
-            {Constants.TRANSACTIONS}
-          </Text>
+        <View style={styles.txnSetView}>
+          <Text style={styles.txnLblTxt}>{Constants.TRANSACTIONS}</Text>
           <TouchableOpacity>
             <Image
               source={Images.icon_setting}
@@ -173,23 +125,14 @@ class SifirAccountScreen extends Component {
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.listStyle}>
+        <View style={styles.txnListView}>
           <FlatList
-            data={transactions}
+            data={txnData}
             width={BTN_WIDTH * 2 - 50}
             style={{height: 200}}
             renderItem={({item}) => (
               <TouchableOpacity>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    width: '100%',
-                    height: 50,
-                    borderBottomColor: AppStyle.listViewSep,
-                    borderBottomWidth: 2,
-                    alignItems: 'center',
-                  }}>
+                <View style={styles.listItme}>
                   <Image source={item.imgURL} style={{width: 30, height: 30}} />
                   <View style={{flex: 5, marginLeft: 20}}>
                     <Text style={{color: AppStyle.mainColor}}>{item.s1}</Text>
@@ -215,19 +158,39 @@ class SifirAccountScreen extends Component {
   }
 }
 
+function mapStateToProps(state) {
+  return state.account;
+}
+
+function mapDispatchToProps(dispatch) {
+  return {};
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirAccountScreen);
+
 const styles = StyleSheet.create({
-  mainscreen: {
+  mainView: {
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
   },
-  topContStyle: {
+  leftTxnBtnView: {
+    borderRightColor: 'transparent',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 0,
+    borderTopLeftRadius: 0,
+  },
+  headerView: {
     flex: 3,
     marginTop: 0,
     marginLeft: 20,
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
-  btnStyle: {
+  btnAreaView: {
     flex: 1,
     flexDirection: 'row',
     borderColor: AppStyle.mainColor,
@@ -238,20 +201,20 @@ const styles = StyleSheet.create({
     marginRight: 26,
     marginTop: 30,
   },
-  listStyle: {
+  txnListView: {
     flex: 3,
     height: '100%',
     marginBottom: 20,
     marginLeft: 25,
   },
-  btcTxtStyle: {
+  boxTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
     fontSize: 27,
     marginLeft: 13,
     marginBottom: -10,
   },
-  btcStyle: {
+  boxImage: {
     marginBottom: 10,
     marginTop: 15,
     marginLeft: 13,
@@ -259,42 +222,32 @@ const styles = StyleSheet.create({
     height: 43,
     opacity: 0.6,
   },
-  backNavStyle: {
+  backNavView: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginTop: 0,
     marginLeft: 13,
   },
-  backTextStyle: {
+  backNavTxt: {
     fontFamily: AppStyle.mainFontBold,
     fontSize: 15,
     color: 'white',
     marginLeft: 5,
   },
-  empty: {
-    flex: 1,
-  },
-  image: {
+  backImg: {
     width: 15,
     height: 15,
     marginLeft: 10,
     marginTop: 2,
   },
-
-  linearGradient: {
+  gradient: {
     flex: 4.6,
     borderRadius: 5,
     borderWidth: 1,
     borderRadius: 15,
   },
-  item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-    color: 'white',
-  },
-  transBtnStyle: {
+  txnBtnView: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -308,22 +261,51 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     alignItems: 'center',
   },
-  activeBtnStyle: {
-    backgroundColor: 'red',
+  listItme: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+    height: 50,
+    borderBottomColor: AppStyle.listViewSep,
+    borderBottomWidth: 2,
+    alignItems: 'center',
+  },
+  satTxt: {
+    color: 'white',
+    fontSize: 26,
+    fontFamily: AppStyle.mainFont,
+    textAlignVertical: 'bottom',
+    marginBottom: 7,
+    marginLeft: 5,
+  },
+  balanceTxt: {
+    color: AppStyle.mainColor,
+    fontFamily: AppStyle.mainFont,
+    fontSize: 16,
+    textAlignVertical: 'bottom',
+    marginBottom: -5,
+    marginLeft: 5,
+  },
+  balanceView: {
+    flex: 5,
+    flexDirection: 'column-reverse',
+    marginLeft: 25,
+    paddingBottom: 15,
+  },
+  txnLblTxt: {
+    color: 'white',
+    fontSize: 23,
+    fontWeight: 'bold',
+  },
+  txnSetView: {
+    flex: 1,
+    flexDirection: 'row',
+    marginLeft: 26,
+    marginTop: 30,
+  },
+  balAmountTxt: {
+    color: 'white',
+    fontFamily: AppStyle.mainFont,
+    fontSize: 50,
   },
 });
-
-function mapStateToProps(state) {
-  return {
-    transactions: state.transactions.data,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {};
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SifirAccountScreen);

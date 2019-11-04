@@ -9,7 +9,7 @@ export default class SifirSettingModal extends Component {
 
   render() {
     return (
-      <View>
+      <>
         <View>
           <View
             style={{
@@ -53,7 +53,7 @@ export default class SifirSettingModal extends Component {
                   <View style={styles.feeTxtStyle}>
                     <Text
                       style={{
-                        fontSize: 30,
+                        fontSize: 25,
                         marginVertical: 10,
                         marginHorizontal: 4,
                       }}>
@@ -144,7 +144,7 @@ export default class SifirSettingModal extends Component {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </>
     );
   }
 }
@@ -162,9 +162,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingLeft: 20,
     paddingRight: 20,
-    paddingTop: 10,
+    paddingTop: 5,
     paddingBottom: 10,
-    height: 180,
+    height: 160,
     width: Constants.SCREEN_WIDTH * 0.85,
   },
   rowStyle: {
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   bottomStyle: {
     flexDirection: 'row-reverse',
     marginBottom: 8,
-    marginTop: -25,
+    marginTop: -21,
   },
   feeTxtStyle: {
     flex: 1,

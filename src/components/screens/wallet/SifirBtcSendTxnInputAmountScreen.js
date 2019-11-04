@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
 } from 'react-native';
-// import {connect} from 'react-redux';
 
 import {AppStyle, Constants} from '@common';
 
@@ -19,30 +18,14 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
 
   render() {
     return (
-      <View style={styles.mainscreen}>
-        <View style={styles.content}>
+      <View style={styles.mainView}>
+        <View style={styles.contentView}>
           <View style={{alignItems: 'center', flex: 5}}>
-            <Text style={styles.recTxtStyle}>
+            <Text style={styles.recLblTxt}>
               {Constants.STR_PAYMENT_RECEIPIENT}
             </Text>
-            <Text
-              style={{
-                color: 'white',
-                fontFamily: AppStyle.mainFont,
-                fontSize: 30,
-                marginTop: 10,
-              }}>
-              {this.state.receipient}
-            </Text>
-            <Text
-              style={{
-                color: AppStyle.mainColor,
-                fontSize: 16,
-                marginTop: 40,
-                fontFamily: AppStyle.mainFontBold,
-              }}>
-              {Constants.STR_PAYMENT_AMOUNT}
-            </Text>
+            <Text style={styles.recTxt}>{this.state.receipient}</Text>
+            <Text style={styles.amountTxt}>{Constants.STR_PAYMENT_AMOUNT}</Text>
           </View>
           <View style={{marginTop: 15}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
@@ -51,14 +34,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
                 keyboardType="number-pad"
                 onChangeText={amount => this.setState({amount: amount})}
               />
-              <Text
-                style={{
-                  color: 'white',
-                  fontSize: 38,
-                  marginBottom: 15,
-                }}>
-                {Constants.STR_BTC}
-              </Text>
+              <Text style={styles.btcTxt}>{Constants.STR_BTC}</Text>
             </View>
             <View style={styles.lineStyle}></View>
           </View>
@@ -72,7 +48,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               <View
                 style={styles.btnStyle}
                 onTouchEnd={() =>
-                  this.props.navigation.navigate('BtcTxnConfirm', {
+                  this.props.navigation.navigate('BtcSendTxnConfirm', {
                     receipient: this.state.receipient,
                     amount: this.state.amount,
                   })
@@ -104,13 +80,13 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  mainscreen: {
+  mainView: {
     flex: 1,
     height: '100%',
     backgroundColor: AppStyle.backgroundColor,
     position: 'relative',
   },
-  content: {
+  contentView: {
     position: 'absolute',
     alignItems: 'center',
     width: '100%',
@@ -130,7 +106,7 @@ const styles = StyleSheet.create({
     borderTopColor: AppStyle.mainColor,
     borderTopWidth: 2,
   },
-  recTxtStyle: {
+  recLblTxt: {
     color: AppStyle.mainColor,
     fontSize: 16,
     marginTop: 30,
@@ -146,5 +122,22 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     fontSize: 23,
+  },
+  recTxt: {
+    color: 'white',
+    fontFamily: AppStyle.mainFont,
+    fontSize: 30,
+    marginTop: 10,
+  },
+  amountTxt: {
+    color: AppStyle.mainColor,
+    fontSize: 16,
+    marginTop: 40,
+    fontFamily: AppStyle.mainFontBold,
+  },
+  btcTxt: {
+    color: 'white',
+    fontSize: 38,
+    marginBottom: 15,
   },
 });

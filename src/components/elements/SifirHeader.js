@@ -6,7 +6,6 @@ import {Images, AppStyle, Constants} from '@common';
 export default class SirFirHeader extends Component {
   state = {curMenu: 0};
   tabNavigae = index => {
-    console.log(index);
     switch (index) {
       case 0:
       case 1:
@@ -24,7 +23,7 @@ export default class SirFirHeader extends Component {
     const {switchPage} = this.props;
 
     return (
-      <View>
+      <>
         <View style={styles.navbarStyle}>
           <View style={{flex: 1}}>
             <Image source={Images.icon_header} style={styles.logocontainer} />
@@ -52,7 +51,7 @@ export default class SirFirHeader extends Component {
           </View>
         </View>
         <Image source={Images.img_shadow} style={{height: 30}} />
-      </View>
+      </>
     );
   }
 }

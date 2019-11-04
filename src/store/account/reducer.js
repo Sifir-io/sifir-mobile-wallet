@@ -1,7 +1,7 @@
 import {Images} from '@common';
 
 const defaultState = {
-  data: [
+  txnData: [
     {
       key: '0',
       imgURL: Images.icon_send,
@@ -73,9 +73,13 @@ const defaultState = {
       s3: '0.51 BTC',
     },
   ],
+  walletName: 'GHASSANS',
+  walletType: 'WALLET',
+  balanceAmount: '14.51',
+  balanceType: 'SAT',
 };
 
-export default transactions = (state = defaultState, action) => {
+export default account = (state = defaultState, action) => {
   switch (action.type) {
     default:
       return state;

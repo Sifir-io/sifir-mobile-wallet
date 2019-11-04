@@ -36,24 +36,24 @@ export default class SifirGetAddrScreen extends Component {
     const TAP_WIDTH = Constants.SCREEN_HEIGHT - 495;
     const {showModal, scannedAddr} = this.state;
     return (
-      <View style={styles.mainscreen}>
-        <View style={styles.content}>
+      <View style={styles.mainView}>
+        <View style={styles.contentView}>
           <TouchableOpacity>
             <View
-              style={styles.backNavStyle}
+              style={styles.backNavView}
               onTouchEnd={() => navigate('Account')}>
-              <Image source={Images.icon_back} style={styles.image} />
-              <Image source={Images.icon_btc_cir} style={styles.image_btc} />
-              <Text style={styles.backTextStyle}>{Constants.STR_Send}</Text>
+              <Image source={Images.icon_back} style={styles.backImg} />
+              <Image source={Images.icon_btc_cir} style={styles.btcImg} />
+              <Text style={styles.backNavTxt}>{Constants.STR_Send}</Text>
             </View>
           </TouchableOpacity>
 
           <View style={styles.titleStyle}>
-            <Text style={styles.comment}>{Constants.STR_Enter_addr}</Text>
-            <Text style={styles.comment}>{Constants.STR_or_scan}</Text>
+            <Text style={styles.commentTxt}>{Constants.STR_Enter_addr}</Text>
+            <Text style={styles.commentTxt}>{Constants.SCAN_ORSCAN}</Text>
           </View>
 
-          <View style={styles.inputStyle}>
+          <View style={styles.inputView}>
             <TextInput
               placeholder={Constants.STR_Enter_Addr}
               placeholderTextColor="white"
@@ -67,10 +67,9 @@ export default class SifirGetAddrScreen extends Component {
           </View>
 
           <View
-            style={styles.tapStyle}
+            style={styles.qrScanView}
             onTouchEnd={() => {
               this.setState({showModal: true});
-              // navigate('QRScan');
             }}>
             <TouchableOpacity>
               <Image
@@ -86,13 +85,13 @@ export default class SifirGetAddrScreen extends Component {
           {scannedAddr != null && (
             <TouchableOpacity>
               <View
-                style={styles.btnStyle}
+                style={styles.continueBtnView}
                 onTouchEnd={() =>
                   navigate('BtcSendTxnInputAmount', {
                     receipient: this.state.scannedAddr,
                   })
                 }>
-                <Text style={styles.btnTxtStyle}>{Constants.STR_CONTINUE}</Text>
+                <Text style={styles.continueTxt}>{Constants.STR_CONTINUE}</Text>
                 <Image
                   source={Images.icon_up_blue}
                   style={{width: 20, height: 20, marginLeft: 20}}
@@ -101,8 +100,8 @@ export default class SifirGetAddrScreen extends Component {
             </TouchableOpacity>
           )}
           {scannedAddr == null && (
-            <View style={[styles.btnStyle, {opacity: 0.5}]}>
-              <Text style={styles.btnTxtStyle}>{Constants.STR_CONTINUE}</Text>
+            <View style={[styles.continueBtnView, {opacity: 0.5}]}>
+              <Text style={styles.continueTxt}>{Constants.STR_CONTINUE}</Text>
               <Image
                 source={Images.icon_up_blue}
                 style={{width: 20, height: 20, marginLeft: 20}}
@@ -122,48 +121,47 @@ export default class SifirGetAddrScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  mainscreen: {
+  mainView: {
     flex: 1,
     height: '100%',
     backgroundColor: AppStyle.backgroundColor,
     position: 'relative',
   },
-  content: {
+  contentView: {
     position: 'absolute',
     left: 0,
     top: 0,
   },
-  backNavStyle: {
+  backNavView: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginTop: 0,
     marginLeft: 13,
   },
-  backTextStyle: {
+  backNavTxt: {
     fontFamily: AppStyle.mainFontBold,
     fontSize: 15,
     color: 'white',
     marginLeft: 5,
   },
-  image: {
+  backImg: {
     width: 15,
     height: 15,
     marginLeft: 10,
     marginTop: 2,
   },
-  image_btc: {
+  btcImg: {
     width: 23,
     height: 23,
     marginLeft: 5,
   },
-
-  comment: {
+  commentTxt: {
     color: 'white',
     fontSize: 15,
     marginBottom: -5,
   },
-  btnStyle: {
+  continueBtnView: {
     height: 90,
     marginTop: 30,
     marginBottom: 30,
@@ -176,7 +174,7 @@ const styles = StyleSheet.create({
     marginLeft: 43,
     marginRight: 43,
   },
-  inputStyle: {
+  inputView: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 30,
@@ -188,7 +186,7 @@ const styles = StyleSheet.create({
     borderColor: AppStyle.mainColor,
     borderWidth: 2,
   },
-  tapStyle: {
+  qrScanView: {
     flex: 4,
     alignItems: 'center',
     justifyContent: 'center',
@@ -219,7 +217,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 20,
   },
-  btnTxtStyle: {
+  continueTxt: {
     color: AppStyle.mainColor,
     fontSize: 25,
     fontWeight: 'bold',

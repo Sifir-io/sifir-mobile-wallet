@@ -4,10 +4,11 @@ import {createStackNavigator} from 'react-navigation-stack';
 import {
   SifirGetAddrScreen,
   SifirBtcSendTxnInputAmountScreen,
-  SifirBtcTxnConfirmScreen,
-  SifirBtcSendTxnConfirmedScreen,
+  SifirBtcSendTxnConfirmScreen,
   SifirAccountsListScreen,
   SifirAccountScreen,
+  SifirBtcReceiveTxnScreen,
+  SifirBtcTxnConfirmedScreen,
 } from '@screens/wallet';
 
 const WalletStack = createStackNavigator(
@@ -36,14 +37,20 @@ const WalletStack = createStackNavigator(
         header: null,
       },
     },
-    BtcTxnConfirm: {
-      screen: SifirBtcTxnConfirmScreen,
+    BtcSendTxnConfirm: {
+      screen: SifirBtcSendTxnConfirmScreen,
       navigationOptions: {
         header: null,
       },
     },
-    BtcSendTxnConfirmed: {
-      screen: SifirBtcSendTxnConfirmedScreen,
+    BtcReceiveTxn: {
+      screen: SifirBtcReceiveTxnScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    BtcTxnConfirmed: {
+      screen: SifirBtcTxnConfirmedScreen,
       navigationOptions: {
         header: null,
       },

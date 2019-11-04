@@ -109,9 +109,9 @@ const styles = {
   },
 
   rectangle: {
-    height: Constants.rectDimensions,
-    width: Constants.rectDimensions,
-    borderWidth: Constants.rectBorderWidth,
+    height: Constants.RECT_DIMENSIONS,
+    width: Constants.RECT_DIMENSIONS,
+    borderWidth: Constants.RECT_BORDER_WIDTH,
     borderColor: AppStyle.mainColor,
     alignItems: 'center',
     justifyContent: 'center',
@@ -122,7 +122,7 @@ const styles = {
     flex: 1.4,
     height: SCREEN_WIDTH,
     width: SCREEN_WIDTH,
-    backgroundColor: Constants.overlayColor,
+    backgroundColor: Constants.OVERLAY_COLOR,
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 50,
@@ -132,20 +132,20 @@ const styles = {
     flex: 1,
     height: SCREEN_WIDTH,
     width: SCREEN_WIDTH,
-    backgroundColor: Constants.overlayColor,
+    backgroundColor: Constants.OVERLAY_COLOR,
     paddingBottom: SCREEN_WIDTH * 0.25,
   },
 
   leftAndRightOverlay: {
     height: SCREEN_WIDTH * 0.65,
     width: SCREEN_WIDTH,
-    backgroundColor: Constants.overlayColor,
+    backgroundColor: Constants.OVERLAY_COLOR,
   },
 
   scanBar: {
-    width: Constants.scanBarWidth,
-    height: Constants.scanBarHeight,
-    backgroundColor: Constants.scanBarColor,
+    width: Constants.SCAN_BAR_WIDTH,
+    height: Constants.SCAN_BAR_HEIGHT,
+    backgroundColor: Constants.SCAN_BAR_COLOR,
   },
 
   buttonBg: {

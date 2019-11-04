@@ -27,4 +27,11 @@ export default Images = {
   icon_back_trans: require('./../assets/images/back_trans.png'),
   icon_torch: require('./../assets/images/ic_flashlight.png'),
   icon_gallery: require('./../assets/images/ic_gallery.png'),
+  img_qrcode: require('./../assets/images/qrcode.png'),
+  icon_rectangle: require('./../assets/images/rec.png'),
+  icon_vertical_line: require('./../assets/images/vertical_line.png'),
+  icon_check_blue: require('./../assets/images/check_blue.png'),
+  icon_check_white: require('./../assets/images/check_white.png'),
+  icon_network: require('./../assets/images/network.png'),
+  icon_arrow_white: require('./../assets/images/arrow_white.png'),
 };

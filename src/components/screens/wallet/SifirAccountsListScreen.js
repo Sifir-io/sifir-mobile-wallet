@@ -14,17 +14,17 @@ class SifirAccountsListScreen extends Component {
   render() {
     const CARD_SIZE = Constants.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
-    const {accounts} = this.props;
+    const {accountsList} = this.props;
 
     return (
-      <View style={styles.mainscreen}>
-        <View style={styles.setting}>
+      <View style={styles.mainView}>
+        <View style={styles.settingView}>
           <TouchableOpacity>
-            <Image source={Images.icon_setting} style={styles.image} />
+            <Image source={Images.icon_setting} style={styles.settingImage} />
           </TouchableOpacity>
         </View>
-        <View style={styles.container}>
-          {accounts.map((item, i) => (
+        <View style={styles.girdView}>
+          {accountsList.map((item, i) => (
             <SifirAccountButton
               key={i}
               width={CARD_SIZE}
@@ -44,7 +44,7 @@ class SifirAccountsListScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  setting: {
+  settingView: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -52,20 +52,17 @@ const styles = StyleSheet.create({
     marginTop: -10,
     height: 100,
   },
-  empty: {
-    flex: 1,
-  },
-  image: {
+  settingImage: {
     width: 35,
     height: 35,
   },
-  mainscreen: {
+  mainView: {
     flex: 1,
     display: 'flex',
     width: '100%',
     backgroundColor: AppStyle.backgroundColor,
   },
-  container: {
+  girdView: {
     flex: 1,
     width: '100%',
     display: 'flex',
@@ -79,7 +76,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps(state) {
   return {
-    accounts: state.accounts.data,
+    accountsList: state.accountsList.data,
   };
 }
 
