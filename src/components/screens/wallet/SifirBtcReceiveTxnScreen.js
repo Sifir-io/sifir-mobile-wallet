@@ -11,7 +11,7 @@ import Overlay from 'react-native-modal-overlay';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 import SifirNotificationModal from '@elements/SifirNotificationModal';
 export default class SifirBtcReceiveTxnScreen extends Component {
   state = {

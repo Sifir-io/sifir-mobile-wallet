@@ -7,34 +7,34 @@ import {
   TouchableOpacity,
   Text,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 
 import {connect} from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
+import {getWallet} from '@store/states/wallet';
 
 class SifirAccountScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
-
+  componentDidMount() {
+    this.props.getWallet();
+  }
   state = {
     btnStatus: 0,
   };
 
   render() {
     const {navigate} = this.props.navigation;
-    const {
-      txnData,
-      walletName,
-      walletType,
-      balanceAmount,
-      balanceType,
-    } = this.props;
+
     const {btnStatus} = this.state;
     const BTN_WIDTH = Constants.SCREEN_WIDTH / 2;
 
+    const {data, error, loaded, loading} = this.props.wallet;
+    const {txnData, walletName, walletType, balanceAmount, balanceType} = data;
     return (
       <View style={styles.mainView}>
         <View style={{flex: 0.7}}>
@@ -55,19 +55,35 @@ class SifirAccountScreen extends Component {
             style={styles.gradient}>
             <View>
               <Image source={Images.icon_bitcoin} style={styles.boxImage} />
-              <Text style={styles.boxTxt}>{walletName}</Text>
-              <Text style={styles.boxTxt}>{walletType}</Text>
+              {loading === true && (
+                <ActivityIndicator size="large" color={AppStyle.mainColor} />
+              )}
+              {loaded === true && loading === false && (
+                <>
+                  <Text style={styles.boxTxt}>{walletName}</Text>
+                  <Text style={styles.boxTxt}>{walletType}</Text>
+                </>
+              )}
             </View>
           </LinearGradient>
           <View
             height={BTN_WIDTH - 30}
             width={BTN_WIDTH - 30}
             style={styles.balanceView}>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={styles.balAmountTxt}>{balanceAmount}</Text>
-              <Text style={styles.satTxt}>{balanceType}</Text>
-            </View>
-            <Text style={styles.balanceTxt}>{Constants.STR_Cur_Balance}</Text>
+            {loading === true && (
+              <ActivityIndicator size="large" color={AppStyle.mainColor} />
+            )}
+            {loaded === true && loading === false && (
+              <>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.balAmountTxt}>{balanceAmount}</Text>
+                  <Text style={styles.satTxt}>{balanceType}</Text>
+                </View>
+                <Text style={styles.balanceTxt}>
+                  {Constants.STR_Cur_Balance}
+                </Text>
+              </>
+            )}
           </View>
         </View>
 
@@ -126,45 +142,53 @@ class SifirAccountScreen extends Component {
           </TouchableOpacity>
         </View>
         <View style={styles.txnListView}>
-          <FlatList
-            data={txnData}
-            width={BTN_WIDTH * 2 - 50}
-            style={{height: 200}}
-            renderItem={({item}) => (
-              <TouchableOpacity>
-                <View style={styles.listItme}>
-                  <Image source={item.imgURL} style={{width: 30, height: 30}} />
-                  <View style={{flex: 5, marginLeft: 20}}>
-                    <Text style={{color: AppStyle.mainColor}}>{item.s1}</Text>
+          {loading === true && (
+            <ActivityIndicator size="large" color={AppStyle.mainColor} />
+          )}
+          {loaded === true && loading === false && (
+            <FlatList
+              data={txnData}
+              width={BTN_WIDTH * 2 - 50}
+              style={{height: 200}}
+              renderItem={({item}) => (
+                <TouchableOpacity>
+                  <View style={styles.listItme}>
+                    <Image
+                      source={Images[item.imgURL]}
+                      style={{width: 30, height: 30}}
+                    />
+                    <View style={{flex: 5, marginLeft: 20}}>
+                      <Text style={{color: AppStyle.mainColor}}>{item.s1}</Text>
+                      <Text
+                        style={{color: AppStyle.mainColor, fontWeight: 'bold'}}>
+                        {item.s2}
+                      </Text>
+                    </View>
                     <Text
-                      style={{color: AppStyle.mainColor, fontWeight: 'bold'}}>
-                      {item.s2}
+                      style={{
+                        flex: 2,
+                        color: AppStyle.mainColor,
+                      }}>
+                      {item.s3}
                     </Text>
                   </View>
-                  <Text
-                    style={{
-                      flex: 2,
-                      color: AppStyle.mainColor,
-                    }}>
-                    {item.s3}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            )}
-          />
+                </TouchableOpacity>
+              )}
+            />
+          )}
         </View>
       </View>
     );
   }
 }
 
-function mapStateToProps(state) {
-  return state.account;
-}
+const mapStateToProps = state => {
+  return {
+    wallet: state.wallet,
+  };
+};
 
-function mapDispatchToProps(dispatch) {
-  return {};
-}
+const mapDispatchToProps = {getWallet};
 
 export default connect(
   mapStateToProps,
@@ -210,7 +234,7 @@ const styles = StyleSheet.create({
   boxTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 27,
+    fontSize: 25,
     marginLeft: 13,
     marginBottom: -10,
   },

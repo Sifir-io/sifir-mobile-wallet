@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 
 export default class SirFirHeader extends Component {
   state = {curMenu: 0};

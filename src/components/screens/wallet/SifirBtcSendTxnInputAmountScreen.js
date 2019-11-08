@@ -7,7 +7,7 @@ import {
   TextInput,
 } from 'react-native';
 
-import {AppStyle, Constants} from '@common';
+import {AppStyle, Constants} from '@common/index';
 
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
   state = {

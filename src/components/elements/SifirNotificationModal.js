@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-import {Images, Constants} from '@common';
+import {Images, Constants} from '@common/index';
 import Overlay from 'react-native-modal-overlay';
 
 export default class SifirNotificationModal extends Component {

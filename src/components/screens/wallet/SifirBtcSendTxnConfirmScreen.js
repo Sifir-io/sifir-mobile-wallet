@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
-import AppStyle from '../../../common/AppStyle';
+import AppStyle from '@common/AppStyle';
 
 export default class ShopMainScreen extends Component {
   render() {

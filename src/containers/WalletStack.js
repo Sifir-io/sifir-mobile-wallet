@@ -9,7 +9,7 @@ import {
   SifirAccountScreen,
   SifirBtcReceiveTxnScreen,
   SifirBtcTxnConfirmedScreen,
-} from '@screens/wallet';
+} from '@screens/wallet/index';
 
 const WalletStack = createStackNavigator(
   {

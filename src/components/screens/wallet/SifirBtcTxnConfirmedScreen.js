@@ -2,7 +2,7 @@ import React, {Component, PureComponent} from 'react';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 // import {connect} from 'react-redux';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 
 export default class SifirBtcTxnConfirmedScreen extends Component {
   state = {

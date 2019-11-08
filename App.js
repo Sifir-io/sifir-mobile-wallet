@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
-import Root from './src/containers/index';
 import {Provider} from 'react-redux';
-import initStore from './src/store/index';
-
-const store = initStore();
+import Root from '@containers/index';
+import store from '@store';
 
 export default class SifirApp extends Component {
   render() {

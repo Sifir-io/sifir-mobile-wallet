@@ -2,7 +2,7 @@ import React from 'react';
 import {createAppContainer} from 'react-navigation';
 import {View} from 'react-native';
 
-import {AppStyle} from '@common';
+import {AppStyle} from '@common/index';
 import SifirHeader from '@elements/SifirHeader';
 import WalletStack from './WalletStack';
 import ChatStack from './ChatStack';

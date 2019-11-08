@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import {View, TouchableOpacity, Image} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import * as Animatable from 'react-native-animatable';
-import {AppStyle, Images, Constants} from '@common';
+import {AppStyle, Images, Constants} from '@common/index';
 import {RNCamera} from 'react-native-camera';
 const SCREEN_HEIGHT = Constants.SCREEN_HEIGHT;
 const SCREEN_WIDTH = Constants.SCREEN_WIDTH;

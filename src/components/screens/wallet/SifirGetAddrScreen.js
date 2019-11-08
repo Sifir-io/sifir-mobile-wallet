@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 // import {connect} from 'react-redux';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 
 export default class SifirGetAddrScreen extends Component {

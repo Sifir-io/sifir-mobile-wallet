@@ -1,20 +1,30 @@
 import React, {Component} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import {connect} from 'react-redux';
 
-import SifirAccountButton from '@elements/SifirAccountButton';
+import SifirWalletButton from '@elements/SifirWalletButton';
+import {getWalletList} from '@store/states/walletList';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 
 class SifirAccountsListScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
+  componentDidMount() {
+    this.props.getWalletList();
+  }
 
   render() {
     const CARD_SIZE = Constants.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
-    const {accountsList} = this.props;
+    const {data, error, loaded, loading} = this.props.walletList;
 
     return (
       <View style={styles.mainView}>
@@ -23,20 +33,27 @@ class SifirAccountsListScreen extends Component {
             <Image source={Images.icon_setting} style={styles.settingImage} />
           </TouchableOpacity>
         </View>
+        {loading === true && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color={AppStyle.mainColor} />
+          </View>
+        )}
         <View style={styles.girdView}>
-          {accountsList.map((item, i) => (
-            <SifirAccountButton
-              key={i}
-              width={CARD_SIZE}
-              height={CARD_SIZE * 1.1}
-              iconURL={item[0]}
-              iconClickedURL={item[1]}
-              str1={item[2]}
-              str2={item[3]}
-              navigatePage={item[4]}
-              navigate={navigate}
-            />
-          ))}
+          {loaded === true &&
+            loading === false &&
+            data.map((item, i) => (
+              <SifirWalletButton
+                key={i}
+                width={CARD_SIZE}
+                height={CARD_SIZE * 1.1}
+                iconURL={Images[item[0]]}
+                iconClickedURL={Images[item[1]]}
+                str1={item[2]}
+                str2={item[3]}
+                navigatePage={item[4]}
+                navigate={navigate}
+              />
+            ))}
         </View>
       </View>
     );
@@ -72,17 +89,22 @@ const styles = StyleSheet.create({
     padding: 30,
     justifyContent: 'space-between',
   },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
-function mapStateToProps(state) {
+const mapStateToProps = state => {
   return {
-    accountsList: state.accountsList.data,
+    walletList: state.walletList,
   };
-}
+};
 
-function mapDispatchToProps(dispatch) {
-  return {};
-}
+const mapDispatchToProps = {
+  getWalletList,
+};
 
 export default connect(
   mapStateToProps,

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Slider from 'react-native-slider';
 
-import {Images, AppStyle, Constants} from '@common';
+import {Images, AppStyle, Constants} from '@common/index';
 
 export default class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};

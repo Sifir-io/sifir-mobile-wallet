@@ -1,11 +1,9 @@
-import reducer from './reducer';
-import {createStore, applyMiddleware} from 'redux';
+import * as reducers from './states';
+import {createStore, applyMiddleware, combineReducers} from 'redux';
+import thunkMiddleware from 'redux-thunk';
 
-export default function initStore() {
-  const store = createStore(
-    reducer,
-    applyMiddleware(),
-    // Middleware will not be applied to this sample.
-  );
-  return store;
-}
+const rootReducer = (state, action) => {
+  return combineReducers(reducers)(state, action);
+};
+
+export default createStore(rootReducer, applyMiddleware(thunkMiddleware));
