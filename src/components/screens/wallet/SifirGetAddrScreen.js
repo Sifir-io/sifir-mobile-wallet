@@ -8,33 +8,48 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-// import {connect} from 'react-redux';
 
-import {Images, AppStyle, Constants} from '@common/index';
+import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 
 export default class SifirGetAddrScreen extends Component {
-  //   constructor(props, context) {
-  //     super(props, context);
-  //   }
   state = {
     btnStatus: 0,
     showModal: false,
     torchOn: false,
-    scannedAddr: null,
+    address: null,
+    txnInfo: this.props.navigation.getParam('txnInfo'),
+    addrFontSize: 22,
   };
 
-  closeModal = (available, data) => {
-    if (available) {
-      this.setState({scannedAddr: data});
+  closeModal = data => {
+    this.setState({
+      address: data,
+      showModal: false,
+      addrFontSize: (1.2 * C.SCREEN_WIDTH) / data.length,
+    });
+  };
+
+  continue = () => {
+    let {txnInfo} = this.state;
+    txnInfo.address = this.state.address;
+    this.props.navigation.navigate('BtcSendTxnInputAmount', {txnInfo});
+  };
+
+  inputAddr = address => {
+    if (address.length * 22 < C.SCREEN_WIDTH) {
+      this.setState({address, addrFontSize: 22});
+    } else {
+      this.setState({
+        address,
+        addrFontSize: (1.2 * C.SCREEN_WIDTH) / address.length,
+      });
     }
-    this.setState({showModal: false});
   };
 
   render() {
     const {navigate} = this.props.navigation;
-    const TAP_WIDTH = Constants.SCREEN_HEIGHT - 495;
-    const {showModal, scannedAddr} = this.state;
+    const {showModal, address, addrFontSize} = this.state;
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
@@ -44,26 +59,23 @@ export default class SifirGetAddrScreen extends Component {
               onTouchEnd={() => navigate('Account')}>
               <Image source={Images.icon_back} style={styles.backImg} />
               <Image source={Images.icon_btc_cir} style={styles.btcImg} />
-              <Text style={styles.backNavTxt}>{Constants.STR_Send}</Text>
+              <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
             </View>
           </TouchableOpacity>
 
           <View style={styles.titleStyle}>
-            <Text style={styles.commentTxt}>{Constants.STR_Enter_addr}</Text>
-            <Text style={styles.commentTxt}>{Constants.SCAN_ORSCAN}</Text>
+            <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
+            <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
           </View>
 
           <View style={styles.inputView}>
             <TextInput
-              placeholder={Constants.STR_Enter_Addr}
+              placeholder={C.STR_Enter_Addr}
               placeholderTextColor="white"
-              style={styles.inputTxtStyle}
-              value={scannedAddr}
-              onChangeText={scannedAddr => this.setState({scannedAddr})}
+              style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
+              value={address}
+              onChangeText={address => this.inputAddr(address)}
             />
-            <TouchableOpacity>
-              <Image source={Images.icon_setting} style={styles.setImgStyle} />
-            </TouchableOpacity>
           </View>
 
           <View
@@ -72,26 +84,16 @@ export default class SifirGetAddrScreen extends Component {
               this.setState({showModal: true});
             }}>
             <TouchableOpacity>
-              <Image
-                source={Images.img_camera}
-                style={{
-                  height: TAP_WIDTH,
-                  width: TAP_WIDTH * 1.06,
-                }}
-              />
+              <Image source={Images.img_camera} style={styles.cameraImg} />
             </TouchableOpacity>
           </View>
 
-          {scannedAddr != null && (
+          {address != null && (
             <TouchableOpacity>
               <View
                 style={styles.continueBtnView}
-                onTouchEnd={() =>
-                  navigate('BtcSendTxnInputAmount', {
-                    receipient: this.state.scannedAddr,
-                  })
-                }>
-                <Text style={styles.continueTxt}>{Constants.STR_CONTINUE}</Text>
+                onTouchEnd={() => this.continue()}>
+                <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
                 <Image
                   source={Images.icon_up_blue}
                   style={{width: 20, height: 20, marginLeft: 20}}
@@ -99,9 +101,9 @@ export default class SifirGetAddrScreen extends Component {
               </View>
             </TouchableOpacity>
           )}
-          {scannedAddr == null && (
+          {address == null && (
             <View style={[styles.continueBtnView, {opacity: 0.5}]}>
-              <Text style={styles.continueTxt}>{Constants.STR_CONTINUE}</Text>
+              <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
               <Image
                 source={Images.icon_up_blue}
                 style={{width: 20, height: 20, marginLeft: 20}}
@@ -179,8 +181,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
     marginTop: 10,
-    width: Constants.SCREEN_WIDTH * 0.8,
-    marginLeft: Constants.SCREEN_WIDTH * 0.1,
+    width: C.SCREEN_WIDTH * 0.8,
+    marginLeft: C.SCREEN_WIDTH * 0.1,
     height: 70,
     borderRadius: 10,
     borderColor: AppStyle.mainColor,
@@ -190,26 +192,17 @@ const styles = StyleSheet.create({
     flex: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    width: Constants.SCREEN_WIDTH,
+    width: C.SCREEN_WIDTH,
     padding: 0,
     margin: 0,
   },
   inputTxtStyle: {
     flex: 1,
     marginLeft: 10,
-    fontSize: 22,
     color: 'white',
     textAlign: 'left',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-  },
-  setImgStyle: {
-    flex: 1,
-    height: 10,
-    width: 32,
-    marginTop: 18,
-    marginBottom: 18,
-    marginRight: 10,
   },
   titleStyle: {
     flex: 0.7,
@@ -221,5 +214,9 @@ const styles = StyleSheet.create({
     color: AppStyle.mainColor,
     fontSize: 25,
     fontWeight: 'bold',
+  },
+  cameraImg: {
+    height: C.SCREEN_HEIGHT - 495,
+    width: (C.SCREEN_HEIGHT - 495) * 1.06,
   },
 });

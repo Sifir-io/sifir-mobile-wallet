@@ -13,16 +13,14 @@ export default class SifirWalletButton extends Component {
   state = {isClicked: false};
 
   render() {
+    const {width, height, navigate} = this.props;
     const {
-      width,
-      height,
       iconURL,
       iconClickedURL,
-      str1,
-      str2,
-      navigate,
-      navigatePage,
-    } = this.props;
+      label,
+      desc,
+      pageURL,
+    } = this.props.walletInfo;
     const {isClicked} = this.state;
 
     return (
@@ -32,7 +30,7 @@ export default class SifirWalletButton extends Component {
         }}
         onTouchEnd={() => {
           this.setState({isClicked: false});
-          navigate(navigatePage);
+          navigate(pageURL, {walletInfo: this.props.walletInfo});
         }}>
         <TouchableWithoutFeedback
           onPressIn={() => this.setState({isClicked: true})}
@@ -51,7 +49,7 @@ export default class SifirWalletButton extends Component {
                   ? styles.activeCardTxtStyle
                   : styles.cardTxtStyle
               }>
-              {str1}
+              {label}
             </Text>
             <Text
               style={
@@ -59,7 +57,7 @@ export default class SifirWalletButton extends Component {
                   ? styles.activeCardTxtStyle
                   : styles.cardTxtStyle
               }>
-              {str2}
+              {desc}
             </Text>
           </View>
         </TouchableWithoutFeedback>

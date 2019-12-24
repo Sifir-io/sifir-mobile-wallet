@@ -7,70 +7,64 @@ import {
   TextInput,
 } from 'react-native';
 
-import {AppStyle, Constants} from '@common/index';
+import {AppStyle, C} from '@common/index';
 
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
   state = {
-    receipient: this.props.navigation.getParam('receipient'),
     btnStatus: 0,
     amount: null,
+    txnInfo: this.props.navigation.getParam('txnInfo'),
+  };
+
+  confirm = () => {
+    let {txnInfo} = this.state;
+    txnInfo.amount = this.state.amount;
+    this.props.navigation.navigate('BtcSendTxnConfirm', {txnInfo});
   };
 
   render() {
+    const {address} = this.state.txnInfo;
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
           <View style={{alignItems: 'center', flex: 5}}>
-            <Text style={styles.recLblTxt}>
-              {Constants.STR_PAYMENT_RECEIPIENT}
-            </Text>
-            <Text style={styles.recTxt}>{this.state.receipient}</Text>
-            <Text style={styles.amountTxt}>{Constants.STR_PAYMENT_AMOUNT}</Text>
+            <Text style={styles.recLblTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
+            <Text style={styles.recTxt}>{address}</Text>
+            <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
           </View>
           <View style={{marginTop: 15}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <TextInput
                 style={styles.inputStyle}
-                keyboardType="number-pad"
+                keyboardType="decimal-pad"
                 onChangeText={amount => this.setState({amount: amount})}
               />
-              <Text style={styles.btcTxt}>{Constants.STR_BTC}</Text>
+              <Text style={styles.btcTxt}>{C.STR_BTC}</Text>
             </View>
-            <View style={styles.lineStyle}></View>
+            <View style={styles.lineStyle} />
           </View>
           {this.state.amount !== null && (
             <TouchableOpacity
               style={{
-                marginTop: Constants.SCREEN_HEIGHT - 520,
+                marginTop: C.SCREEN_HEIGHT - 520,
               }}
               shadowColor="black"
               shadowOffset="30">
-              <View
-                style={styles.btnStyle}
-                onTouchEnd={() =>
-                  this.props.navigation.navigate('BtcSendTxnConfirm', {
-                    receipient: this.state.receipient,
-                    amount: this.state.amount,
-                  })
-                }>
-                <Text style={styles.confirmTxtStyle}>
-                  {Constants.STR_CONFIRM}
-                </Text>
+              <View style={styles.btnStyle} onTouchEnd={() => this.confirm()}>
+                <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
               </View>
             </TouchableOpacity>
           )}
           {(this.state.amount === null ||
-            parseInt(this.state.amount, 10) == 0) && (
+            parseInt(this.state.amount, 10) === 0) && (
             <View
               style={[
                 styles.btnStyle,
-                {marginTop: Constants.SCREEN_HEIGHT - 520, opacity: 0.5},
+                {marginTop: C.SCREEN_HEIGHT - 520, opacity: 0.5},
               ]}
               shadowColor="black"
               shadowOffset="30">
-              <Text style={styles.confirmTxtStyle}>
-                {Constants.STR_CONFIRM}
-              </Text>
+              <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
             </View>
           )}
         </View>
@@ -94,7 +88,7 @@ const styles = StyleSheet.create({
     top: 0,
   },
   btnStyle: {
-    width: Constants.SCREEN_WIDTH * 0.6,
+    width: C.SCREEN_WIDTH * 0.6,
     height: 60,
     backgroundColor: '#53cbc8',
     alignItems: 'center',
@@ -115,7 +109,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     color: 'white',
     fontSize: 50,
-    width: Constants.SCREEN_WIDTH * 0.55,
+    width: C.SCREEN_WIDTH * 0.55,
     fontFamily: AppStyle.mainFont,
   },
   confirmTxtStyle: {
@@ -128,6 +122,8 @@ const styles = StyleSheet.create({
     fontFamily: AppStyle.mainFont,
     fontSize: 30,
     marginTop: 10,
+    marginHorizontal: 50,
+    textAlign: 'center',
   },
   amountTxt: {
     color: AppStyle.mainColor,

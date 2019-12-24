@@ -9,6 +9,7 @@ import {
   SifirAccountScreen,
   SifirBtcReceiveTxnScreen,
   SifirBtcTxnConfirmedScreen,
+  SifrAddWalletScreen,
 } from '@screens/wallet/index';
 
 const WalletStack = createStackNavigator(
@@ -51,6 +52,12 @@ const WalletStack = createStackNavigator(
     },
     BtcTxnConfirmed: {
       screen: SifirBtcTxnConfirmedScreen,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    AddWallet: {
+      screen: SifrAddWalletScreen,
       navigationOptions: {
         header: null,
       },

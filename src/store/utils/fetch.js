@@ -1,3 +1,6 @@
+/**
+ * FOR TESTING ONLY
+ */
 import axios from 'axios';
 import {SIFIR_API_HOST} from './constants';
 

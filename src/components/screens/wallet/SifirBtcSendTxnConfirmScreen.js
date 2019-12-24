@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
-import {Images, AppStyle, Constants} from '@common/index';
+import {Images, AppStyle, C} from '@common/index';
 
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
@@ -11,11 +11,15 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
   state = {
     btnStatus: 0,
     modalVisible: false,
-    receipient: this.props.navigation.getParam('receipient'),
-    amount: this.props.navigation.getParam('amount'),
+    txnInfo: this.props.navigation.getParam('txnInfo'),
   };
 
   render() {
+    const {address, amount, feeSettingEnabled} = this.state.txnInfo;
+    const amountFontSize = (C.vw * 100) / amount.length;
+    const btcUnitFontSize = amountFontSize * 0.6;
+    const recTxtFontSize = (C.vw * 250) / address.length;
+
     return (
       <View style={styles.mainView}>
         <View
@@ -30,11 +34,11 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
             alignItems: 'center',
             marginTop: 15,
           }}>
-          <Text style={styles.recTxt}>{Constants.STR_PAYMENT_RECEIPIENT}</Text>
-          <Text style={styles.addrTxt}>{this.state.receipient}</Text>
-          <Text style={styles.amountLblTxt}>
-            {Constants.STR_PAYMENT_AMOUNT}
+          <Text style={styles.recTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
+          <Text style={[styles.addrTxt, {fontSize: recTxtFontSize}]}>
+            {address}
           </Text>
+          <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
         </View>
         <View style={styles.valueTxt}>
           <View
@@ -42,38 +46,39 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
               flexDirection: 'row',
               alignItems: 'flex-end',
             }}>
-            <Text style={styles.bigTxt}>
-              {this.props.navigation.getParam('amount').substring(0, 4)}
+            <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
+              {amount}
             </Text>
             <Text
               style={{
                 color: 'white',
-                fontSize: 38,
-                marginBottom: 15,
+                fontSize: btcUnitFontSize,
+                marginBottom: 5,
               }}>
-              {Constants.STR_BTC}
+              {C.STR_BTC}
             </Text>
           </View>
-          <View style={styles.lineView}></View>
+          <View style={styles.lineView} />
         </View>
-        <View style={styles.setArea}>
-          <Text style={styles.setTxt}>{Constants.STR_FEES}</Text>
-          <Text
-            style={{
-              fontSize: 23,
-              color: 'white',
-              marginLeft: 10,
-              marginRight: 10,
-            }}>
-            {this.state.amount.substring(0, 4)} BTC
-          </Text>
-          <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
-        </View>
+        {feeSettingEnabled && (
+          <View style={styles.setArea}>
+            <Text style={styles.setTxt}>{C.STR_FEES}</Text>
+            <Text
+              style={{
+                fontSize: 23,
+                color: 'white',
+                marginLeft: 10,
+                marginRight: 10,
+              }}>
+              {amount} BTC
+            </Text>
+            <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
+          </View>
+        )}
         <TouchableOpacity
           onLongPress={() =>
             this.props.navigation.navigate('BtcTxnConfirmed', {
-              address: this.state.receipient,
-              amount: this.state.amount,
+              txnInfo: this.state.txnInfo,
               isSendTxn: true,
             })
           }
@@ -82,7 +87,7 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
             alignItems: 'center',
           }}>
           <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
-            <Text style={styles.sendBtnTxt}>{Constants.STR_SEND}</Text>
+            <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
             <Image
               source={Images.icon_up_dark}
               style={{width: 20, height: 20}}
@@ -100,14 +105,17 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
           }}
           childrenWrapperStyle={styles.dlgChild}
           animationDuration={500}>
-          {hideModal => <SifirSettingModal hideModal={hideModal} />}
+          {hideModal => (
+            <SifirSettingModal
+              hideModal={hideModal}
+              feeEnabled={feeSettingEnabled}
+            />
+          )}
         </Overlay>
       </View>
     );
   }
 }
-
-const vh = Constants.SCREEN_HEIGHT / 100;
 
 const styles = StyleSheet.create({
   mainView: {
@@ -129,14 +137,14 @@ const styles = StyleSheet.create({
     height: 30,
   },
   sendBtn: {
-    width: Constants.SCREEN_WIDTH * 0.7,
+    width: C.SCREEN_WIDTH * 0.7,
     flexDirection: 'row',
-    height: 12 * vh,
+    height: 12 * C.vh,
     backgroundColor: '#53cbc8',
     alignItems: 'center',
     borderRadius: 10,
     justifyContent: 'center',
-    marginBottom: 5 * vh,
+    marginBottom: 5 * C.vh,
   },
   sendBtnTxt: {
     color: AppStyle.backgroundColor,
@@ -158,23 +166,23 @@ const styles = StyleSheet.create({
   },
   bigTxt: {
     color: 'white',
-    fontSize: 12 * vh,
-    width: Constants.SCREEN_WIDTH * 0.55,
+    width: C.SCREEN_WIDTH * 0.55,
     textAlign: 'center',
   },
   recTxt: {
     color: AppStyle.mainColor,
-    fontSize: 16,
     fontFamily: AppStyle.mainFontBold,
+    fontSize: 16,
   },
   addrTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 5 * vh,
     marginTop: 10,
+    marginHorizontal: 50,
+    textAlign: 'center',
   },
   waitTxt: {
-    fontSize: 3 * vh,
+    fontSize: 3 * C.vh,
     color: AppStyle.mainColor,
     marginLeft: 10,
   },
@@ -191,11 +199,11 @@ const styles = StyleSheet.create({
   amountLblTxt: {
     color: AppStyle.mainColor,
     fontSize: 16,
-    marginTop: 3 * vh,
+    marginTop: 3 * C.vh,
     fontFamily: AppStyle.mainFontBold,
   },
   dlgChild: {
-    marginTop: 12 * vh,
+    marginTop: 12 * C.vh,
     backgroundColor: 'transparent',
   },
 });

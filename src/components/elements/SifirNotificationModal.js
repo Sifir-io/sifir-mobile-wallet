@@ -1,23 +1,20 @@
 import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-import {Images, Constants} from '@common/index';
+import {Images, C} from '@common/index';
 import Overlay from 'react-native-modal-overlay';
 
 export default class SifirNotificationModal extends Component {
   render() {
     return (
-      <>
+      <View style={styles.mainView}>
         <Overlay
           visible={this.props.visible}
           closeOnTouchOutside
           onClose={this.props.onClose}
           animationType="zoomIn"
           containerStyle={styles.container}
-          childrenWrapperStyle={{
-            marginTop: this.props.marginTop,
-            backgroundColor: 'transparent',
-          }}
+          childrenWrapperStyle={styles.childrenWrapperStyle}
           animationDuration={500}>
           {hideModal => (
             <View style={styles.receivedModal}>
@@ -38,17 +35,22 @@ export default class SifirNotificationModal extends Component {
             </View>
           )}
         </Overlay>
-      </>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  mainView: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   receivedModal: {
     backgroundColor: '#39b54a',
     borderRadius: 10,
     flexDirection: 'row',
-    width: Constants.SCREEN_WIDTH * 0.9,
+    width: C.SCREEN_WIDTH * 0.9,
     height: 70,
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -62,5 +64,9 @@ const styles = StyleSheet.create({
   btnImg: {width: 40, height: 40, marginRight: 15},
   container: {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  childrenWrapperStyle: {
+    marginTop: 100,
+    backgroundColor: 'transparent',
   },
 });

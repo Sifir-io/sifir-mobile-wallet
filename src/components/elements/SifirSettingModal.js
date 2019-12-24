@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Slider from 'react-native-slider';
 
-import {Images, AppStyle, Constants} from '@common/index';
+import {Images, AppStyle, C} from '@common/index';
 
 export default class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
@@ -25,7 +25,7 @@ export default class SifirSettingModal extends Component {
             </TouchableOpacity>
           </View>
           <View style={styles.bodyStyle}>
-            {this.state.curMenu == 1 && (
+            {this.state.curMenu === 1 && (
               <View
                 style={{
                   flex: 1,
@@ -47,7 +47,7 @@ export default class SifirSettingModal extends Component {
                         fontSize: 18,
                         marginLeft: 5,
                       }}>
-                      {Constants.STR_SET_FEES}
+                      {C.STR_SET_FEES}
                     </Text>
                   </View>
                   <View style={styles.feeTxtStyle}>
@@ -86,12 +86,12 @@ export default class SifirSettingModal extends Component {
                     width: '100%',
                     justifyContent: 'space-between',
                   }}>
-                  <Text style={{fontSize: 20}}>{Constants.STR_Wait}</Text>
+                  <Text style={{fontSize: 20}}>{C.STR_Wait}</Text>
                   <Text style={{fontSize: 20, color: 'blue'}}>4 Hours</Text>
                 </View>
               </View>
             )}
-            {this.state.curMenu == 0 && (
+            {this.state.curMenu === 0 && (
               <View style={{flex: 1}}>
                 <TouchableOpacity style={{flex: 1}}>
                   <View style={styles.rowStyle}>
@@ -99,22 +99,23 @@ export default class SifirSettingModal extends Component {
                       source={Images.icon_funds}
                       style={{width: 33, height: 30}}
                     />
-                    <Text style={styles.textStyle}>
-                      {Constants.STR_Manage_Fund}
-                    </Text>
+                    <Text style={styles.textStyle}>{C.STR_Manage_Fund}</Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={{flex: 1}}>
-                  <View
-                    style={styles.rowStyle}
-                    onTouchEnd={() => this.setState({curMenu: 1})}>
-                    <Image
-                      source={Images.icon_clock}
-                      style={{width: 30, height: 30}}
-                    />
-                    <Text style={styles.textStyle}>SET FEES</Text>
-                  </View>
-                </TouchableOpacity>
+
+                {this.props.feeSettingEnabled && (
+                  <TouchableOpacity style={{flex: 1}}>
+                    <View
+                      style={styles.rowStyle}
+                      onTouchEnd={() => this.setState({curMenu: 1})}>
+                      <Image
+                        source={Images.icon_clock}
+                        style={{width: 30, height: 30}}
+                      />
+                      <Text style={styles.textStyle}>SET FEES</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity style={{flex: 1}}>
                   <View
                     style={{
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingBottom: 10,
     height: 160,
-    width: Constants.SCREEN_WIDTH * 0.85,
+    width: C.SCREEN_WIDTH * 0.85,
   },
   rowStyle: {
     flex: 1,

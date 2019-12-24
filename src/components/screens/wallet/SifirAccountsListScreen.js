@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
   View,
   Image,
@@ -7,25 +7,25 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
-
 import SifirWalletButton from '@elements/SifirWalletButton';
-import {getWalletList} from '@store/states/walletList';
+import {getBtcWalletList} from '@actions/btcwallet';
+import {Images, AppStyle, C} from '@common/index';
 
-import {Images, AppStyle, Constants} from '@common/index';
-
-class SifirAccountsListScreen extends Component {
+class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
   }
+
   componentDidMount() {
-    this.props.getWalletList();
+    this.props.getBtcWalletList();
   }
 
   render() {
-    const CARD_SIZE = Constants.SCREEN_WIDTH / 2 - 40;
+    const CARD_SIZE = C.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
-    const {data, error, loaded, loading} = this.props.walletList;
-
+    const {
+      btcWallet: {btcWalletList, loaded, loading},
+    } = this.props;
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
@@ -41,16 +41,12 @@ class SifirAccountsListScreen extends Component {
         <View style={styles.girdView}>
           {loaded === true &&
             loading === false &&
-            data.map((item, i) => (
+            btcWalletList.map((wallet, i) => (
               <SifirWalletButton
                 key={i}
                 width={CARD_SIZE}
                 height={CARD_SIZE * 1.1}
-                iconURL={Images[item[0]]}
-                iconClickedURL={Images[item[1]]}
-                str1={item[2]}
-                str2={item[3]}
-                navigatePage={item[4]}
+                walletInfo={wallet}
                 navigate={navigate}
               />
             ))}
@@ -66,7 +62,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     padding: 30,
-    marginTop: -10,
+    marginTop: 10,
     height: 100,
   },
   settingImage: {
@@ -98,13 +94,11 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    walletList: state.walletList,
+    btcWallet: state.btcWallet,
   };
 };
 
-const mapDispatchToProps = {
-  getWalletList,
-};
+const mapDispatchToProps = {getBtcWalletList};
 
 export default connect(
   mapStateToProps,

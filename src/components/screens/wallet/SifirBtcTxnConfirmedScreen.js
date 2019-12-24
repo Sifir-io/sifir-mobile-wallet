@@ -1,51 +1,92 @@
 import React, {Component, PureComponent} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
-// import {connect} from 'react-redux';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+} from 'react-native';
+import {sendBitcoin} from '@actions/btcwallet';
+import {connect} from 'react-redux';
 
-import {Images, AppStyle, Constants} from '@common/index';
+import {Images, AppStyle, C} from '@common/index';
 
-export default class SifirBtcTxnConfirmedScreen extends Component {
+class SifirBtcTxnConfirmedScreen extends Component {
   state = {
     isSendTxn: this.props.navigation.getParam('isSendTxn'),
-    address: this.props.navigation.getParam('address'),
-    amount: this.props.navigation.getParam('amount'),
+    txnInfo: this.props.navigation.getParam('txnInfo'),
   };
-  render() {
-    const {isSendTxn, amount, address} = this.state;
 
+  done = () => {
+    this.props.navigation.navigate('Account', {walletInfo: this.state.txnInfo});
+  };
+
+  componentDidMount() {
+    this.props.sendBitcoin(this.state.txnInfo);
+  }
+
+  render() {
+    const {isSendTxn, txnInfo} = this.state;
+    const {amount, address} = txnInfo;
+    const {loaded, loading, btcSendResult} = this.props.btcWallet;
+    const addrTxtFontSize = (C.vw * 250) / address.length;
     return (
       <View style={styles.mainView}>
-        <View style={{alignItems: 'center', flex: 3}}>
-          <Image source={Images.icon_done} style={styles.checkImg} />
-          <Text style={styles.paymentTxt}>{Constants.STR_PAYMENT}</Text>
-          <Text style={styles.addressLblTxt}>
-            {isSendTxn ? Constants.STR_SENT : Constants.STR_RECEIVED}
-          </Text>
-          <Text style={styles.payAddrTxt}>
-            {Constants.STR_PAYMENT +
-              ' ' +
-              (isSendTxn ? Constants.STR_RECEIPIENT : Constants.STR_SENDER)}
-          </Text>
-          <Text style={styles.addrTxt}>{address}</Text>
-          <Text style={styles.amountLblTxt}>
-            {Constants.STR_PAYMENT_AMOUNT}
-          </Text>
-          <Text style={styles.amountTxt}>
-            {amount + ' ' + Constants.STR_BTC}
-          </Text>
-        </View>
-
-        <TouchableOpacity style={styles.doneTouch}>
-          <View shadowColor="black" shadowOffset="30" style={styles.doneView}>
-            <Text style={styles.doneTxt}>{Constants.STR_DONE}</Text>
+        {loading === true && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
-        </TouchableOpacity>
+        )}
+        {loaded === true && btcSendResult !== null && (
+          <>
+            <View style={{alignItems: 'center', flex: 3}}>
+              <Image source={Images.icon_done} style={styles.checkImg} />
+              <Text style={styles.paymentTxt}>{C.STR_PAYMENT}</Text>
+              <Text style={styles.addressLblTxt}>
+                {isSendTxn ? C.STR_SENT : C.STR_RECEIVED}
+              </Text>
+              <Text style={styles.payAddrTxt}>
+                {C.STR_PAYMENT +
+                  ' ' +
+                  (isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER)}
+              </Text>
+              <Text style={[styles.addrTxt, {fontSize: addrTxtFontSize}]}>
+                {address}
+              </Text>
+              <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
+              <Text style={styles.amountTxt}>{amount + ' ' + C.STR_BTC}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.doneTouch}
+              onPressOut={() => this.done()}>
+              <View
+                shadowColor="black"
+                shadowOffset="30"
+                style={styles.doneView}>
+                <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     );
   }
 }
 
-const vh = Constants.SCREEN_HEIGHT / 100;
+const mapStateToProps = state => {
+  return {
+    btcWallet: state.btcWallet,
+  };
+};
+
+const mapDispatchToProps = {sendBitcoin};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirBtcTxnConfirmedScreen);
+
 const styles = StyleSheet.create({
   mainView: {
     flex: 1,
@@ -54,9 +95,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   doneView: {
-    width: Constants.SCREEN_WIDTH * 0.5,
+    width: C.SCREEN_WIDTH * 0.5,
     flexDirection: 'row',
-    height: 9.5 * vh,
+    height: 9.5 * C.vh,
     backgroundColor: '#53cbc8',
     alignItems: 'center',
     borderRadius: 10,
@@ -66,18 +107,17 @@ const styles = StyleSheet.create({
   paymentTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 10 * vh,
+    fontSize: 10 * C.vh,
     marginTop: 10,
   },
   addressLblTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 10 * vh,
+    fontSize: 10 * C.vh,
     marginTop: -30,
   },
   payAddrTxt: {
     color: AppStyle.mainColor,
-    fontSize: 16,
     marginTop: 20,
     fontFamily: AppStyle.mainFontBold,
   },
@@ -86,6 +126,8 @@ const styles = StyleSheet.create({
     fontFamily: AppStyle.mainFont,
     fontSize: 28,
     marginTop: 5,
+    marginHorizontal: 50,
+    textAlign: 'center',
   },
   amountLblTxt: {
     color: AppStyle.mainColor,
@@ -110,5 +152,10 @@ const styles = StyleSheet.create({
     fontSize: 26,
     marginRight: 15,
   },
-  checkImg: {width: 8 * vh, height: 8 * vh, marginTop: 2 * vh},
+  checkImg: {width: 8 * C.vh, height: 8 * C.vh, marginTop: 2 * C.vh},
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

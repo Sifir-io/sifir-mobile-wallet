@@ -1,5 +1,5 @@
-import Constants from './constants';
+import {C} from './constants';
 import Images from './images';
 import AppStyle from './AppStyle';
 
-export {Constants, Images, AppStyle};
+export {C, Images, AppStyle};

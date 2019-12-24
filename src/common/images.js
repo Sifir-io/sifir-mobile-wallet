@@ -1,4 +1,4 @@
-export default Images = {
+export default {
   icon_indicator: require('./../assets/images/back.png'),
   icon_header: require('./../assets/images/head.png'),
   img_shadow: require('./../assets/images/shadow.png'),
@@ -33,5 +33,9 @@ export default Images = {
   icon_check_blue: require('./../assets/images/check_blue.png'),
   icon_check_white: require('./../assets/images/check_white.png'),
   icon_network: require('./../assets/images/network.png'),
+  icon_failure: require('./../assets/images/failure.png'),
+  icon_logo: require('./../assets/images/logo.png'),
+  icon_btcBtn: require('./../assets/images/bitcoin_btn1.png'),
+  icon_btcBtn_clicked: require('./../assets/images/bitcoin_btn.png'),
   icon_arrow_white: require('./../assets/images/arrow_white.png'),
 };

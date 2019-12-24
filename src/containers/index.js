@@ -1,18 +1,18 @@
 import React from 'react';
-import {createAppContainer} from 'react-navigation';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
 import {View} from 'react-native';
-
-import {AppStyle} from '@common/index';
 import SifirHeader from '@elements/SifirHeader';
+import {AppLandingScreen, PairWithTokenScreen} from '@screens/auth/index';
 import WalletStack from './WalletStack';
-import ChatStack from './ChatStack';
-import ShopStack from './ShopStack';
+import RoomsStack from './RoomsStack';
+import SettingsStack from './SettingsStack';
+import {AppStyle} from '@common/index';
 
 const WalletTab = createAppContainer(WalletStack);
-const ChatTab = createAppContainer(ChatStack);
-const ShopTab = createAppContainer(ShopStack);
+const RoomsTab = createAppContainer(RoomsStack);
+const SettingsTab = createAppContainer(SettingsStack);
 
-export default class Root extends React.Component {
+class Root extends React.Component {
   constructor(props) {
     super(props);
 
@@ -31,9 +31,22 @@ export default class Root extends React.Component {
       <View style={{flex: 1, backgroundColor: AppStyle.backgroundColor}}>
         <SifirHeader switchPage={this.switchPage} />
         {currentTab === 0 && <WalletTab />}
-        {currentTab === 1 && <ChatTab />}
-        {currentTab === 2 && <ShopTab />}
+        {currentTab === 1 && <RoomsTab />}
+        {currentTab === 2 && <SettingsTab />}
       </View>
     );
   }
 }
+
+export default createAppContainer(
+  createSwitchNavigator(
+    {
+      AppLandingScreen,
+      Pair: PairWithTokenScreen,
+      App: Root,
+    },
+    {
+      initialRouteName: 'AppLandingScreen',
+    },
+  ),
+);

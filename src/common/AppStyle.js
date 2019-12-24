@@ -1,4 +1,4 @@
-export default AppStyle = {
+export default {
   mainColor: '#2EF2ED',
   backgroundColor: '#0c1d28',
   listViewSep: '#0a1922',

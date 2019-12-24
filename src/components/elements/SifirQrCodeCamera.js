@@ -3,16 +3,12 @@ import React, {Component} from 'react';
 import {View, TouchableOpacity, Image} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import * as Animatable from 'react-native-animatable';
-import {AppStyle, Images, Constants} from '@common/index';
+import {AppStyle, Images, C} from '@common/index';
 import {RNCamera} from 'react-native-camera';
-const SCREEN_HEIGHT = Constants.SCREEN_HEIGHT;
-const SCREEN_WIDTH = Constants.SCREEN_WIDTH;
-
-console.disableYellowBox = true;
 
 class SifirQrCodeCamera extends Component {
   onSuccess(e) {
-    this.props.closeHandler(true, e.data);
+    this.props.closeHandler(e.data);
   }
 
   state = {
@@ -21,7 +17,7 @@ class SifirQrCodeCamera extends Component {
   makeSlideOutTranslation(translationType, fromValue) {
     return {
       from: {
-        [translationType]: SCREEN_WIDTH * -0.18,
+        [translationType]: C.SCREEN_WIDTH * -0.18,
       },
       to: {
         [translationType]: fromValue,
@@ -34,7 +30,7 @@ class SifirQrCodeCamera extends Component {
       <QRCodeScanner
         showMarker
         onRead={this.onSuccess.bind(this)}
-        cameraStyle={{height: SCREEN_HEIGHT}}
+        cameraStyle={{height: C.SCREEN_HEIGHT}}
         flashMode={
           this.state.isFlashOn
             ? RNCamera.Constants.FlashMode.torch
@@ -45,7 +41,7 @@ class SifirQrCodeCamera extends Component {
             <View style={styles.topOverlay}>
               <View style={styles.titleContainer}>
                 <TouchableOpacity
-                  onPress={() => this.props.closeHandler(false, '')}
+                  onPress={() => this.props.closeHandler(null)}
                   style={styles.buttonBg}>
                   <Image
                     source={Images.icon_back_trans}
@@ -85,7 +81,7 @@ class SifirQrCodeCamera extends Component {
                   easing="linear"
                   animation={this.makeSlideOutTranslation(
                     'translateY',
-                    SCREEN_WIDTH * 0.2,
+                    C.SCREEN_WIDTH * 0.2,
                   )}
                 />
               </View>
@@ -109,9 +105,9 @@ const styles = {
   },
 
   rectangle: {
-    height: Constants.RECT_DIMENSIONS,
-    width: Constants.RECT_DIMENSIONS,
-    borderWidth: Constants.RECT_BORDER_WIDTH,
+    height: C.RECT_DIMENSIONS,
+    width: C.RECT_DIMENSIONS,
+    borderWidth: C.RECT_BORDER_WIDTH,
     borderColor: AppStyle.mainColor,
     alignItems: 'center',
     justifyContent: 'center',
@@ -120,9 +116,9 @@ const styles = {
 
   topOverlay: {
     flex: 1.4,
-    height: SCREEN_WIDTH,
-    width: SCREEN_WIDTH,
-    backgroundColor: Constants.OVERLAY_COLOR,
+    height: C.SCREEN_WIDTH,
+    width: C.SCREEN_WIDTH,
+    backgroundColor: C.OVERLAY_COLOR,
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 50,
@@ -130,22 +126,22 @@ const styles = {
 
   bottomOverlay: {
     flex: 1,
-    height: SCREEN_WIDTH,
-    width: SCREEN_WIDTH,
-    backgroundColor: Constants.OVERLAY_COLOR,
-    paddingBottom: SCREEN_WIDTH * 0.25,
+    height: C.SCREEN_WIDTH,
+    width: C.SCREEN_WIDTH,
+    backgroundColor: C.OVERLAY_COLOR,
+    paddingBottom: C.SCREEN_WIDTH * 0.25,
   },
 
   leftAndRightOverlay: {
-    height: SCREEN_WIDTH * 0.65,
-    width: SCREEN_WIDTH,
-    backgroundColor: Constants.OVERLAY_COLOR,
+    height: C.SCREEN_WIDTH * 0.65,
+    width: C.SCREEN_WIDTH,
+    backgroundColor: C.OVERLAY_COLOR,
   },
 
   scanBar: {
-    width: Constants.SCAN_BAR_WIDTH,
-    height: Constants.SCAN_BAR_HEIGHT,
-    backgroundColor: Constants.SCAN_BAR_COLOR,
+    width: C.SCAN_BAR_WIDTH,
+    height: C.SCAN_BAR_HEIGHT,
+    backgroundColor: C.SCAN_BAR_COLOR,
   },
 
   buttonBg: {

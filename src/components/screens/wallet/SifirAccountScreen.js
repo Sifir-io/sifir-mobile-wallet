@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {
   View,
   Image,
@@ -6,35 +6,44 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   Text,
-  FlatList,
   ActivityIndicator,
 } from 'react-native';
-
 import {connect} from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
+import {Images, AppStyle, C} from '@common/index';
+import {getWalletDetails} from '@actions/btcwallet';
+import SifirTxnList from '@elements/SifirTxnList';
+import SifirBTCAmount from '@elements/SifirBTCAmount';
 
-import {Images, AppStyle, Constants} from '@common/index';
-import {getWallet} from '@store/states/wallet';
-
-class SifirAccountScreen extends Component {
+class SifirAccountScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
   }
   componentDidMount() {
-    this.props.getWallet();
+    const {label, type} = this.props.navigation.getParam('walletInfo');
+    this.setState({label, type});
+    this.props.getWalletDetails({label, type});
   }
   state = {
     btnStatus: 0,
+    label: '',
+    type: '',
   };
 
   render() {
+    const BTN_WIDTH = C.SCREEN_WIDTH / 2;
+
     const {navigate} = this.props.navigation;
-
     const {btnStatus} = this.state;
-    const BTN_WIDTH = Constants.SCREEN_WIDTH / 2;
+    const {
+      loaded,
+      loading,
+      btcWalletDetails,
+      feeSettingEnabled,
+    } = this.props.btcWallet;
+    const {txnData, balance, btcUnit} = btcWalletDetails;
+    const {label, type} = this.state;
 
-    const {data, error, loaded, loading} = this.props.wallet;
-    const {txnData, walletName, walletType, balanceAmount, balanceType} = data;
     return (
       <View style={styles.mainView}>
         <View style={{flex: 0.7}}>
@@ -43,7 +52,7 @@ class SifirAccountScreen extends Component {
               style={styles.backNavView}
               onTouchEnd={() => navigate('AccountsList')}>
               <Image source={Images.icon_back} style={styles.backImg} />
-              <Text style={styles.backNavTxt}>{Constants.STR_My_Wallets}</Text>
+              <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -60,8 +69,10 @@ class SifirAccountScreen extends Component {
               )}
               {loaded === true && loading === false && (
                 <>
-                  <Text style={styles.boxTxt}>{walletName}</Text>
-                  <Text style={styles.boxTxt}>{walletType}</Text>
+                  <Text style={styles.boxTxt}>{label}</Text>
+                  {type === C.STR_WATCH_WALLET_TYPE && (
+                    <Text style={styles.boxTxt}>{C.STR_WATCHING}</Text>
+                  )}
                 </>
               )}
             </View>
@@ -76,45 +87,49 @@ class SifirAccountScreen extends Component {
             {loaded === true && loading === false && (
               <>
                 <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.balAmountTxt}>{balanceAmount}</Text>
-                  <Text style={styles.satTxt}>{balanceType}</Text>
+                  <Text style={styles.balAmountTxt}>
+                    <SifirBTCAmount amount={balance} unit={btcUnit} />
+                  </Text>
+                  <Text style={styles.satTxt}>{btcUnit}</Text>
                 </View>
-                <Text style={styles.balanceTxt}>
-                  {Constants.STR_Cur_Balance}
-                </Text>
+                <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
               </>
             )}
           </View>
         </View>
 
         <View style={styles.btnAreaView}>
-          <TouchableWithoutFeedback
-            style={{flex: 1}}
-            onPressIn={() => this.setState({btnStatus: 1})}
-            onPressOut={() => {
-              this.setState({btnStatus: 0});
-              navigate('GetAddress');
-            }}>
-            <View
-              style={[
-                styles.txnBtnView,
-                btnStatus === 1 ? {backgroundColor: 'black', opacity: 0.7} : {},
-              ]}>
-              <Text style={{color: 'white', fontSize: 15}}>
-                {Constants.STR_SEND}
-              </Text>
-              <Image
-                source={Images.icon_up_arrow}
-                style={{width: 11, height: 11, marginLeft: 10}}
-              />
-            </View>
-          </TouchableWithoutFeedback>
+          {type === C.STR_SPEND_WALLET_TYPE && (
+            <TouchableWithoutFeedback
+              style={{flex: 1}}
+              onPressIn={() => this.setState({btnStatus: 1})}
+              onPressOut={() => {
+                this.setState({btnStatus: 0});
+                navigate('GetAddress', {
+                  txnInfo: {type, label, feeSettingEnabled},
+                });
+              }}>
+              <View
+                style={[
+                  styles.txnBtnView,
+                  btnStatus === 1
+                    ? {backgroundColor: 'black', opacity: 0.7}
+                    : {},
+                ]}>
+                <Text style={{color: 'white', fontSize: 15}}>{C.STR_SEND}</Text>
+                <Image
+                  source={Images.icon_up_arrow}
+                  style={{width: 11, height: 11, marginLeft: 10}}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          )}
           <TouchableWithoutFeedback
             style={{flex: 1}}
             onPressIn={() => this.setState({btnStatus: 2})}
             onPressOut={() => {
               this.setState({btnStatus: 0});
-              navigate('BtcReceiveTxn', {address: '#Temp Address'});
+              navigate('BtcReceiveTxn', {walletInfo: {type, label}});
             }}>
             <View
               style={[
@@ -123,7 +138,7 @@ class SifirAccountScreen extends Component {
                 btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
               ]}>
               <Text style={[{color: 'white', fontSize: 15}]}>
-                {Constants.STR_RECEIVE}
+                {C.STR_RECEIVE}
               </Text>
               <Image
                 source={Images.icon_down_arrow}
@@ -133,7 +148,7 @@ class SifirAccountScreen extends Component {
           </TouchableWithoutFeedback>
         </View>
         <View style={styles.txnSetView}>
-          <Text style={styles.txnLblTxt}>{Constants.TRANSACTIONS}</Text>
+          <Text style={styles.txnLblTxt}>{C.TRANSACTIONS}</Text>
           <TouchableOpacity>
             <Image
               source={Images.icon_setting}
@@ -145,35 +160,12 @@ class SifirAccountScreen extends Component {
           {loading === true && (
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           )}
-          {loaded === true && loading === false && (
-            <FlatList
-              data={txnData}
+          {loaded === true && loading === false && txnData !== null && (
+            <SifirTxnList
+              txnData={txnData}
+              unit={btcUnit}
               width={BTN_WIDTH * 2 - 50}
-              style={{height: 200}}
-              renderItem={({item}) => (
-                <TouchableOpacity>
-                  <View style={styles.listItme}>
-                    <Image
-                      source={Images[item.imgURL]}
-                      style={{width: 30, height: 30}}
-                    />
-                    <View style={{flex: 5, marginLeft: 20}}>
-                      <Text style={{color: AppStyle.mainColor}}>{item.s1}</Text>
-                      <Text
-                        style={{color: AppStyle.mainColor, fontWeight: 'bold'}}>
-                        {item.s2}
-                      </Text>
-                    </View>
-                    <Text
-                      style={{
-                        flex: 2,
-                        color: AppStyle.mainColor,
-                      }}>
-                      {item.s3}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
+              height={200}
             />
           )}
         </View>
@@ -184,16 +176,13 @@ class SifirAccountScreen extends Component {
 
 const mapStateToProps = state => {
   return {
-    wallet: state.wallet,
+    btcWallet: state.btcWallet,
   };
 };
 
-const mapDispatchToProps = {getWallet};
+const mapDispatchToProps = {getWalletDetails};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SifirAccountScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SifirAccountScreen);
 
 const styles = StyleSheet.create({
   mainView: {
@@ -234,7 +223,7 @@ const styles = StyleSheet.create({
   boxTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 25,
+    fontSize: 24,
     marginLeft: 13,
     marginBottom: -10,
   },
@@ -250,7 +239,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    marginTop: 0,
+    marginTop: 7,
     marginLeft: 13,
   },
   backNavTxt: {
@@ -267,7 +256,6 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 4.6,
-    borderRadius: 5,
     borderWidth: 1,
     borderRadius: 15,
   },
@@ -283,15 +271,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
-    alignItems: 'center',
-  },
-  listItme: {
-    flex: 1,
-    flexDirection: 'row',
-    width: '100%',
-    height: 50,
-    borderBottomColor: AppStyle.listViewSep,
-    borderBottomWidth: 2,
     alignItems: 'center',
   },
   satTxt: {
