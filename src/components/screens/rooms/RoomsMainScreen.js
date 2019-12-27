@@ -49,7 +49,7 @@ export default class RoomsMainScreen extends Component {
 
   onSrchTxtChange = txt => {
     this.setState({srchTxt: txt});
-    if (txt != '') {
+    if (txt !== '') {
       this.setState({isSrchStarted: true});
     }
   };
@@ -65,15 +65,7 @@ export default class RoomsMainScreen extends Component {
   };
 
   FlatListItemSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 3,
-          width: '100%',
-          backgroundColor: 'transparent',
-        }}
-      />
-    );
+    return <View style={styles.flatListItemSep} />;
   };
 
   render() {
@@ -168,5 +160,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
+  },
+  flatListItemSep: {
+    height: 3,
+    width: '100%',
+    backgroundColor: 'transparent',
   },
 });

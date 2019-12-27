@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import Slider from 'react-native-slider';
-
 import {Images, AppStyle, C} from '@common/index';
 
 export default class SifirChatTxnFunds extends Component {
@@ -11,23 +9,17 @@ export default class SifirChatTxnFunds extends Component {
     return (
       <>
         <View>
-          <View
-            style={{
-              flexDirection: 'row-reverse',
-              marginBottom: 8,
-            }}
-            onTouchEnd={this.props.hideModal}></View>
           <View style={styles.bodyStyle}>
-            {this.state.curMenu == 1 && <></>}
-            {this.state.curMenu == 0 && (
+            {this.state.curMenu === 1 && <></>}
+            {this.state.curMenu === 0 && (
               <View style={{flex: 1}}>
                 <TouchableOpacity style={{flex: 1}}>
                   <View style={styles.rowStyle}>
                     <Image
                       source={Images.icon_chatSend}
-                      style={{width: 33, height: 30}}
+                      style={styles.chatSendImg}
                     />
-                    <Text style={styles.textStyle}>SEND FUNDS</Text>
+                    <Text style={styles.textStyle}>{C.STR_SEND_FUND}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={{flex: 1}}>
@@ -36,26 +28,18 @@ export default class SifirChatTxnFunds extends Component {
                     onTouchEnd={() => this.setState({curMenu: 1})}>
                     <Image
                       source={Images.icon_chatRequest}
-                      style={{width: 30, height: 30}}
+                      style={styles.chatReqImg}
                     />
-                    <Text style={styles.textStyle}>REQUEST FUNDS</Text>
+                    <Text style={styles.textStyle}>{C.STR_REQUEST_FUNDS}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={{flex: 1}}>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
+                  <View style={styles.mngFundView}>
                     <Image
                       source={Images.icon_dollar}
-                      style={{
-                        width: 30,
-                        height: 37,
-                      }}
+                      style={styles.mngFundImg}
                     />
-                    <Text style={styles.textStyle}>MANAGE FUNDS</Text>
+                    <Text style={styles.textStyle}>{C.STR_MANAGE_FUNDS}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -65,7 +49,7 @@ export default class SifirChatTxnFunds extends Component {
             <TouchableOpacity>
               <Image
                 source={Images.icon_dialog_arrow}
-                style={{height: 40, width: 40, marginRight: 10}}
+                style={styles.btmArrowImg}
               />
             </TouchableOpacity>
           </View>
@@ -105,4 +89,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: -21,
   },
+  chatSendImg: {width: 33, height: 30},
+  chatReqImg: {width: 30, height: 30},
+  mngFundView: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  mngFundImg: {width: 30, height: 37},
+  btmArrowImg: {height: 40, width: 40, marginRight: 10},
 });

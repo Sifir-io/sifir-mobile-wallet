@@ -23,6 +23,10 @@ export default class SifirGetAddrScreen extends Component {
   };
 
   closeModal = data => {
+    if (data === null) {
+      this.setState({showModal: false});
+      return;
+    }
     this.setState({
       address: data,
       showModal: false,

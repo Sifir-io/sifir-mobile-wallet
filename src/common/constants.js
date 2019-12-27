@@ -58,4 +58,8 @@ export const C = {
   STR_ADDR_QR_SHARE: 'QRCode & Address Share',
   STR_ADDR_SHARE: 'Address Share',
   STR_AMOUNT_BENUMBER: 'Amount is not a number',
+  STR_SEND_FUND: 'SEND FUNDS',
+  STR_REQUEST_FUNDS: 'REQUEST FUNDS',
+  STR_MANAGE_FUNDS: 'MANAGE FUNDS',
+  STR_TYPE_MSG: 'Type a message'
 };

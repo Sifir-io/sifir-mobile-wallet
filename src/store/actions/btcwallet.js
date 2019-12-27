@@ -134,7 +134,7 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
     switch (type) {
       case C.STR_WATCH_WALLET_TYPE:
         address = await btcClient.getUnusedAddressesByPub32Label(label);
-        address = address[0]['address'];
+        address = address[0].address;
         break;
       case C.STR_SPEND_WALLET_TYPE:
         address = await btcClient.getNewAddress(addrType);
@@ -158,7 +158,9 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
 const sendBitcoin = ({address, amount}) => async dispatch => {
   dispatch({type: types.SEND_BITCOIN + PENDING});
   try {
-    if (isNaN(amount)) throw C.STR_AMOUNT_BENUMBER;
+    if (isNaN(amount)) {
+      throw C.STR_AMOUNT_BENUMBER;
+    }
     await dispatch(initBtcClient());
     const btcSendResult = await btcClient.spend(address, Number(amount));
     dispatch({

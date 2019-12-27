@@ -1,6 +1,7 @@
-import RoomsMainScreen from '../components/screens/rooms/RoomsMainScreen';
-import RoomsDetailScreen from '../components/screens/rooms/RoomsDetailScreen';
+import {fromRight} from 'react-navigation-transitions';
 import {createStackNavigator} from 'react-navigation-stack';
+
+import {RoomsMainScreen, RoomsDetailScreen} from '@screens/rooms/index';
 
 const RoomsStack = createStackNavigator(
   {
@@ -19,6 +20,7 @@ const RoomsStack = createStackNavigator(
   },
   {
     initialRouteName: 'RoomsMain',
+    transitionConfig: () => fromRight(700),
   },
 );
 

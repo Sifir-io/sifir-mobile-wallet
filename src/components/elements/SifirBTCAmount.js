@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import {PureComponent} from 'react';
 import {C} from '@common/index';
 
 export default class SifirBTCAmount extends PureComponent {

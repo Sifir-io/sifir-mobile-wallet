@@ -69,7 +69,9 @@ export default class RoomsDetailScreen extends Component {
   };
 
   sendMsg = () => {
-    if (this.state.inputMsg === '') return;
+    if (this.state.inputMsg === '') {
+      return;
+    }
     var sentMsg = {type: 'SENT', content: this.state.inputMsg};
     this.state.messages.unshift(sentMsg);
     this.setState({messages: this.state.messages, inputMsg: ''});
@@ -111,7 +113,7 @@ export default class RoomsDetailScreen extends Component {
               <Image source={Images.icon_emoji} style={styles.emojiImg} />
             </TouchableOpacity>
             <TextInput
-              placeholder={'Type a message'}
+              placeholder={C.STR_TYPE_MSG}
               placeholderTextColor="white"
               value={this.state.inputMsg}
               onChangeText={inputMsg => {

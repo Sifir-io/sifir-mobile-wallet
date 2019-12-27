@@ -11,54 +11,21 @@ export default class SifirSettingModal extends Component {
     return (
       <>
         <View>
-          <View
-            style={{
-              flexDirection: 'row-reverse',
-              marginBottom: 8,
-            }}
-            onTouchEnd={this.props.hideModal}>
+          <View style={styles.mainView} onTouchEnd={this.props.hideModal}>
             <TouchableOpacity>
-              <Image
-                source={Images.icon_close}
-                style={{height: 30, width: 30, marginRight: 10}}
-              />
+              <Image source={Images.icon_close} style={styles.closeImg} />
             </TouchableOpacity>
           </View>
           <View style={styles.bodyStyle}>
             {this.state.curMenu === 1 && (
-              <View
-                style={{
-                  flex: 1,
-                  backgroundColor: 'white',
-                  marginTop: 15,
-                }}>
+              <View style={styles.timeView}>
                 <View style={{flexDirection: 'row'}}>
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      flexDirection: 'row',
-                    }}>
-                    <Image
-                      source={Images.icon_clock}
-                      style={{width: 25, height: 25}}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        marginLeft: 5,
-                      }}>
-                      {C.STR_SET_FEES}
-                    </Text>
+                  <View style={styles.clockImgView}>
+                    <Image source={Images.icon_clock} style={styles.clockImg} />
+                    <Text style={styles.setFeeTxt}>{C.STR_SET_FEES}</Text>
                   </View>
-                  <View style={styles.feeTxtStyle}>
-                    <Text
-                      style={{
-                        fontSize: 25,
-                        marginVertical: 10,
-                        marginHorizontal: 4,
-                      }}>
-                      0.015 BTC
-                    </Text>
+                  <View style={styles.feeTxtView}>
+                    <Text style={styles.feeTxt}>0.015 BTC</Text>
                   </View>
                 </View>
                 <View style={{width: '100%'}}>
@@ -69,23 +36,14 @@ export default class SifirSettingModal extends Component {
                     onValueChange={value => this.setState({value})}
                     minimumTrackTintColor="#25b6fa"
                     maximumTrackTintColor="#412160"
-                    thumbStyle={{
-                      height: 25,
-                      width: 25,
-                      borderRadius: 12.5,
-                    }}
+                    thumbStyle={styles.thumb}
                     trackStyle={{
                       height: 10,
                       borderRadius: 5,
                     }}
                   />
                 </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    width: '100%',
-                    justifyContent: 'space-between',
-                  }}>
+                <View style={styles.waitView}>
                   <Text style={{fontSize: 20}}>{C.STR_Wait}</Text>
                   <Text style={{fontSize: 20, color: 'blue'}}>4 Hours</Text>
                 </View>
@@ -180,7 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: -21,
   },
-  feeTxtStyle: {
+  feeTxtView: {
     flex: 1,
     borderWidth: 1,
     borderColor: '#e0e0e0',
@@ -189,4 +147,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 14,
   },
+  mainView: {
+    flexDirection: 'row-reverse',
+    marginBottom: 8,
+  },
+  closeImg: {height: 30, width: 30, marginRight: 10},
+  timeView: {
+    flex: 1,
+    backgroundColor: 'white',
+    marginTop: 15,
+  },
+  clockImgView: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  clockImg: {width: 25, height: 25},
+  setFeeTxt: {fontSize: 18, marginLeft: 5},
+  feeTxt: {
+    fontSize: 25,
+    marginVertical: 10,
+    marginHorizontal: 4,
+  },
+  waitView: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  thumb: {height: 25, width: 25, borderRadius: 12.5},
 });

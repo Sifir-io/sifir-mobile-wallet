@@ -2,6 +2,7 @@ import {Image, View} from 'react-native';
 import PropTypes from 'prop-types';
 import React from 'react';
 import qr from 'qr.js';
+import {Buffer} from 'buffer';
 
 function qr2bmp(data, colors, scale) {
   const header = Buffer.from(
@@ -10,7 +11,9 @@ function qr2bmp(data, colors, scale) {
   );
   const size = data.length;
   const width = size * scale;
-  if (width % 4 !== 0) throw new Error('Image width must be multiple of 4');
+  if (width % 4 !== 0) {
+    throw new Error('Image width must be multiple of 4');
+  }
   header.writeUInt32LE(width, 0x12);
   header.writeUInt32LE(width, 0x16);
   header.writeUInt32LE(width * width * 3, 0x22);

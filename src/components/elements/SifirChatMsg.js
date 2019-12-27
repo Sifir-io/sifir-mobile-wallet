@@ -2,9 +2,7 @@ import React, {Component} from 'react';
 import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
-import {Badge} from 'react-native-elements';
-import LinearGradient from 'react-native-linear-gradient';
-import Swipeout from 'react-native-swipeout';
+// import {Badge} from 'react-native-elements';
 
 export default class SifirChatMsg extends Component {
   state = {};

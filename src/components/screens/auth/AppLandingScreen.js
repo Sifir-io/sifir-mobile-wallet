@@ -35,7 +35,6 @@ class AppLandingScreen extends React.Component {
 const styles = StyleSheet.create({
   mainView: {
     flex: 1,
-    // justifyContent: 'center',
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
@@ -49,4 +48,7 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = {loadAuthInfo};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppLandingScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AppLandingScreen);

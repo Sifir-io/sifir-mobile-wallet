@@ -182,7 +182,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {getWalletDetails};
 
-export default connect(mapStateToProps, mapDispatchToProps)(SifirAccountScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirAccountScreen);
 
 const styles = StyleSheet.create({
   mainView: {
