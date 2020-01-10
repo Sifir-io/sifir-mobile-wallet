@@ -41,6 +41,8 @@ target 'Sifir' do
   pod 'RNShare', :path => '../node_modules/react-native-share'
 
 
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
   target 'SifirTests' do
     inherit! :search_paths
     # Pods for testing
