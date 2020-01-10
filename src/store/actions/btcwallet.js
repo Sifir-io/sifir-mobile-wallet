@@ -25,15 +25,14 @@ const initBtcClient = () => async (dispatch, getState) => {
   }
 
   // TODO check what type of token this is and use the right transport
-  // Note: Two vairables are not used intialized to test node_modeuls issue
+
   const client_matrix = await getClient(token);
   const transport_matrix = await getTransport(client_matrix, token);
 
-  // This relies on Tor/Orbot being installed on the phone/machine
   const transport = cypherNodeHttpTransport({
     proxyUrl: '127.0.0.1:9050',
     gatewayUrl:
-      'http://dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion',
+      'http://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion',
   });
   btcClient = await _btc({transport});
 

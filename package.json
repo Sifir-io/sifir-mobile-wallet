@@ -14,11 +14,12 @@
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.2",
     "@tradle/react-native-http": "^2.0.1",
+    "asyncstorage-down": "^4.2.0",
     "base-64": "^0.1.0",
     "browserify-zlib": "^0.1.4",
     "buffer": "^5.4.3",
     "cyphernode-js-sdk": "^0.1.0",
-    "cyphernode-js-sdk-transports": "git+https://github.com/gabidi/cyphernode-js-sdk-transports",
+    "cyphernode-js-sdk-transports": "git+https://github.com/gabidi/cyphernode-js-sdk-transports#temp/pre-storage",
     "dns.js": "^1.0.1",
     "events": "^3.1.0",
     "https-browserify": "0.0.1",
