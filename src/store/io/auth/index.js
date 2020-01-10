@@ -15,4 +15,11 @@ const saveAuthInfo = async authInfo => {
   });
 };
 
-module.exports = {getSavedAuthInfo, saveAuthInfo};
+const deleteAuthInfo = async authInfo => {
+  return await SInfo.deleteItem('SIFIR_TOKEN', {
+    sharedPreferencesName: 'Sifir',
+    keychainService: 'SifirKeychain',
+  });
+};
+
+module.exports = {getSavedAuthInfo, saveAuthInfo, deleteAuthInfo};

@@ -1,7 +1,7 @@
 import * as types from '@types/index';
 import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
 import {getClient, pairMatrixClient} from '@io/matrix/';
-import {saveAuthInfo, getSavedAuthInfo} from '@io/auth';
+import {saveAuthInfo, getSavedAuthInfo, deleteAuthInfo} from '@io/auth';
 
 export const loadAuthInfo = () => async dispatch => {
   const {token, key} = await getSavedAuthInfo();
@@ -17,6 +17,12 @@ export const loadAuthInfo = () => async dispatch => {
       warning: 'AUTH_INFO_NOT_FOUND',
     });
   }
+};
+export const clearAuthInfo = () => async dispatch => {
+  await deleteAuthInfo();
+  dispatch({
+    type: types.DELETE_AUTH_STATUS + FULFILLED,
+  });
 };
 //export const initMatrixClient = ({token}) => async dispatch => {
 //  const client = await getClient();

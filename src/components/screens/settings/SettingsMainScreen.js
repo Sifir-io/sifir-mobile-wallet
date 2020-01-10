@@ -1,16 +1,36 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
 import AppStyle from '@common/AppStyle';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {clearAuthInfo} from '@actions/auth';
+import {connect} from 'react-redux';
 
-export default class SettingsMainScreen extends Component {
+class SettingsMainScreen extends Component {
+  constructor(props, context) {
+    super(props, context);
+  }
   render() {
     return (
       <View style={styles.mainscreen}>
-        <Text style={styles.tempStyle}> Comming Soon - Settings</Text>
+        <TouchableOpacity onPress={() => this.props.clearAuthInfo()}>
+          <Text style={styles.tempStyle}> Delete Pairing Data</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    auth: state.auth,
+  };
+};
+
+const mapDispatchToProps = {clearAuthInfo};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SettingsMainScreen);
 
 const styles = StyleSheet.create({
   mainscreen: {

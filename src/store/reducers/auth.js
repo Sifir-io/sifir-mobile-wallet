@@ -11,6 +11,13 @@ const initialState = {
 };
 
 const auth = createReducer(initialState)({
+  [types.DELETE_AUTH_STATUS + FULFILLED]: state => ({
+    ...state,
+    token: null,
+    key: null,
+    loading: false,
+    loaded: false,
+  }),
   [types.GET_AUTH_STATUS + REJECTED]: state => ({
     ...state,
     loading: false,
