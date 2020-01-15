@@ -1,4 +1,5 @@
-global.net = require('react-native-tcp');
+// global.net = require('react-native-tcp');
+global.encoding = require('encoding');
 if (typeof __dirname === 'undefined') global.__dirname = '/';
 if (typeof __filename === 'undefined') global.__filename = '';
 if (typeof process === 'undefined') {
@@ -21,7 +22,7 @@ process.env['NODE_ENV'] = isDev ? 'development' : 'production';
 if (typeof localStorage !== 'undefined') {
   localStorage.debug = isDev ? '*' : '';
 }
-
 // If using the crypto shim, uncomment the following line to ensure
 /// crypto is loaded first, so it can populate global.crypto
-require('crypto');
+import crypto from 'crypto';
+global.crypto = crypto;

@@ -4,10 +4,21 @@ import _btc from '@io/btcClient';
 import {cypherNodeHttpTransport} from 'cyphernode-js-sdk';
 import {getClient, getTransport} from '@io/matrix';
 import {Images, C} from '@common/index';
-
+import torBridge from '@helpers/torBridge';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
+  try {
+    const reply = await torBridge.sendMessage(
+      'https://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion:2009/v0/getblockinfo',
+      JSON.stringify({test: 'poopp'}),
+    );
+    console.log('GOT REPLY', reply);
+  } catch (err) {
+
+    console.error('BBRIDGE ERROR', err);
+    return;
+  }
   if (btcClient) {
     return btcClient;
   }
@@ -23,19 +34,14 @@ const initBtcClient = () => async (dispatch, getState) => {
     });
     return;
   }
-
-  // TODO check what type of token this is and use the right transport
-
   const client_matrix = await getClient(token);
-  const transport_matrix = await getTransport(client_matrix, token);
-
-  const transport = cypherNodeHttpTransport({
-    proxyUrl: '127.0.0.1:9050',
-    gatewayUrl:
-      'http://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion',
-  });
-  btcClient = await _btc({transport});
-
+  const transport = await getTransport(client_matrix, token);
+  try {
+    btcClient = await _btc({transport});
+    //  btcClient.getWatchedPub32();
+  } catch (err) {
+    console.error(err);
+  }
   dispatch({
     type: types.BTC_CLIENT_STATUS + FULFILLED,
   });
@@ -58,6 +64,7 @@ const getBtcWalletList = () => async dispatch => {
 
   try {
     await dispatch(initBtcClient());
+    console.log(window.crypto.subtle);
 
     const watchedPub32 = await btcClient.getWatchedPub32();
 
@@ -88,6 +95,7 @@ const getBtcWalletList = () => async dispatch => {
       payload: {btcWalletList},
     });
   } catch (error) {
+    console.error(error);
     dispatch({
       type: types.BTC_WALLET_LIST_DATA_SHOW + REJECTED,
       payload: {error},

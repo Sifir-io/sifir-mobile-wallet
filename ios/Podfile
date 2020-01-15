@@ -36,12 +36,13 @@ target 'Sifir' do
 
 
 
-  pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
 
   pod 'RNShare', :path => '../node_modules/react-native-share'
 
 
   pod 'RNFS', :path => '../node_modules/react-native-fs'
+
+  pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
 
   target 'SifirTests' do
     inherit! :search_paths

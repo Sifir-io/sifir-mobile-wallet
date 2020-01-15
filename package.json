@@ -59,15 +59,17 @@
     "redux-thunk": "^2.3.0",
     "stream-browserify": "^1.0.0",
     "string_decoder": "^0.10.31",
+    "superagent": "^5.2.1",
+    "text-encoding": "^0.7.0",
     "timers-browserify": "^1.4.2",
     "url": "^0.10.3",
-    "vm-browserify": "^1.1.2"
+    "vm-browserify": "^1.1.2",
+    "axios": "^0.19.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/runtime": "^7.6.3",
     "@react-native-community/eslint-config": "^0.0.5",
-    "axios": "^0.19.0",
     "babel-jest": "^24.9.0",
     "babel-plugin-module-resolver": "^3.2.0",
     "eslint": "^6.5.1",
@@ -82,6 +84,7 @@
     "preset": "react-native"
   },
   "react-native": {
+    "encoding": "text-encoding",
     "zlib": "browserify-zlib",
     "console": "console-browserify",
     "constants": "constants-browserify",
@@ -108,6 +111,7 @@
     "tls": false
   },
   "browser": {
+    "encoding": "text-encoding",
     "zlib": "browserify-zlib",
     "console": "console-browserify",
     "constants": "constants-browserify",
