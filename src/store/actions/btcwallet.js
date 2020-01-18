@@ -1,28 +1,17 @@
 import * as types from '@types/index';
 import {FULFILLED, PENDING, REJECTED} from '@utils/index';
 import _btc from '@io/btcClient';
-import {cypherNodeHttpTransport} from 'cyphernode-js-sdk';
 import {getClient, getTransport} from '@io/matrix';
 import {Images, C} from '@common/index';
-import torBridge from '@helpers/torBridge';
+import {rnTorTransport} from '@io/tor/sifirRnTorTransport';
+import {
+  makeNewPgpKey,
+  signMessageWithArmoredKey,
+  verifySignedMessage,
+} from '@io/pgp/gopenpgp';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
-  try {
-    const reply = await torBridge.sendMessage(
-      'https://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion:2009/v0/getblockinfo',
-      JSON.stringify({test: 'poopp'}),
-    );
-    console.log('GOT REPLY', reply);
-  } catch (err) {
-
-    console.error('BBRIDGE ERROR', err);
-    return;
-  }
-  if (btcClient) {
-    return btcClient;
-  }
-
   const {
     auth: {token},
   } = getState();
@@ -34,13 +23,37 @@ const initBtcClient = () => async (dispatch, getState) => {
     });
     return;
   }
-  const client_matrix = await getClient(token);
-  const transport = await getTransport(client_matrix, token);
+  const key = await makeNewPgpKey({
+    passphrase: 'ttest',
+    email: 'poop@nop.com',
+    name: 'kaka',
+  });
+  const msg = 'My message';
+  const {armoredSignature} = await signMessageWithArmoredKey({
+    msg,
+    passphrase: 'ttest',
+    privKey: key.privKeyArmored,
+  });
+  const isSigned = await verifySignedMessage({
+    armoredSignature,
+    msg,
+    armoredKey: key.pubKeyArmored,
+  });
+  // const client_matrix = await getClient(token);
+  // const transport = await getTransport(client_matrix, token);
+  const transport = rnTorTransport({
+    onionUrl:
+      'http://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion/sifir',
+  });
   try {
     btcClient = await _btc({transport});
-    //  btcClient.getWatchedPub32();
   } catch (err) {
     console.error(err);
+    dispatch({
+      type: types.BTC_CLIENT_STATUS + REJECTED,
+      payload: {error: 'Error creating btc client'},
+    });
+    return;
   }
   dispatch({
     type: types.BTC_CLIENT_STATUS + FULFILLED,
