@@ -14,8 +14,6 @@ import com.facebook.react.bridge.Arguments;
 import com.proton.gopenpgp.helper.Helper;
 import com.proton.gopenpgp.crypto.Crypto;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
-
 
 public class PgpBridge extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
@@ -30,14 +28,6 @@ public class PgpBridge extends ReactContextBaseJavaModule {
     public String getName() {
         return "PgpBridge";
     }
-
-    @Override
-    public Map<String, Object> getConstants() {
-        final Map<String, Object> constants = new HashMap<>();
-        // constants.put(DURATION_SHORT_KEY, TorBridge.LENGTH_SHORT);
-        return constants;
-    }
-
 
     @ReactMethod
     public void genNewKey(String pass, String email, String name, Promise promise) {
@@ -55,7 +45,7 @@ public class PgpBridge extends ReactContextBaseJavaModule {
             reply.putString("hexKeyId",unlockedKeyObj.getHexKeyID());
             promise.resolve(reply);
         } catch (Exception e) {
-            promise.reject("Poop", e);
+            promise.reject(e);
         }
     }
 

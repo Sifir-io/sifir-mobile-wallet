@@ -59,11 +59,7 @@ public class TorBridgeAsyncTask extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... params) {
         try {
-            String method = params[0];
-            String onionUrl = params[1];
-            String message = params[2];
-            String reply = run(method, onionUrl, message);
-            return reply;
+            return run(params[0], params[1], params[2]);
         } catch (Exception e) {
             this.error = e;
             return e.toString();
