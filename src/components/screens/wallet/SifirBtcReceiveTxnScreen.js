@@ -7,7 +7,7 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  BackHandler,
+  // BackHandler,
 } from 'react-native';
 import {connect} from 'react-redux';
 import Overlay from 'react-native-modal-overlay';
@@ -21,30 +21,30 @@ class SifirBtcReceiveTxnScreen extends Component {
   constructor(props) {
     super(props);
     this.qrCode = '';
-    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+    // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
   componentWillMount() {
-    BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
+    //   BackHandler.addEventListener(
+    //     'hardwareBackPress',
+    //     this.handleBackButtonClick,
+    //   );
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
+    //  BackHandler.removeEventListener(
+    //    'hardwareBackPress',
+    //    this.handleBackButtonClick,
+    //  );
   }
 
   handleBackButtonClick() {
-    if (this.state.fromRoom) {
-      this.props.navigation.navigate('RoomsDetail');
-      return true;
-    }
-    this.props.navigation.goBack(null);
-    return true;
+    //  if (this.state.fromRoom) {
+    //    this.props.navigation.navigate('RoomsDetail');
+    //    return true;
+    //  }
+    //  this.props.navigation.goBack(null);
+    //  return true;
   }
 
   state = {

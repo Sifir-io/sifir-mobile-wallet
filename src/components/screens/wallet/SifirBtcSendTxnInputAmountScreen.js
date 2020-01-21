@@ -13,31 +13,31 @@ import {AppStyle, C} from '@common/index';
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
   constructor(props) {
     super(props);
-    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+    // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
   componentWillMount() {
-    BackHandler.addEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
+    //  BackHandler.addEventListener(
+    //    'hardwareBackPress',
+    //    this.handleBackButtonClick,
+    //  );
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener(
-      'hardwareBackPress',
-      this.handleBackButtonClick,
-    );
+    // BackHandler.removeEventListener(
+    //   'hardwareBackPress',
+    //   this.handleBackButtonClick,
+    // );
   }
 
   handleBackButtonClick() {
-    if (this.state.fromRoom) {
-      this.props.navigation.navigate('RoomsDetail');
-      return true;
-    } else {
-      this.props.navigation.goBack(null);
-    }
-    return true;
+    // if (this.state.fromRoom) {
+    //   this.props.navigation.navigate('RoomsDetail');
+    //   return true;
+    // } else {
+    //   this.props.navigation.goBack(null);
+    // }
+    // return true;
   }
 
   state = {

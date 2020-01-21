@@ -14,6 +14,7 @@ import okhttp3.OkHttpClient;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.util.concurrent.TimeUnit;
 
 public class TorBridge extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
@@ -28,6 +29,9 @@ public class TorBridge extends ReactContextBaseJavaModule {
         this.client = new OkHttpClient()
                 .newBuilder()
                 .proxy(this.proxy)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .build();
     }
 

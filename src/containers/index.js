@@ -5,15 +5,11 @@ import {View, StyleSheet} from 'react-native';
 import SifirHeader from '@elements/SifirHeader';
 import {AppLandingScreen, PairWithTokenScreen} from '@screens/auth/index';
 import WalletTab from './WalletStack';
-import RoomsTab from './RoomsStack';
-import ShopTab from './ShopStack';
 import {AppStyle} from '@common/index';
 
 const ContentNavigator = createSwitchNavigator(
   {
     WALLET: WalletTab,
-    ROOMS: RoomsTab,
-    SHOP: ShopTab,
   },
   {
     initialRouteName: 'WALLET',

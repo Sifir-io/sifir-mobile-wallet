@@ -11,7 +11,7 @@ export default class SirFirHeader extends Component {
   };
 
   render() {
-    const menus = [C.STR_WALLET, C.STR_ROOMS, C.STR_SHOP];
+    const menus = [C.STR_WALLET];
     const {curMenu} = this.state;
     const {switchPage} = this.props;
 

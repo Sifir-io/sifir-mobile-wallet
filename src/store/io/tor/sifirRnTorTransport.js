@@ -17,6 +17,7 @@ const rnTorTransport = ({onionUrl}) => {
       '',
       'iD8DBQFIYQCSi0P7OS4VvkwRAm7nAKC1Ra4RmhtgPFEIckxu0uACoVWVIwCg0u2B5u2gS2tSO7LXagplAF+AwI0=;=FfiF',
     );
+    console.log('got resp', resp);
     // TODO verify resp signature
     return JSON.parse(resp);
   };
@@ -29,6 +30,7 @@ const rnTorTransport = ({onionUrl}) => {
       payload,
       'iD8DBQFIYQCSi0P7OS4VvkwRAm7nAKC1Ra4RmhtgPFEIckxu0uACoVWVIwCg0u2B5u2gS2tSO7LXagplAF+AwI0=;=FfiF',
     );
+    console.log('got resp', resp);
     // TODO verify resp signature
     return JSON.parse(resp);
   };
