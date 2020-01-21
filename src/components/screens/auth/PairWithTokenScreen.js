@@ -29,7 +29,7 @@ class PairWithTokenScreen extends Component {
     this.setState({showModal: false});
     const {token, key} = validatedTokenHash(qrdata);
     if (!token || !key) {
-      this.setState({qrError: 'Invalid token from the QR Code'});
+      this.setState({qrError: C.STR_INVALID_TOKEN_ERR_MSG});
       return;
     } else {
       this.props.pairPhoneWithToken({token, key});
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
   checkImg: {width: 8 * C.vh, height: 8 * C.vh, marginTop: 2 * C.vh},
   progressView: {
     flex: 1,
-    // justifyContent: 'center',
     flexDirection: 'row',
     justifyContent: 'space-around',
   },

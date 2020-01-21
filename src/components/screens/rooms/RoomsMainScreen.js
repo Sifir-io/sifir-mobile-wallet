@@ -4,64 +4,47 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  TextInput,
+  ActivityIndicator,
   FlatList,
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
-import SifirChatListItem from '@elements/SifirChatListItem';
+import {connect} from 'react-redux';
 
-export default class RoomsMainScreen extends Component {
+import SifirChatListItem from '@elements/SifirChatListItem';
+import SifirSearchBox from '@elements/SifirSearchBox';
+import {loadRoomList} from '@actions/rooms';
+
+class RoomsMainScreen extends Component {
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  componentDidMount() {
+    this.props.loadRoomList();
+  }
+
   state = {
     srchTxt: '',
     isSrchStarted: false,
     itemClicked: false,
-    listData: [
-      {
-        id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-        title: 'Ghassan',
-        cont: 'Hey man! You got a medium in black available?',
-        timeTxt: 'Just now',
-        avatar_url: Images.img_face1,
-        selected: false,
-      },
-      {
-        id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-        title: 'Ghassan',
-        cont: 'Hey man! You got a medium in black available?',
-        timeTxt: 'Just now',
-        avatar_url: Images.img_face1,
-        selected: false,
-      },
-      {
-        id: '58694a0f-3da1-471f-bd96-145571e29d72',
-        title: 'Ghassan',
-        cont: 'Hey man! You got a medium in black available?',
-        timeTxt: 'Just now',
-        avatar_url: Images.img_face1,
-        selected: false,
-      },
-    ],
+    roomsList: [],
     gColors: [
       ['#122C3A', '#122C3A', '#122C3A'],
       ['#52d4cd', '#54a5b1', '#57658c'],
     ],
   };
 
-  onSrchTxtChange = txt => {
-    this.setState({srchTxt: txt});
-    if (txt !== '') {
-      this.setState({isSrchStarted: true});
-    }
-  };
-
   clickedItem = data => {
-    const index = this.state.listData.findIndex(item => data.id === item.id);
-    var data = this.state.listData;
-    data[index].selected = !data[index].selected;
-    this.setState({listData: data});
-    setTimeout(() => {
-      this.props.navigation.navigate('RoomsDetail');
-    }, 500);
+    this.props.navigation.navigate('RoomsDetail');
+
+    // const index = this.state.listData.findIndex(item => data.id === item.id);
+    // let listData = this.state.listData;
+    // listData[index].selected = true;
+    // this.setState({listData});
+    // setTimeout(() => {
+    //   listData[index].selected = false;
+    //   this.setState({listData});
+    // }, 500);
   };
 
   FlatListItemSeparator = () => {
@@ -69,40 +52,37 @@ export default class RoomsMainScreen extends Component {
   };
 
   render() {
+    const {roomsList, loaded, loading} = this.props.rooms;
     return (
       <View style={styles.mainscreen}>
-        <View style={styles.searchView}>
-          <Image source={Images.icon_search} style={styles.srchImg} />
-          <TextInput
-            style={styles.srchInput}
-            onChangeText={text => this.onSrchTxtChange(text)}
-            value={this.state.srchTxt}
-          />
-          {this.state.isSrchStarted && (
-            <TouchableOpacity
-              onPressOut={() =>
-                this.setState({
-                  srchTxt: '',
-                  isSrchStarted: false,
-                })
-              }>
-              <Image source={Images.icon_close1} style={styles.srchCloseImg} />
-            </TouchableOpacity>
-          )}
-        </View>
-        <FlatList
-          data={this.state.listData}
-          ItemSeparatorComponent={this.FlatListItemSeparator}
-          renderItem={({item}) => (
-            <SifirChatListItem
-              data={item}
-              clickedItem={this.clickedItem}
-              gColors={this.state.gColors}
-            />
-          )}
-          keyExtractor={item => item.id}
-          style={styles.listView}
+        <SifirSearchBox
+          onChangeText={this.onSrchTxtChange}
+          onCloseSrch={this.onCloseSrch}
+          value={this.state.srchTxt}
+          isSrchStarted={this.state.isSrchStarted}
         />
+        {loading === true && (
+          <ActivityIndicator
+            size="large"
+            color={AppStyle.mainColor}
+            style={styles.loading}
+          />
+        )}
+        {loaded === true && (
+          <FlatList
+            data={roomsList}
+            ItemSeparatorComponent={this.FlatListItemSeparator}
+            renderItem={({item}) => (
+              <SifirChatListItem
+                data={item}
+                clickedItem={this.clickedItem}
+                gColors={this.state.gColors}
+              />
+            )}
+            keyExtractor={item => item.id}
+            style={styles.listView}
+          />
+        )}
         <TouchableOpacity style={styles.addImgView}>
           <Image source={Images.icon_plus} style={styles.addImg} />
         </TouchableOpacity>
@@ -121,31 +101,6 @@ const styles = StyleSheet.create({
   tempStyle: {
     color: 'white',
     fontSize: 20,
-  },
-  searchView: {
-    borderRadius: 17,
-    backgroundColor: '#122C3A',
-    marginHorizontal: 15,
-    paddingVertical: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  srchImg: {
-    width: 20,
-    height: 20,
-    marginLeft: 10,
-  },
-  srchInput: {
-    paddingVertical: 0,
-    color: 'white',
-    marginLeft: 10,
-    fontSize: 17,
-    width: C.SCREEN_WIDTH * 0.75,
-  },
-  srchCloseImg: {
-    width: 15,
-    height: 15,
-    marginRight: 15,
   },
   listView: {
     flex: 1,
@@ -166,4 +121,18 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
   },
+  loading: {
+    marginTop: C.SCREEN_HEIGHT / 3,
+  },
 });
+
+const mapStateToProps = state => {
+  return {
+    rooms: state.rooms,
+  };
+};
+
+const mapDispatchToProps = {loadRoomList};
+
+// eslint-disable-next-line prettier/prettier
+export default connect(mapStateToProps, mapDispatchToProps)(RoomsMainScreen);

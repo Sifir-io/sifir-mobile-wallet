@@ -16,9 +16,9 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
 
   render() {
     const {address, amount, feeSettingEnabled} = this.state.txnInfo;
-    const amountFontSize = (C.vw * 100) / amount.length;
+    const amountFontSize = (C.vw * 80) / amount.length;
     const btcUnitFontSize = amountFontSize * 0.6;
-    const recTxtFontSize = (C.vw * 250) / address.length;
+    const recTxtFontSize = (C.vw * 70) / address.length;
 
     return (
       <View style={styles.mainView}>
@@ -63,15 +63,7 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
         {feeSettingEnabled && (
           <View style={styles.setArea}>
             <Text style={styles.setTxt}>{C.STR_FEES}</Text>
-            <Text
-              style={{
-                fontSize: 23,
-                color: 'white',
-                marginLeft: 10,
-                marginRight: 10,
-              }}>
-              {amount} BTC
-            </Text>
+            <Text style={styles.btcAmountTxt}>{amount} BTC</Text>
             <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
           </View>
         )}
@@ -205,5 +197,11 @@ const styles = StyleSheet.create({
   dlgChild: {
     marginTop: 12 * C.vh,
     backgroundColor: 'transparent',
+  },
+  btcAmountTxt: {
+    fontSize: 23,
+    color: 'white',
+    marginLeft: 10,
+    marginRight: 10,
   },
 });

@@ -3,8 +3,6 @@ import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
 import {Badge, Icon} from 'react-native-elements';
-import LinearGradient from 'react-native-linear-gradient';
-import Swipeout from 'react-native-swipeout';
 
 export default class SifirChatListItem extends Component {
   state = {i: 0};
@@ -22,16 +20,17 @@ export default class SifirChatListItem extends Component {
   ];
 
   render() {
-    const {data, clickedItem, gColors} = this.props;
+    const {data, clickedItem} = this.props;
+    const status = [
+      {stat: 'Availalbe', color: 'green'},
+      {stat: 'Busy', color: 'red'},
+      {stat: 'Away', color: AppStyle.backgroundColor},
+    ];
+
     return (
-      <Swipeout
-        right={this.swipeoutBtns}
-        style={styles.swipeout}
-        buttonWidth={70}>
-        <TouchableOpacity onPress={() => clickedItem(data)}>
-          <LinearGradient
-            colors={data.selected === false ? gColors[0] : gColors[1]}
-            style={styles.chatItem}>
+      <>
+        <View style={styles.consultItem}>
+          <View style={styles.chatItem}>
             <Image source={Images.img_face1} style={styles.itemImg} />
             <Badge
               status="success"
@@ -39,15 +38,44 @@ export default class SifirChatListItem extends Component {
               containerStyle={styles.itemBadgeCont}
             />
             <View style={styles.txtItemView}>
-              <Text style={styles.nameItemTxt}>{data.title}</Text>
-              <Text style={styles.contItemTxt}>{data.cont}</Text>
+              <View style={styles.headView}>
+                <Text style={styles.nameItemTxt}>{data.title}</Text>
+                <View style={styles.consultStar}>
+                  <Icon name="star" type="rowing" color="black" size={19} />
+                  <Text>{data.star}</Text>
+                </View>
+              </View>
+              <Text style={styles.contItemTxt}>{data.type}</Text>
+              <Text style={[styles.contItemTxt, {fontSize: 12}]}>
+                {data.location}
+              </Text>
             </View>
             <View style={styles.timeTxtView}>
-              <Text style={styles.timeItem}>{data.timeTxt}</Text>
+              <Text style={styles.rateItem}>{`$${data.rate}/min`}</Text>
+              <View
+                style={[
+                  styles.statusView,
+                  {backgroundColor: status[data.status].color},
+                ]}>
+                <Text style={styles.statusTxt}>{status[data.status].stat}</Text>
+              </View>
             </View>
-          </LinearGradient>
-        </TouchableOpacity>
-      </Swipeout>
+          </View>
+          <View>
+            <Text style={{color: 'white'}}>{data.cont}</Text>
+          </View>
+          <TouchableOpacity onPress={() => clickedItem(data)}>
+            <View style={styles.payContView}>
+              <Text style={styles.payBtnTxt}>PAY TO CONTACT</Text>
+            </View>
+          </TouchableOpacity>
+          <View style={styles.infoView}>
+            <Text style={styles.infoTxt}>
+              You will only be chareged if Alice accpts your request
+            </Text>
+          </View>
+        </View>
+      </>
     );
   }
 }
@@ -139,9 +167,9 @@ const styles = StyleSheet.create({
   },
   statusView: {
     borderRadius: 5,
-    width: 70,
     alignItems: 'center',
     paddingVertical: 3,
+    paddingHorizontal: 7,
     backgroundColor: 'green',
   },
   infoTxt: {color: 'white', fontStyle: 'italic'},

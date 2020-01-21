@@ -1,38 +1,35 @@
 import React from 'react';
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-import {View} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+
 import SifirHeader from '@elements/SifirHeader';
 import {AppLandingScreen, PairWithTokenScreen} from '@screens/auth/index';
-import WalletStack from './WalletStack';
-import RoomsStack from './RoomsStack';
-import SettingsStack from './SettingsStack';
+import WalletTab from './WalletStack';
+import RoomsTab from './RoomsStack';
+import ShopTab from './ShopStack';
 import {AppStyle} from '@common/index';
 
-const WalletTab = createAppContainer(WalletStack);
-const RoomsTab = createAppContainer(RoomsStack);
-const SettingsTab = createAppContainer(SettingsStack);
+const ContentNavigator = createSwitchNavigator(
+  {
+    WALLET: WalletTab,
+    ROOMS: RoomsTab,
+    SHOP: ShopTab,
+  },
+  {
+    initialRouteName: 'WALLET',
+  },
+);
 
 class Root extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      currentTab: 0,
-    };
-  }
-
-  switchPage = page => {
-    this.setState({currentTab: page});
-  };
+  static router = ContentNavigator.router;
 
   render() {
-    const {currentTab} = this.state;
     return (
-      <View style={{flex: 1, backgroundColor: AppStyle.backgroundColor}}>
-        <SifirHeader switchPage={this.switchPage} />
-        {currentTab === 0 && <WalletTab />}
-        {currentTab === 1 && <RoomsTab />}
-        {currentTab === 2 && <SettingsTab />}
+      <View style={styles.mainView}>
+        <SifirHeader
+          switchPage={page => this.props.navigation.navigate(page)}
+        />
+        <ContentNavigator navigation={this.props.navigation} />
       </View>
     );
   }
@@ -50,3 +47,7 @@ export default createAppContainer(
     },
   ),
 );
+
+const styles = StyleSheet.create({
+  mainView: {flex: 1, backgroundColor: AppStyle.backgroundColor},
+});

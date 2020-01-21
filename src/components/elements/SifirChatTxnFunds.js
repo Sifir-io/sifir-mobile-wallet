@@ -3,18 +3,24 @@ import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 
 export default class SifirChatTxnFunds extends Component {
-  state = {curMenu: 0, value: 0.6};
+  state = {curMenu: 0};
 
   render() {
+    const MENUS = {NO_SELECTED: 0, SEND_FUND: 1, REQ_FUND: 2, MNG_FUND: 3};
+
     return (
       <>
         <View>
           <View style={styles.bodyStyle}>
-            {this.state.curMenu === 1 && <></>}
-            {this.state.curMenu === 0 && (
+            {this.state.curMenu === MENUS.REQ_FUND && <></>}
+            {this.state.curMenu === MENUS.NO_SELECTED && (
               <View style={{flex: 1}}>
                 <TouchableOpacity style={{flex: 1}}>
-                  <View style={styles.rowStyle}>
+                  <View
+                    style={styles.rowStyle}
+                    onTouchEnd={() =>
+                      this.props.onClickTxnFundMenu(MENUS.SEND_FUND)
+                    }>
                     <Image
                       source={Images.icon_chatSend}
                       style={styles.chatSendImg}
@@ -25,7 +31,9 @@ export default class SifirChatTxnFunds extends Component {
                 <TouchableOpacity style={{flex: 1}}>
                   <View
                     style={styles.rowStyle}
-                    onTouchEnd={() => this.setState({curMenu: 1})}>
+                    onTouchEnd={() =>
+                      this.props.onClickTxnFundMenu(MENUS.REQ_FUND)
+                    }>
                     <Image
                       source={Images.icon_chatRequest}
                       style={styles.chatReqImg}

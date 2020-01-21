@@ -6,60 +6,57 @@ import {
   TouchableOpacity,
   TextInput,
   FlatList,
+  ActivityIndicator,
   Text,
+  BackHandler,
 } from 'react-native';
 import {Badge} from 'react-native-elements';
 import Overlay from 'react-native-modal-overlay';
+import {connect} from 'react-redux';
+
+import {loadRoomMsg} from '@actions/rooms';
 import {Images, AppStyle, C} from '@common/index';
 import SifirChatMsg from '@elements/SifirChatMsg';
 import SifirChatTxnFunds from '../../elements/SifirChatTxnFunds';
+class RoomsDetailScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+  }
 
-export default class RoomsDetailScreen extends Component {
+  componentWillMount() {
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  handleBackButtonClick() {
+    if (this.state.fromShop) {
+      this.props.navigation.navigate('ShopMain');
+      return true;
+    }
+    this.props.navigation.goBack(null);
+    return true;
+  }
+  componentDidMount() {
+    this.props.loadRoomMsg();
+  }
+
   state = {
-    messages: [
-      {
-        type: 'RECEIVED',
-        cont_type: 'media',
-      },
-      {
-        type: 'COIN_REQUEST',
-        content: {
-          time: '10:43 PM',
-          amount: '0.012',
-          currency: 'BTC',
-        },
-      },
-      {
-        type: 'SENT',
-        content: 'You know it! Saved one just for you. Not many left!',
-      },
-      {
-        type: 'COIN_SENT',
-        content: {
-          time: '10:43 PM',
-          name: 'GHASSAN',
-          amount: '0.012',
-          currency: 'BTC',
-        },
-      },
-      {
-        type: 'SENT',
-        content: 'You know it! Saved one just for you',
-      },
-      {
-        type: 'RECEIVED',
-        content: 'Hey man! You got a medium in black available?',
-        time: '10:42 PM',
-      },
-      {
-        type: 'TIME',
-        content: 'TODAY',
-      },
-    ],
+    messages: [],
     mediaModal: false,
     txnFundsModal: false,
     inputMsg: '',
     selectEmoji: false,
+    fromShop: this.props.navigation.getParam('fromShop'),
   };
 
   onClose = () => this.setState({mediaModal: false, txnFundsModal: false});
@@ -72,12 +69,39 @@ export default class RoomsDetailScreen extends Component {
     if (this.state.inputMsg === '') {
       return;
     }
-    var sentMsg = {type: 'SENT', content: this.state.inputMsg};
+    var sentMsg = {type: C.STR_SENT, content: this.state.inputMsg};
     this.state.messages.unshift(sentMsg);
     this.setState({messages: this.state.messages, inputMsg: ''});
   };
 
+  onClickTxnFundMenu = menu => {
+    this.setState({txnFundsModal: false});
+    const MENUS = {NO_SELECTED: 0, SEND_FUND: 1, REQ_FUND: 2, MNG_FUND: 3};
+    switch (menu) {
+      case MENUS.SEND_FUND:
+        this.props.navigation.navigate('BtcSendTxnInputAmount', {
+          txnInfo: {address: 'Alice'},
+          fromRoom: true,
+        });
+        break;
+      case MENUS.REQ_FUND:
+        this.props.navigation.navigate('BtcReceiveTxn', {
+          walletInfo: {
+            address: 'Alice',
+            label: 'test',
+            type: C.STR_SPEND_WALLET_TYPE,
+          },
+          fromRoom: true,
+        });
+        break;
+      default:
+        break;
+    }
+  };
+
   render() {
+    const {roomMsg, loaded, loading} = this.props.rooms;
+
     return (
       <View style={styles.mainscreen}>
         <View style={styles.headerView}>
@@ -94,15 +118,23 @@ export default class RoomsDetailScreen extends Component {
             <Image source={Images.icon_setting} style={styles.settingImg} />
           </TouchableOpacity>
         </View>
-
-        <FlatList
-          data={this.state.messages}
-          renderItem={({item}) => (
-            <SifirChatMsg data={item} onPlayMedia={this.onPlayMedia} />
-          )}
-          inverted
-          style={styles.chatContent}
-        />
+        {loading === true && (
+          <ActivityIndicator
+            size="large"
+            color={AppStyle.mainColor}
+            style={styles.loading}
+          />
+        )}
+        {loaded === true && (
+          <FlatList
+            data={roomMsg}
+            renderItem={({item}) => (
+              <SifirChatMsg data={item} onPlayMedia={this.onPlayMedia} />
+            )}
+            inverted
+            style={styles.chatContent}
+          />
+        )}
 
         <View style={styles.bottomView}>
           <View style={styles.typeMsgView}>
@@ -174,13 +206,15 @@ export default class RoomsDetailScreen extends Component {
           onClose={this.onClose}
           closeOnTouchOutside
           animationType="zoomIn"
-          containerStyle={{
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: 15,
-          }}
+          containerStyle={styles.txnFundsOverlay}
           childrenWrapperStyle={styles.dlgChild}
           animationDuration={500}>
-          {hideModal => <SifirChatTxnFunds hideModal={hideModal} />}
+          {hideModal => (
+            <SifirChatTxnFunds
+              hideModal={hideModal}
+              onClickTxnFundMenu={this.onClickTxnFundMenu}
+            />
+          )}
         </Overlay>
       </View>
     );
@@ -229,7 +263,10 @@ const styles = StyleSheet.create({
     marginLeft: -7,
   },
   bottomView: {
+    position: 'absolute',
+    bottom: 0,
     height: 80,
+    width: C.SCREEN_WIDTH,
     backgroundColor: 'black',
     justifyContent: 'center',
     alignItems: 'center',
@@ -272,6 +309,7 @@ const styles = StyleSheet.create({
   },
   chatContent: {
     marginVertical: 15,
+    marginBottom: 80,
   },
   mediaModalView: {
     backgroundColor: 'transparent',
@@ -299,4 +337,20 @@ const styles = StyleSheet.create({
     marginTop: C.SCREEN_HEIGHT * 0.52,
     backgroundColor: 'transparent',
   },
+  txnFundsModal: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
+  },
+  loading: {
+    marginTop: C.SCREEN_HEIGHT / 3,
+  },
 });
+
+const mapStateToProps = state => {
+  return {
+    rooms: state.rooms,
+  };
+};
+const mapDispatchToProps = {loadRoomMsg};
+// eslint-disable-next-line prettier/prettier
+export default connect(mapStateToProps, mapDispatchToProps)(RoomsDetailScreen);

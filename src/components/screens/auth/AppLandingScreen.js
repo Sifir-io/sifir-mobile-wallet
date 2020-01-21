@@ -7,9 +7,11 @@ class AppLandingScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
   }
+
   componentDidMount() {
     this._bootstrapAsync();
   }
+
   _bootstrapAsync = async () => {
     await this.props.loadAuthInfo();
     const {
@@ -18,7 +20,9 @@ class AppLandingScreen extends React.Component {
     if (token && key && paired) {
       this.props.navigation.navigate('App');
     } else {
-      this.props.navigation.navigate('Pair');
+      // this.props.navigation.navigate('Pair');
+      // For chat page component design
+      this.props.navigation.navigate('App');
     }
   };
 

@@ -12,6 +12,7 @@ export const C = {
   STR_My_Wallets: 'My Wallets',
   STR_WALLET: 'WALLET',
   STR_ROOMS: 'ROOMS',
+  STR_SHOP: 'SHOP',
   STR_SETTINGS: 'SETTINGS',
   STR_Cur_Balance: 'Current Balance',
   TRANSACTIONS: 'Transactions',
@@ -61,5 +62,12 @@ export const C = {
   STR_SEND_FUND: 'SEND FUNDS',
   STR_REQUEST_FUNDS: 'REQUEST FUNDS',
   STR_MANAGE_FUNDS: 'MANAGE FUNDS',
-  STR_TYPE_MSG: 'Type a message'
+  STR_TYPE_MSG: 'Type a message',
+  STR_TIME: 'TIME',
+  STR_COIN_REQUEST: 'COIN_REQUEST',
+  STR_COIN_SENT: 'COIN_SENT',
+  STR_INVALID_TOKEN_ERR_MSG: 'Invalid token from the QR Code',
+  STR_LEGACY: 'Legacy',
+  STR_Segwit_Compatible: 'Segwit Compatible',
+  STR_Bech32: 'Bech32',
 };

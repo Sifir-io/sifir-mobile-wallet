@@ -9,13 +9,13 @@ export default class SifirChatMsg extends Component {
   render() {
     const {data, onPlayMedia} = this.props;
     switch (data.type) {
-      case 'TIME':
+      case C.STR_TIME:
         return (
           <View style={styles.timeItemView}>
             <Text style={styles.timeItemTxt}>{data.content}</Text>
           </View>
         );
-      case 'RECEIVED':
+      case C.STR_RECEIVED:
         if (data.cont_type === 'media') {
           return (
             <View style={{marginBottom: 17}}>
@@ -56,7 +56,7 @@ export default class SifirChatMsg extends Component {
             </View>
           );
         }
-      case 'SENT':
+      case C.STR_SENT:
         return (
           <View style={styles.sentMsgView}>
             <View style={styles.sentContView}>
@@ -70,7 +70,7 @@ export default class SifirChatMsg extends Component {
             </View>
           </View>
         );
-      case 'COIN_REQUEST':
+      case C.STR_COIN_REQUEST:
         return (
           <View style={styles.coinSentView}>
             <Text style={styles.coinTimeTxt}>{data.content.time}</Text>
@@ -89,7 +89,7 @@ export default class SifirChatMsg extends Component {
             />
           </View>
         );
-      case 'COIN_SENT':
+      case C.STR_COIN_SENT:
         return (
           <View style={styles.coinSentView}>
             <Text style={styles.coinTimeTxt}>{data.content.time}</Text>

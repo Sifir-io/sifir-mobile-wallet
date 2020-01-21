@@ -70,7 +70,7 @@ export default class SifirSettingModal extends Component {
                         source={Images.icon_clock}
                         style={{width: 30, height: 30}}
                       />
-                      <Text style={styles.textStyle}>SET FEES</Text>
+                      <Text style={styles.textStyle}>{C.STR_SET_FEES}</Text>
                     </View>
                   </TouchableOpacity>
                 )}
@@ -88,7 +88,7 @@ export default class SifirSettingModal extends Component {
                         height: 37,
                       }}
                     />
-                    <Text style={styles.textStyle}>SETTINGS</Text>
+                    <Text style={styles.textStyle}>{C.STR_SETTINGS}</Text>
                   </View>
                 </TouchableOpacity>
               </View>

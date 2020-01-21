@@ -1,6 +1,6 @@
+import React from 'react';
 import {fromRight} from 'react-navigation-transitions';
 import {createStackNavigator} from 'react-navigation-stack';
-
 import {RoomsMainScreen, RoomsDetailScreen} from '@screens/rooms/index';
 
 const RoomsStack = createStackNavigator(
@@ -24,4 +24,10 @@ const RoomsStack = createStackNavigator(
   },
 );
 
-export default RoomsStack;
+export default class RoomsTab extends React.Component {
+  static router = RoomsStack.router;
+
+  render() {
+    return <RoomsStack navigation={this.props.navigation} />;
+  }
+}

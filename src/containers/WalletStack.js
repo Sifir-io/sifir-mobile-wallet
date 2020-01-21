@@ -1,5 +1,6 @@
 import {fromRight} from 'react-navigation-transitions';
 import {createStackNavigator} from 'react-navigation-stack';
+import React from 'react';
 
 import {
   SifirGetAddrScreen,
@@ -69,4 +70,10 @@ const WalletStack = createStackNavigator(
   },
 );
 
-export default WalletStack;
+export default class WalletTab extends React.Component {
+  static router = WalletStack.router;
+
+  render() {
+    return <WalletStack navigation={this.props.navigation} />;
+  }
+}

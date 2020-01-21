@@ -11,7 +11,7 @@ export default class SirFirHeader extends Component {
   };
 
   render() {
-    const menus = [C.STR_WALLET, C.STR_ROOMS, C.STR_SETTINGS];
+    const menus = [C.STR_WALLET, C.STR_ROOMS, C.STR_SHOP];
     const {curMenu} = this.state;
     const {switchPage} = this.props;
 
@@ -26,7 +26,7 @@ export default class SirFirHeader extends Component {
               <View
                 onTouchEnd={() => {
                   this.setState({curMenu: i});
-                  switchPage(i);
+                  switchPage(menus[i]);
                 }}
                 style={curMenu === i ? styles.activeMenuItem : {}}>
                 {this.state.showMsgNotify && (

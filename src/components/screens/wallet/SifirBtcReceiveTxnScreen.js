@@ -7,6 +7,7 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  BackHandler,
 } from 'react-native';
 import {connect} from 'react-redux';
 import Overlay from 'react-native-modal-overlay';
@@ -20,7 +21,32 @@ class SifirBtcReceiveTxnScreen extends Component {
   constructor(props) {
     super(props);
     this.qrCode = '';
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
+
+  componentWillMount() {
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  handleBackButtonClick() {
+    if (this.state.fromRoom) {
+      this.props.navigation.navigate('RoomsDetail');
+      return true;
+    }
+    this.props.navigation.goBack(null);
+    return true;
+  }
+
   state = {
     btnStatus: 0,
     modalVisible: false,
@@ -31,6 +57,7 @@ class SifirBtcReceiveTxnScreen extends Component {
     showQRCode: false,
     showSelector: false,
     enableWatchSelection: false,
+    fromRoom: this.props.navigation.getParam('fromRoom'),
   };
 
   componentDidMount() {
@@ -266,9 +293,9 @@ class SifirBtcReceiveTxnScreen extends Component {
             <FlatList
               style={styles.addList}
               data={[
-                {title: 'Legacy', addrType: 'legacy'},
-                {title: 'Segwit Compatible', addrType: 'p2sh-segwit'},
-                {title: 'Bech32', addrType: 'bech32'},
+                {title: C.STR_LEGACY, addrType: 'legacy'},
+                {title: C.STR_Segwit_Compatible, addrType: 'p2sh-segwit'},
+                {title: C.STR_Bech32, addrType: 'bech32'},
               ]}
               renderItem={({item}) => (
                 <TouchableOpacity

@@ -19,6 +19,7 @@ public class TorBridge extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
     public OkHttpClient client;
     public Proxy proxy;
+
     public TorBridge(ReactApplicationContext context) {
         super(context);
         reactContext = context;
@@ -36,9 +37,9 @@ public class TorBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void sendRequest(String onionUrl, String method, String message, Promise promise) {
+    public void sendRequest(String onionUrl, String method, String message, String signatureHeader, Promise promise) {
         try {
-            new TorBridgeAsyncTask(promise, this.client).execute(method, onionUrl, message);
+            new TorBridgeAsyncTask(promise, this.client).execute(method, onionUrl, message, signatureHeader);
         } catch (Exception e) {
             promise.reject(e);
         }

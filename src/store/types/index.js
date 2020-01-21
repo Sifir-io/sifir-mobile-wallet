@@ -10,3 +10,7 @@ export const REQUEST_PAIR = 'REQUEST_PAIR';
 export const GET_AUTH_STATUS = 'GET_AUTH_STATUS';
 export const GET_TOKEN_FROM_QR = 'GET_TOKEN_FROM_QR';
 export const MATRIX_CLIENT = 'ACTION_MATRIX_CLIENT';
+
+// Rooms
+export const GET_ROOMS_LIST = 'GET_ROOMS_LIST';
+export const GET_ROOM_MSG = 'GET_ROOM_MSG';

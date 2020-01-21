@@ -5,15 +5,46 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
+  BackHandler,
 } from 'react-native';
 
 import {AppStyle, C} from '@common/index';
 
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
+  }
+
+  componentWillMount() {
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener(
+      'hardwareBackPress',
+      this.handleBackButtonClick,
+    );
+  }
+
+  handleBackButtonClick() {
+    if (this.state.fromRoom) {
+      this.props.navigation.navigate('RoomsDetail');
+      return true;
+    } else {
+      this.props.navigation.goBack(null);
+    }
+    return true;
+  }
+
   state = {
     btnStatus: 0,
     amount: null,
     txnInfo: this.props.navigation.getParam('txnInfo'),
+    fromRoom: this.props.navigation.getParam('fromRoom'),
   };
 
   confirm = () => {

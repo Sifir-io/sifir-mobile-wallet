@@ -27,7 +27,7 @@ class SifirTxnEntry extends PureComponent {
           imgURL = Images.icon_receive;
           break;
         default:
-          txIDStr = 'Unknon - #' + txIDStr;
+          txIDStr = 'Unknown - #' + txIDStr;
           imgURL = Images.icon_receive;
           break;
       }
