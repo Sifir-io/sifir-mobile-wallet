@@ -5,12 +5,14 @@ import SifirHeader from '@elements/SifirHeader';
 import {AppLandingScreen, PairWithTokenScreen} from '@screens/auth/index';
 import WalletStack from './WalletStack';
 import RoomsStack from './RoomsStack';
-import SettingsStack from './SettingsStack';
+// import SettingsStack from './SettingsStack';
+import LnStack from './LnStack';
 import {AppStyle} from '@common/index';
 
 const WalletTab = createAppContainer(WalletStack);
 const RoomsTab = createAppContainer(RoomsStack);
-const SettingsTab = createAppContainer(SettingsStack);
+const LnTab = createAppContainer(LnStack);
+// const SettingsTab = createAppContainer(SettingsStack);
 
 class Root extends React.Component {
   constructor(props) {
@@ -32,7 +34,7 @@ class Root extends React.Component {
         <SifirHeader switchPage={this.switchPage} />
         {currentTab === 0 && <WalletTab />}
         {currentTab === 1 && <RoomsTab />}
-        {currentTab === 2 && <SettingsTab />}
+        {currentTab === 2 && <LnTab />}
       </View>
     );
   }
