@@ -7,7 +7,6 @@ const {PgpBridge} = NativeModules;
 
 const makeNewPgpKey = async ({passphrase, email, name}) => {
   const key = await PgpBridge.genNewKey(passphrase, email, name);
-  console.log('ggggo', key);
   return key;
 };
 const signMessageWithArmoredKey = async ({msg, privKey, passphrase}) => {
@@ -16,21 +15,30 @@ const signMessageWithArmoredKey = async ({msg, privKey, passphrase}) => {
     privKey,
     passphrase,
   );
-  console.log('signed', {armoredSignature, message});
   return {armoredSignature, message};
 };
 const verifySignedMessage = async ({msg, armoredSignature, armoredKey}) => {
-  console.log('sending', msg, armoredSignature, armoredKey);
   const isGood = await PgpBridge.verifySignedMessage(
     msg,
     armoredSignature,
     armoredKey,
   );
-  console.log('sign ve', isGood);
   return isGood;
+};
+// TODO these functions , note if optional keys provided with sign or check sign
+
+const encryptMessage = async ({msg, pubKey, passphrase, privKey = null}) => {
+  const encryptedMessage = msg;
+  return encryptedMessage;
+};
+const decryptMessage = async ({msg, privKey, passphrase, pubKey = null}) => {
+  const decryptedMessage = msg;
+  return decryptedMessage;
 };
 module.exports = {
   makeNewPgpKey,
   signMessageWithArmoredKey,
   verifySignedMessage,
+  encryptMessage,
+  decryptMessage,
 };

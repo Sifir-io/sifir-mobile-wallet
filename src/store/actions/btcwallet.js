@@ -8,7 +8,7 @@ import {
   makeNewPgpKey,
   signMessageWithArmoredKey,
   verifySignedMessage,
-} from '@io/pgp/gopenpgp';
+} from '@io/pgp/';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
@@ -23,27 +23,37 @@ const initBtcClient = () => async (dispatch, getState) => {
     });
     return;
   }
-  const key = await makeNewPgpKey({
-    passphrase: 'ttest',
+  const passphrase = 'keypassphrase from state';
+  const onionUrl =
+    'http://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion/sifir';
+  const {pubKeyArmored: nodePubKey} = await makeNewPgpKey({
+    passphrase,
     email: 'poop@nop.com',
     name: 'kaka',
   });
-  const msg = 'My message';
-  const {armoredSignature} = await signMessageWithArmoredKey({
-    msg,
-    passphrase: 'ttest',
-    privKey: key.privKeyArmored,
-  });
-  const isSigned = await verifySignedMessage({
-    armoredSignature,
-    msg,
-    armoredKey: key.pubKeyArmored,
+  const deviceKey = await makeNewPgpKey({
+    email: 'poop@nop.com',
+    name: 'kaka',
+    passphrase,
   });
   // const client_matrix = await getClient(token);
   // const transport = await getTransport(client_matrix, token);
   const transport = rnTorTransport({
-    onionUrl:
-      'http://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion/sifir',
+    verifySigFn: (msg, armoredSignature) =>
+      verifySignedMessage({
+        armoredSignature,
+        msg,
+        armoredKey: nodePubKey,
+      }),
+    signFn: async payload => {
+      const {armoredSignature} = await signMessageWithArmoredKey({
+        msg: payload,
+        passphrase,
+        privKey: deviceKey.privKeyArmored,
+      });
+      return armoredSignature;
+    },
+    onionUrl,
   });
   try {
     btcClient = await _btc({transport});
@@ -77,10 +87,7 @@ const getBtcWalletList = () => async dispatch => {
 
   try {
     await dispatch(initBtcClient());
-    console.log(window.crypto.subtle);
-
     const watchedPub32 = await btcClient.getWatchedPub32();
-
     watchedPub32.forEach(async ({pub32, label}) =>
       btcWalletList.push({
         pub32,

@@ -13,6 +13,7 @@ class AppLandingScreen extends React.Component {
   }
 
   _bootstrapAsync = async () => {
+    //FIXME check for keys first then go to the correct view
     await this.props.loadAuthInfo();
     const {
       auth: {token, key, paired},
@@ -20,9 +21,7 @@ class AppLandingScreen extends React.Component {
     if (token && key && paired) {
       this.props.navigation.navigate('App');
     } else {
-      // this.props.navigation.navigate('Pair');
-      // For chat page component design
-      this.props.navigation.navigate('App');
+      this.props.navigation.navigate('Pair');
     }
   };
 

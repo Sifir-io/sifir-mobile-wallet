@@ -1,38 +1,57 @@
 /**
  * Helper that generates a Sifir transport interface bridging to a Native http module to proxy on (Tor) via Orbot
+ * Signs outgoing requests with device keys
+ * Validates responses with Node public keys
+ * @TODO clean up stuff and abstract it
  */
 import {NativeModules} from 'react-native';
-
+import base64 from 'base-64';
 const {TorBridge} = NativeModules;
 
-const rnTorTransport = ({onionUrl}) => {
-  if (!onionUrl || !onionUrl.length || !/^http:\/\/.+$/.test(onionUrl))
+const rnTorTransport = ({onionUrl, verifySigFn, signFn}) => {
+  const _verifyRespSignature = async headers => {
+    const {
+      'content-signature': [sig],
+    } = JSON.parse(headers);
+    // verifySign expects decoded armored sig
+    const decodedSig = base64.decode(sig);
+    console.log('sig', sig, decodedSig);
+    await verifySigFn(decodedSig);
+    return true;
+  };
+  const _signPayload = async payload => {
+    return base64.encode(await signFn(payload));
+  };
+  if (!onionUrl || !onionUrl.length || !/^http:\/\/.+$/.test(onionUrl)) {
     throw 'Cannot initalize Tor transport without a valid OnionURL';
+  }
   const get = async (command, payload) => {
     const url = `${onionUrl}/${command}/${payload ? payload : ''}`;
-    // TODO sign get request url
-    const resp = await TorBridge.sendRequest(
+    const payloadSignature = await _signPayload(url);
+    const {body, headers} = await TorBridge.sendRequest(
       url,
       'GET',
       '',
-      'iD8DBQFIYQCSi0P7OS4VvkwRAm7nAKC1Ra4RmhtgPFEIckxu0uACoVWVIwCg0u2B5u2gS2tSO7LXagplAF+AwI0=;=FfiF',
+      payloadSignature,
     );
-    console.log('got resp', resp);
-    // TODO verify resp signature
-    return JSON.parse(resp);
+    if (!(await _verifyRespSignature(headers))) {
+      throw 'Invalid message signature!';
+    }
+    return JSON.parse(body);
   };
-  const post = async (command, body) => {
-    const payload = JSON.stringify(body);
-    // TODO sign payload
-    const resp = await TorBridge.sendRequest(
+  const post = async (command, payload) => {
+    const jsonPayload = JSON.stringify(payload);
+    const payloadSignature = await _signPayload(jsonPayload);
+    const {body, headers} = await TorBridge.sendRequest(
       `${onionUrl}/${command}`,
       'POST',
-      payload,
-      'iD8DBQFIYQCSi0P7OS4VvkwRAm7nAKC1Ra4RmhtgPFEIckxu0uACoVWVIwCg0u2B5u2gS2tSO7LXagplAF+AwI0=;=FfiF',
+      jsonPayload,
+      payloadSignature,
     );
-    console.log('got resp', resp);
-    // TODO verify resp signature
-    return JSON.parse(resp);
+    if (!(await _verifyRespSignature(headers))) {
+      throw 'Invalid message signature!';
+    }
+    return JSON.parse(body);
   };
 
   return {get, post};
