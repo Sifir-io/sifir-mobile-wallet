@@ -17,18 +17,27 @@ import com.proton.gopenpgp.crypto.Crypto;
 
 public class PgpBridge extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
+    private com.proton.gopenpgp.crypto.Key unlockedKeyObj;
 
     public PgpBridge(ReactApplicationContext context) {
         super(context);
         this.reactContext = context;
 
     }
-
     @Override
     public String getName() {
         return "PgpBridge";
     }
+    @ReactMethod
+    public void initAndUnlockKeys(String privateKeyArmored,String passphrase,Promise promise){
+             try {com.proton.gopenpgp.crypto.Key keyObj = Crypto.newKeyFromArmored(privateKeyArmored);
+             this.unlockedKeyObj = keyObj.unlock(passphrase);
+                promise.resolve(true)
+             }catch(err){
+                promise.reject(false)
+             }
 
+    }
     @ReactMethod
     public void genNewKey(String pass, String email, String name, Promise promise) {
         try {
@@ -50,16 +59,14 @@ public class PgpBridge extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void signMessage(String msg, String privKey, String pass, Promise promise) {
+    public void signMessage(String msg, String privKey?, String pass, Promise promise) {
         try {
             byte[] passphrase = pass.getBytes();
             com.proton.gopenpgp.crypto.PlainMessage plainText = Crypto.newPlainMessageFromString(msg);
-
             com.proton.gopenpgp.crypto.Key privKeyObj = Crypto.newKeyFromArmored(privKey);
             com.proton.gopenpgp.crypto.Key unlockedKeyObj = privKeyObj.unlock(passphrase);
             com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(unlockedKeyObj);
             com.proton.gopenpgp.crypto.PGPSignature pgpSignature = signingKeyRing.signDetached(plainText);
-
             WritableMap reply = Arguments.createMap();
             reply.putString("armoredSignature", pgpSignature.getArmored());
             reply.putString("message", plainText.getString());
@@ -68,6 +75,22 @@ public class PgpBridge extends ReactContextBaseJavaModule {
             promise.reject(e);
         }
     }
+     @ReactMethod
+     public void signMessage(String msg, Promise promise) {
+            try {
+                if(!this.unlockedKeyObj)
+                 throw "Must unlock key first"
+                com.proton.gopenpgp.crypto.PlainMessage plainText = Crypto.newPlainMessageFromString(msg);
+                com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
+                com.proton.gopenpgp.crypto.PGPSignature pgpSignature = signingKeyRing.signDetached(plainText);
+                WritableMap reply = Arguments.createMap();
+                reply.putString("armoredSignature", pgpSignature.getArmored());
+                reply.putString("message", plainText.getString());
+                promise.resolve(reply);
+            } catch (Exception e) {
+                promise.reject(e);
+            }
+        }
 
     @ReactMethod
     public void verifySignedMessage(String msgToVerify,String armoredMessageSignature, String pubKey, Promise promise) {
@@ -82,4 +105,32 @@ public class PgpBridge extends ReactContextBaseJavaModule {
             promise.reject(e);
         }
     }
+        @ReactMethod
+        public void encryptMessageWithArmoredPub(String msgToEncrypt,String armoredPub) {
+            try {
+                WritableMap map = new WritableMap()
+                string armored = Helper.encryptMessageArmored(armoredPub, msgToEncrypt);
+                map.putString('encryptedMsg',armored)
+                if(this.unlockedKeyObj){
+                    string signature = this.signDetached(msgToEncrypt);
+                    map.putString('signature',signature);
+
+                }
+                promise.resolve(map);
+            } catch (Exception e){
+                promise.reject(e);
+            }
+        }
+
+        @ReactMethod
+        public void decryptMessage(String msgToEncrypt) {
+            try {
+                if(!this.unlockedKeyObj)
+                      throw "Must unlock key first"
+                const msg = Helper.encryptMessageArmored(pubkey, "plain text")
+                promise.resolve(msg);
+            } catch (Exception e){
+                promise.reject(e);
+            }
+        }
 }

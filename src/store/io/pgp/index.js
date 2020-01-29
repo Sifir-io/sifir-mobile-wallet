@@ -5,6 +5,16 @@ import {NativeModules} from 'react-native';
 
 const {PgpBridge} = NativeModules;
 
+/**
+ * True of false if key is unlocked
+ * @param privateKeyArmored
+ * @param passphrase
+ * @returns {Promise<*>}
+ */
+const initAndUnlockKeys = async ({privateKeyArmored, passphrase}) => {
+  return await PgpBridge.initAndUnlockKeys(privateKeyArmored, passphrase);
+};
+
 const makeNewPgpKey = async ({passphrase, email, name}) => {
   const key = await PgpBridge.genNewKey(passphrase, email, name);
   return key;
@@ -26,17 +36,24 @@ const verifySignedMessage = async ({msg, armoredSignature, armoredKey}) => {
   return isGood;
 };
 // TODO these functions , note if optional keys provided with sign or check sign
-
-const encryptMessage = async ({msg, pubKey, passphrase, privKey = null}) => {
-  const encryptedMessage = msg;
+/**
+ * Will encrypt a message with a provided armored pubKey
+ * If initAndUnlockKeys has been called on a private key it will
+ * return a detached signature for the message
+ * @param msg
+ * @param pubKey
+ * @returns {Promise<{encryptedMsg:string,signature?:string}>}
+ */
+const encryptMessage = async ({msg, pubKey}) => {
+  const {encryptedMsg,signature} = await PgpBridge.encryptMessageWithArmoredPub(msg,pubKey);
   return encryptedMessage;
 };
-const decryptMessage = async ({msg, privKey, passphrase, pubKey = null}) => {
-  const decryptedMessage = msg;
-  return decryptedMessage;
+const decryptMessage = async ({msg, privKey, passphrase=null}) => {
+  return await PgpBridge.decryptMessage(msg);
 };
 module.exports = {
   makeNewPgpKey,
+  initAndUnlockKeys,
   signMessageWithArmoredKey,
   verifySignedMessage,
   encryptMessage,
