@@ -11,7 +11,6 @@ export const FULFILLED = '_FULFILLED';
 export const REJECTED = '_REJECTED';
 export const READY = 'READY';
 
-
 // key status
 export const PGP_KEYS_NOT_FOUND = 'PGP_KEYS_NOT_FOUND';
 

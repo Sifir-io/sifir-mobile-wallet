@@ -78,7 +78,7 @@ export default class SifirGetAddrScreen extends Component {
               placeholderTextColor="white"
               style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
               value={address}
-              onChangeText={address => this.inputAddr(address)}
+              onChangeText={add => this.inputAddr(add)}
             />
           </View>
 
