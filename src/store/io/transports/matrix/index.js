@@ -1,5 +1,6 @@
 import {getAuthedMatrixClient} from './impl/matrixClient.js';
 import {cypherNodeMatrixTransport} from 'cyphernode-js-sdk-transports';
+import base64 from 'base-64';
 
 let _client = null;
 const getClient = async token => {
@@ -9,8 +10,12 @@ const getClient = async token => {
   _client = await getAuthedMatrixClient(token);
   return _client;
 };
-const getTransport = async (client, {user, nodeDeviceId}) => {
+// FIXME middleware
+const getTransport = async (token, devicePgpKey, nodePubkey) => {
+  const {user, nodeDeviceId} = token;
+  const client = getClient(token);
   return await cypherNodeMatrixTransport({
+    // FIXME check this payload
     nodeAccountUser: user,
     nodeDeviceId,
     client,
@@ -18,7 +23,8 @@ const getTransport = async (client, {user, nodeDeviceId}) => {
     // debug: console.log,
   });
 };
-const pairMatrixClient = async (client, {token, key}) => {
+const pairWithNode = async ({token, key, devicePgpKey}) => {
+  const client = await getClient(token);
   const {user, pairingEvent, nodeDeviceId} = token;
   // Await for pairing ACK
   const pairingPromise = new Promise((res, rej) => {
@@ -49,4 +55,4 @@ const pairMatrixClient = async (client, {token, key}) => {
   return client;
 };
 
-module.exports = {getClient, pairMatrixClient, getTransport};
+module.exports = {getClient, pairWithNode, getTransport};

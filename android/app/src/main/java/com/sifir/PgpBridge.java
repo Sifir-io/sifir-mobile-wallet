@@ -1,5 +1,7 @@
 package com.sifir;
 
+import android.util.Log;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -18,6 +20,7 @@ import com.proton.gopenpgp.crypto.Crypto;
 public class PgpBridge extends ReactContextBaseJavaModule {
     private static ReactApplicationContext reactContext;
     private com.proton.gopenpgp.crypto.Key unlockedKeyObj;
+    private com.proton.gopenpgp.crypto.KeyRing keyRing;
 
     public PgpBridge(ReactApplicationContext context) {
         super(context);
@@ -36,6 +39,7 @@ public class PgpBridge extends ReactContextBaseJavaModule {
             byte[] passphrase = pass.getBytes();
             com.proton.gopenpgp.crypto.Key keyObj = Crypto.newKeyFromArmored(privateKeyArmored);
             this.unlockedKeyObj = keyObj.unlock(passphrase);
+            this.keyRing = Crypto.newKeyRing(unlockedKeyObj);
             WritableMap reply = Arguments.createMap();
             reply.putString("pubkeyArmored", unlockedKeyObj.getArmoredPublicKey());
             reply.putString("fingerprint", unlockedKeyObj.getFingerprint());
@@ -92,8 +96,8 @@ public class PgpBridge extends ReactContextBaseJavaModule {
                 throw new Exception("Must unlock key first");
 	    }
             com.proton.gopenpgp.crypto.PlainMessage plainText = Crypto.newPlainMessageFromString(msg);
-            com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
-            com.proton.gopenpgp.crypto.PGPSignature pgpSignature = signingKeyRing.signDetached(plainText);
+//            com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
+            com.proton.gopenpgp.crypto.PGPSignature pgpSignature = this.keyRing.signDetached(plainText);
             promise.resolve(pgpSignature.getArmored());
         } catch (Exception e) {
             promise.reject(e);
@@ -117,14 +121,14 @@ public class PgpBridge extends ReactContextBaseJavaModule {
     @ReactMethod
     public void encryptMessageWithArmoredPub(String msgToEncrypt, String armoredPub,Promise promise) {
         try {
-            HashMap<String, String> resp = new HashMap<>();
+            WritableMap resp = Arguments.createMap();
             String armored = Helper.encryptMessageArmored(armoredPub, msgToEncrypt);
-            resp.put("encryptedMsg", armored);
+            resp.putString("encryptedMsg", armored);
             if (this.unlockedKeyObj != null) {
                 com.proton.gopenpgp.crypto.PlainMessage plainText = Crypto.newPlainMessageFromString(msgToEncrypt);
-                com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
-                com.proton.gopenpgp.crypto.PGPSignature pgpSignature = signingKeyRing.signDetached(plainText);
-                resp.put("signature", pgpSignature.toString());
+//                com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
+                com.proton.gopenpgp.crypto.PGPSignature pgpSignature = this.keyRing.signDetached(plainText);
+                resp.putString("signature", pgpSignature.getArmored());
 
             }
             promise.resolve(resp);
@@ -139,10 +143,17 @@ public class PgpBridge extends ReactContextBaseJavaModule {
             if (this.unlockedKeyObj == null || this.unlockedKeyObj.isUnlocked() != true){
                 throw  new Exception("Must unlock key first");
             }
+            Log.d("PGPBridge",msgToDecrypt);
+            Log.d("PGPBridge",this.unlockedKeyObj.isUnlocked() ? "ttrue": "false");
+            Log.d("PGPBridge",this.unlockedKeyObj.getFingerprint());
             com.proton.gopenpgp.crypto.PGPMessage pgpMessage = Crypto.newPGPMessageFromArmored(msgToDecrypt);
-            com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
-            com.proton.gopenpgp.crypto.PlainMessage pgpSignature = signingKeyRing.decrypt(pgpMessage,signingKeyRing,Crypto.getUnixTime());
-            promise.resolve(pgpSignature);
+            Log.d("PGPBridge",pgpMessage.toString());
+
+//            com.proton.gopenpgp.crypto.KeyRing signingKeyRing = Crypto.newKeyRing(this.unlockedKeyObj);
+            // example https://github.com/ProtonMail/gopenpgp/blob/v2.0.0/helper/helper.go#L114
+            com.proton.gopenpgp.crypto.PlainMessage msg = this.keyRing.decrypt(pgpMessage,null,0);
+            Log.d("PGPBridge",msg.toString());
+            promise.resolve(msg.getString());
         } catch (Exception e) {
             promise.reject(e);
         }

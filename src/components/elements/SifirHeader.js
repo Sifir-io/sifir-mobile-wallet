@@ -22,7 +22,9 @@ export default class SirFirHeader extends Component {
         </View>
         <View style={styles.tabsStyle}>
           {menus.map((item, i) => (
-            <TouchableOpacity key={i}>
+            <TouchableOpacity
+              hitSlop={{top: 2, bottom: 2, left: 2, right: 2}}
+              key={i}>
               <View
                 onTouchEnd={() => {
                   this.setState({curMenu: i});

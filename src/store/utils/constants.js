@@ -13,5 +13,5 @@ export const READY = 'READY';
 
 // key status
 export const PGP_KEYS_NOT_FOUND = 'PGP_KEYS_NOT_FOUND';
-
+export const PGP_KEYS_UNLOCK_FAILED = 'PGP_KEYS_UNLOCK_FAILED';
 export const AUTH_INFO_NOT_FOUND = 'AUTH_INFO_NOT_FOUND';

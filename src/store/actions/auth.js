@@ -4,17 +4,17 @@ import {
   REJECTED,
   AUTH_INFO_NOT_FOUND,
   PGP_KEYS_NOT_FOUND,
+  DELETE,
   READY,
 } from '@utils/constants';
 import {
-  DELETE_AUTH_STATUS,
   PGP_GET_KEYS,
   PGP_UNLOCK_KEYS,
   REQUEST_PAIR,
+  AUTH_INFO_STATUS,
   GET_AUTH_STATUS,
 } from '@types/';
-import {getClient, pairMatrixClient} from '@io/matrix/';
-import {rnTorTransport} from '@io/tor/sifirRnTorTransport';
+import {pairDeviceWithNodeUsingToken} from '@io/transports/';
 import {
   saveAuthInfo,
   getSavedAuthInfo,
@@ -23,14 +23,8 @@ import {
   loadPGPKeys,
   deletePgpKeys,
 } from '@io/auth';
-import {
-  encryptMessage,
-  makeNewPgpKey,
-  initAndUnlockKeys,
-  signMessage,
-  verifySignedMessage,
-} from '@io/pgp';
-import base64 from 'base-64';
+import {encryptMessage, makeNewPgpKey, initAndUnlockKeys} from '@io/pgp';
+import {log, error} from '@io/events/';
 
 const initAndUnlockDeviceKeys = ({
   privkeyArmored,
@@ -46,11 +40,14 @@ const initAndUnlockDeviceKeys = ({
       type: PGP_UNLOCK_KEYS + FULFILLED,
       payload: keyDetails,
     });
+    return keyDetails;
   } catch (err) {
+    log('error unlocking keys', err);
     dispatch({
       type: PGP_UNLOCK_KEYS + REJECTED,
       error: err,
     });
+    return false;
   }
 };
 
@@ -79,6 +76,7 @@ const genAndSaveDevicePgpKeys = ({
       type: PGP_GET_KEYS + REJECTED,
       warning: err,
     });
+    return false;
   }
 };
 const deleteDevicePgpKeys = () => async dispatch => {
@@ -87,6 +85,10 @@ const deleteDevicePgpKeys = () => async dispatch => {
 const loadDevicePgpKeys = () => async dispatch => {
   const payload = await loadPGPKeys();
   if (payload) {
+    // FIXME should PGP private keys be saved in state ? or just public + finger print
+    // and just return private keyu to be use in init during unlockorgenkey
+    //payload.pubkeyArmored = payload.pubkeyArmored.replace(/\\n/gim, '\r\n');
+    //payload.privkeyArmored = payload.privkeyArmored.replace(/\\n/gim, '\r\n');
     dispatch({
       type: PGP_GET_KEYS + FULFILLED,
       payload,
@@ -115,20 +117,30 @@ const loadEncryptedAuthInfo = () => async dispatch => {
       type: GET_AUTH_STATUS + FULFILLED,
       payload: authInfo,
     });
+    // react store kills new lines to serialize the payload onto online, which F's up PGP messages. So unmangle here.
+    // That stole a day from my life..
+    return authInfo;
+    // return authInfo.replace(/\\n/gim, '\r\n');
   } else {
     dispatch({
       type: GET_AUTH_STATUS + REJECTED,
       warning: AUTH_INFO_NOT_FOUND,
     });
+    return false;
   }
 };
-const savedEncryptedAuthInfo = payload => async (dispatch, getState) => {
-  const {pubKeyArmored} = getState();
-  if (!pubKeyArmored) {
+const storeEncryptedAuthInfo = payload => async (dispatch, getState) => {
+  const {
+    auth: {devicePgpKey},
+  } = getState();
+  if (!devicePgpKey || !devicePgpKey.pubkeyArmored) {
     throw 'Cannot save auth info without keys being loaded or init';
   }
-  const encInfo = encryptMessage(JSON.stringify(payload));
-  await saveAuthInfo(encInfo);
+  const {encryptedMsg} = await encryptMessage({
+    msg: JSON.stringify(payload),
+    pubKey: devicePgpKey.pubkeyArmored,
+  });
+  await saveAuthInfo(encryptedMsg);
 };
 
 const setAuthInfoState = payload => async dispatch => {
@@ -144,86 +156,32 @@ const pairPhoneWithToken = ({token = null, key = null} = {}) => async (
   const {
     auth: {devicePgpKey},
   } = getState();
-  console.log('doing tor', token, key, devicePgpKey);
   try {
     // make sure token + keys have been loaded
     if (!token || !devicePgpKey)
       throw 'Cannot pair phone wihtout setting state first';
-    const {eventType} = token;
     dispatch({type: REQUEST_PAIR + PENDING});
-    switch (eventType) {
-      case 'matrix':
-        const client = await getClient(token);
-        await pairMatrixClient(client, {token, key});
-        dispatch({
-          type: REQUEST_PAIR + FULFILLED,
-          // payload: {token, key},
-        });
-        break;
-      case 'tor':
-        console.log('doing tor', devicePgpKey, token);
-        const {fingerprint, publicKeyArmored} = devicePgpKey;
-        const payloadSigner = async ({command, payload}) => {
-          const payloadToSign = JSON.stringify({
-            command,
-            payload: payload || null,
-          });
-          const {armoredSignature} = await signMessage({msg: payloadToSign});
-          return base64.encode(`${armoredSignature};${fingerprint}`);
-        };
-        const payloadSignatureVerifier = async (payload, signatureb64) => {
-          const signature = base64.decode(signatureb64);
-          const [sig, sigfingerprint] = signature.split(';');
-          if (!sig || !sigfingerprint) {
-            throw 'missing sig or fingerprint on request';
-          }
-          // FIXME we need to get the nodes fingerprintt...
-          // for now we just check with the public key we have in the token
-          try {
-            return await verifySignedMessage({
-              msg: payload,
-              armoredSignature: sig,
-              armoredKey: nodePubKey,
-            });
-          } catch (err) {
-            console.error(
-              'error validating signature of incoming message',
-              err,
-            );
-            return false;
-          }
-        };
-
-        const {onionUrl, deviceId, nodeKeyId} = token;
-        const torClient = rnTorTransport({
-          onionUrl,
-          payloadSigner,
-          payloadSignatureVerifier,
-        });
-        const {isValid, nodePubkey} = torClient.post('pairing-event', {
-          devicePubkey: publicKeyArmored,
-          deviceId,
-          nodeKeyId,
-          token,
-          key,
-        });
-        // TODO check nodePubkey's finger print matches the one we scanned in QR
-        if (isValid === true) {
-          dispatch({
-            type: REQUEST_PAIR + FULFILLED,
-            payload: {nodePubkey},
-          });
-        } else {
-          throw 'Non valid reponse got from node';
-        }
-        return isValid;
-      default:
-        throw `${eventType} is not valid pairing type`;
+    const pairResult = await pairDeviceWithNodeUsingToken({
+      token,
+      key,
+      devicePgpKey,
+    });
+    if (!pairResult) throw 'Failed to pair';
+    const {isValid, nodePubkey} = pairResult;
+    if (isValid === true) {
+      dispatch({
+        type: REQUEST_PAIR + FULFILLED,
+        payload: {nodePubkey},
+      });
+    } else {
+      throw 'Non valid reponse got from node';
     }
-  } catch (error) {
+    return {isValid, nodePubkey};
+  } catch (err) {
+    error('error pairing', err);
     dispatch({
       type: REQUEST_PAIR + REJECTED,
-      error,
+      error: err,
     });
     return false;
   }
@@ -231,13 +189,14 @@ const pairPhoneWithToken = ({token = null, key = null} = {}) => async (
 const clearAuthInfo = () => async dispatch => {
   await deleteAuthInfo();
   dispatch({
-    type: DELETE_AUTH_STATUS + FULFILLED,
+    type: AUTH_INFO_STATUS + DELETE,
+    payload: {},
   });
 };
 
 export {
   loadEncryptedAuthInfo,
-  savedEncryptedAuthInfo,
+  storeEncryptedAuthInfo,
   setAuthInfoState,
   loadDevicePgpKeys,
   clearAuthInfo,

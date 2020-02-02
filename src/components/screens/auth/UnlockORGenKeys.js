@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
+import {PGP_KEYS_UNLOCK_FAILED} from '@utils/constants';
 import {connect} from 'react-redux';
+import {event, log, error} from '@io/events/';
 import {
   View,
   Image,
   StyleSheet,
   TouchableOpacity,
-  Modal,
   Text,
   ActivityIndicator,
   TextInput,
@@ -17,7 +18,7 @@ import {
   initAndUnlockDeviceKeys,
   setAuthInfoState,
   loadDevicePgpKeys,
-  savedEncryptedAuthInfo,
+  storeEncryptedAuthInfo,
   deleteDevicePgpKeys,
 } from '@actions/auth';
 import {decryptMessage} from '@io/pgp';
@@ -30,6 +31,7 @@ class UnlockORGenKeys extends Component {
     scannedToken: this.props.navigation.getParam('scannedToken'),
     encAuthInfo: this.props.navigation.getParam('encAuthInfo') || null,
     passphrase: '',
+    retryablePairingError: '',
   };
 
   async componentDidMount() {
@@ -44,20 +46,29 @@ class UnlockORGenKeys extends Component {
     this.setState({passphrase: pass});
   }
   async passwordEntered() {
-    await this.props.deleteDevicePgpKeys();
     try {
       if (!this.state.passphrase.length || this.state.passphrase.length < 6) {
         throw 'Enter password first';
       }
-      console.log('here', this.props.auth, this.state);
       let {pubkeyArmored, privkeyArmored} = this.props.auth.devicePgpKey;
       const {scannedToken, passphrase, encAuthInfo} = this.state;
       // paired state, decrypt data and go to app
       if (pubkeyArmored && privkeyArmored && encAuthInfo) {
-        await initAndUnlockDeviceKeys({privkeyArmored, passphrase});
+        const unlockedKeys = await this.props.initAndUnlockDeviceKeys({
+          privkeyArmored,
+          passphrase,
+        });
+        if (!unlockedKeys) {
+          throw PGP_KEYS_UNLOCK_FAILED;
+        }
         const decryptedAuthInfo = await decryptMessage(encAuthInfo);
-        const {token, key} = JSON.parse(decryptedAuthInfo);
-        await this.props.setAuthInfoState({token, key});
+        const {token, key, nodePubkey} = JSON.parse(decryptedAuthInfo);
+        log('ieeeeeeecc', token, key, nodePubkey);
+        if (!token || !key || !nodePubkey) {
+          throw 'Pairing info is invalid or corrupted, please delete and repair';
+        }
+        await this.props.setAuthInfoState({token, key, nodePubkey});
+        event('app.unlocked');
         this.props.navigation.navigate('App');
         return;
         // Just scannedToken
@@ -65,47 +76,69 @@ class UnlockORGenKeys extends Component {
         const {token, key} = scannedToken;
         const {deviceId} = token;
         if (!pubkeyArmored || !privkeyArmored) {
-          ({
-            privkeyArmored,
-            pubkeyArmored,
-          } = await this.props.genAndSaveDevicePgpKeys({
+          const generatedKeys = await this.props.genAndSaveDevicePgpKeys({
             user: deviceId,
             email: `${deviceId}@sifir.io`,
             passphrase,
-          }));
-          console.log('GENERATED KEYSS', privkeyArmored, pubkeyArmored);
+          });
+          if (!generatedKeys) {
+            throw 'Failed to generate keys for device, please retry';
+          }
+          ({privkeyArmored, pubkeyArmored} = generatedKeys);
+          log('Device:Generated new keys', pubkeyArmored);
         } else {
-          console.log('KEYSS DETECTED', privkeyArmored, pubkeyArmored);
+          log('Device:keys already exists', pubkeyArmored);
         }
-        await this.props.initAndUnlockDeviceKeys({
+        const unlockedKeys = await this.props.initAndUnlockDeviceKeys({
           privkeyArmored,
           passphrase,
         });
-        const isPaired = await this.props.pairPhoneWithToken({token, key});
-        if (isPaired !== true) throw 'Error pairing';
-        await this.savedEncryptedAuthInfo({token, key});
-        await this.setAuthInfoState({token, key});
+        if (!unlockedKeys) {
+          throw PGP_KEYS_UNLOCK_FAILED;
+        }
+        log('keys unlocked!');
+        const pairingResult = await this.props.pairPhoneWithToken({token, key});
+        if (!pairingResult) throw 'Error pairing with token';
+        const {nodePubkey} = pairingResult;
+        event('app.paired', {type: token.eventType});
+        await this.props.storeEncryptedAuthInfo({token, key, nodePubkey});
+        await this.props.setAuthInfoState({token, key, nodePubkey});
+        log('gogin to app');
         this.props.navigation.navigate('App');
         return;
       } else {
         //not paired on auth info , send back to Landing
-        console.log('something funny', this.props.auth);
+        error('unlockOrGenkeys.invalid.state');
+        log('invalid state', this.props.auth);
         this.props.navigation.navigate('AppLandingScreen');
       }
     } catch (err) {
-      console.log('eee', err);
+      switch (err) {
+        case PGP_KEYS_UNLOCK_FAILED:
+          this.setState({
+            retryablePairingError: 'Error unlocking your keys, wrong password',
+          });
+          break;
+        default:
+          error('unlockOrGenkeys.pairingError', err);
+          log('A non retryable error occured while pairing', err);
+          //
+          // something more serious so bug out
+          break;
+      }
       // problem unlocking key
     }
   }
 
   render() {
-    const {passphrase, scannedToken} = this.state;
     const {
-      devicePgpKey: {pubkeyArmored, privkeyArmored} = {},
-      pairing,
-      paired,
-      error,
-    } = this.props.auth;
+      passphrase,
+      scannedToken,
+      retryablePairingError,
+      encAuthInfo,
+    } = this.state;
+    const {devicePgpKey, pairing, paired} = this.props.auth;
+    const {pubkeyArmored} = devicePgpKey;
     let view;
     if (pairing) {
       view = (
@@ -118,25 +151,39 @@ class UnlockORGenKeys extends Component {
     }
     if (paired) {
       view = (
-        <View style={styles.mainContent}>
-          <Text style={styles.commentTxt}>{'Paired sucess!!'}</Text>
-          <ActivityIndicator size="large" style={styles.progress} />
-        </View>
+        <>
+          <View style={styles.mainContent}>
+            <Text style={styles.commentTxt}>{'Paired sucess!!'}</Text>
+            <ActivityIndicator size="large" style={styles.progress} />
+          </View>
+          <TouchableOpacity
+            onPress={() => this.props.navigator.navigate('App')}
+            style={styles.doneTouch}>
+            <View shadowColor="black" shadowOffset="30" style={styles.doneView}>
+              <Text style={styles.doneTxt}>{C.STR_CONTINUE}</Text>
+            </View>
+          </TouchableOpacity>
+        </>
       );
       return view;
     }
-    if (error) {
+    // FIXME these shit views
+    if (retryablePairingError) {
       view = (
         <View style={styles.mainContent}>
-          <Image source={Images.icon_failure} style={styles.checkImg} />
+          <TouchableOpacity
+            onPress={() => this.props.navigator.navigate('AppLandingScreen')}
+            style={styles.doneTouch}>
+            <Image source={Images.icon_failure} style={styles.checkImg} />
+          </TouchableOpacity>
           <Text style={styles.resultTxt}>{C.STR_FAILED}</Text>
-          <Text style={styles.resultTxt}>{error}</Text>
+          <Text style={styles.resultTxt}>{retryablePairingError}</Text>
         </View>
       );
       return view;
     }
     const [welcomeText, ctaText, mainText] =
-      pubkeyArmored && privkeyArmored
+      pubkeyArmored && encAuthInfo
         ? [
             C.STR_WELCOME_BACK,
             C.STR_ENTER_PASS_TO_UNLOCK_WALLET,
@@ -148,7 +195,9 @@ class UnlockORGenKeys extends Component {
         : [
             C.STR_WELCOME_NEW,
             C.STR_ENTER_WORD,
-            `Will be pairiing ${scannedToken.token.eventType.toUpperCase()}`,
+            scannedToken
+              ? `Will be pairiing ${scannedToken.token.eventType.toUpperCase()}`
+              : '',
           ];
     view = (
       <>
@@ -262,7 +311,7 @@ const mapDispatchToProps = {
   genAndSaveDevicePgpKeys,
   initAndUnlockDeviceKeys,
   setAuthInfoState,
-  savedEncryptedAuthInfo,
+  storeEncryptedAuthInfo,
   loadDevicePgpKeys,
   deleteDevicePgpKeys,
 };

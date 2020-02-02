@@ -66,7 +66,7 @@ const encryptMessage = async ({msg, pubKey}) => {
   } = await PgpBridge.encryptMessageWithArmoredPub(msg, pubKey);
   return {signature, encryptedMsg};
 };
-const decryptMessage = async ({msg, privKey, passphrase = null}) => {
+const decryptMessage = async msg => {
   return await PgpBridge.decryptMessage(msg);
 };
 module.exports = {

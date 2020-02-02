@@ -17,9 +17,8 @@ const rnTorTransport = ({
     throw 'Cannot initalize Tor transport without a valid OnionURL';
   }
   const get = async (command, payload) => {
-    const url = `${onionUrl}/${command}/${payload ? payload : ''}`;
+    const url = `${onionUrl}${command}/${payload ? payload : ''}`;
     const payloadSignature = await payloadSigner({command, payload});
-    console.log('get', payloadSignature, command, payload);
     const {body, headers} = await TorBridge.sendRequest(
       url,
       'GET',
@@ -35,7 +34,7 @@ const rnTorTransport = ({
     const jsonPayload = JSON.stringify(payload);
     const payloadSignature = await payloadSigner({command, payload});
     const {body, headers} = await TorBridge.sendRequest(
-      `${onionUrl}/${command}`,
+      `${onionUrl}${command}`,
       'POST',
       jsonPayload,
       payloadSignature,

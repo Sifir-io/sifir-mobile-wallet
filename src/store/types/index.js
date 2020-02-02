@@ -8,6 +8,7 @@ export const SEND_BITCOIN = 'SEND_BITCOIN';
 // Auth
 export const REQUEST_PAIR = 'REQUEST_PAIR';
 export const GET_AUTH_STATUS = 'GET_AUTH_STATUS';
+export const AUTH_INFO_STATUS = 'AUTH_INFO_STATUS';
 export const PGP_GET_KEYS = 'GET_PGP_KEYS';
 export const PGP_UNLOCK_KEYS = 'PGP_UNLOCK_KEYS';
 

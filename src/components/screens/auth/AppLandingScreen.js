@@ -1,8 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {ActivityIndicator, StatusBar, StyleSheet, View} from 'react-native';
-import {loadEncryptedAuthInfo} from '@actions/auth';
+import {
+  loadEncryptedAuthInfo,
+  deleteDevicePgpKeys,
+  clearAuthInfo,
+} from '@actions/auth';
 import {Images, AppStyle, C} from '@common/index';
+import {log, error} from '@io/events/';
 
 class AppLandingScreen extends React.Component {
   constructor(props, context) {
@@ -14,14 +19,13 @@ class AppLandingScreen extends React.Component {
   }
 
   _bootstrapAsync = async () => {
-    await this.props.loadEncryptedAuthInfo();
-    const {
-      auth: {encAuthInfo},
-    } = this.props;
+    //await this.props.clearAuthInfo();
+    //await this.props.deleteDevicePgpKeys();
+
+    const encAuthInfo = await this.props.loadEncryptedAuthInfo();
     if (encAuthInfo) {
       this.props.navigation.navigate('UnlockORGenKeys', {
         encAuthInfo,
-        paired: true,
       });
     } else {
       this.props.navigation.navigate('Pair');
@@ -73,7 +77,11 @@ const mapStateToProps = state => {
     auth: state.auth,
   };
 };
-const mapDispatchToProps = {loadEncryptedAuthInfo};
+const mapDispatchToProps = {
+  loadEncryptedAuthInfo,
+  deleteDevicePgpKeys,
+  clearAuthInfo,
+};
 
 export default connect(
   mapStateToProps,

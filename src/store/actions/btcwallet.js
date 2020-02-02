@@ -1,64 +1,33 @@
 import * as types from '@types/index';
 import {FULFILLED, PENDING, REJECTED} from '@utils/index';
 import _btc from '@io/btcClient';
-import {getClient, getTransport} from '@io/matrix';
 import {Images, C} from '@common/index';
-import {rnTorTransport} from '@io/tor/sifirRnTorTransport';
-import {
-  makeNewPgpKey,
-  signMessageWithArmoredKey,
-  verifySignedMessage,
-} from '@io/pgp/';
+import {getTransportFromToken} from '@io/transports';
+import {log, error} from '@io/events/';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
+  log('btcWallet:starting btc client');
   const {
-    auth: {token},
+    auth: {token, key, nodePubkey, devicePgpKey},
   } = getState();
 
-  if (!token) {
+  if (!token || !key || !nodePubkey) {
     dispatch({
       type: types.BTC_CLIENT_STATUS + REJECTED,
       payload: {error: 'NO TOKEN'},
     });
     return;
   }
-  const passphrase = 'keypassphrase from state';
-  const onionUrl =
-    'http://gt5gt3knblzpaq3mcv2b7lhbh7o3mxh6x3tqw3hqyirwjytuz2gornyd.onion/sifir';
-  const {pubKeyArmored: nodePubKey} = await makeNewPgpKey({
-    passphrase,
-    email: 'poop@nop.com',
-    name: 'kaka',
-  });
-  const deviceKey = await makeNewPgpKey({
-    email: 'poop@nop.com',
-    name: 'kaka',
-    passphrase,
-  });
-  // const client_matrix = await getClient(token);
-  // const transport = await getTransport(client_matrix, token);
-  const transport = rnTorTransport({
-    verifySigFn: (msg, armoredSignature) =>
-      verifySignedMessage({
-        armoredSignature,
-        msg,
-        armoredKey: nodePubKey,
-      }),
-    signFn: async payload => {
-      const {armoredSignature} = await signMessageWithArmoredKey({
-        msg: payload,
-        passphrase,
-        privKey: deviceKey.privKeyArmored,
-      });
-      return armoredSignature;
-    },
-    onionUrl,
+  const transport = await getTransportFromToken({
+    token,
+    nodePubkey,
+    devicePgpKey,
   });
   try {
     btcClient = await _btc({transport});
   } catch (err) {
-    console.error(err);
+    error('error creating btc client', err);
     dispatch({
       type: types.BTC_CLIENT_STATUS + REJECTED,
       payload: {error: 'Error creating btc client'},
@@ -114,11 +83,11 @@ const getBtcWalletList = () => async dispatch => {
       type: types.BTC_WALLET_LIST_DATA_SHOW + FULFILLED,
       payload: {btcWalletList},
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.BTC_WALLET_LIST_DATA_SHOW + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };
@@ -152,11 +121,11 @@ const getWalletDetails = ({label, type}) => async dispatch => {
       type: types.BTC_WALLET_DETAILS + FULFILLED,
       payload: {btcWalletDetails: {balance, txnData, btcUnit}},
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.BTC_WALLET_DETAILS + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };
@@ -182,11 +151,11 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
       type: types.BTC_WALLET_ADDRESS + FULFILLED,
       payload: {address},
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.BTC_WALLET_ADDRESS + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };
@@ -203,11 +172,11 @@ const sendBitcoin = ({address, amount}) => async dispatch => {
       type: types.SEND_BITCOIN + FULFILLED,
       payload: {btcSendResult},
     });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.SEND_BITCOIN + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };

@@ -20,9 +20,10 @@ const initialState = {
   // ---
   token: null,
   key: null,
-  encAuthInfo: null,
+  // encAuthInfo: null,
   // pubkey,privkey,fingerprint,keyhexid
   devicePgpKey: {},
+  nodePubkey: '',
 };
 
 const auth = createReducer(initialState)({
@@ -46,22 +47,25 @@ const auth = createReducer(initialState)({
     ...state,
     keyWarning: warning,
     error,
-    devicePgpKey: null,
+    devicePgpKey: {},
   }),
   // Encrypted authinfo loaded
   [GET_AUTH_STATUS + FULFILLED]: (state, {payload: {authInfo}}) => ({
     ...state,
-    encAuthInfo: authInfo,
+    // encAuthInfo: authInfo,
   }),
-  [GET_AUTH_STATUS + READY]: (state, {payload: {token, key}}) => ({
+  // this is the only call that should modify the auth state, the rest act as status updaters
+  [GET_AUTH_STATUS + READY]: (state, {payload: {token, key, nodePubkey}}) => ({
     ...state,
     token,
+    nodePubkey,
     key,
   }),
   [GET_AUTH_STATUS + REJECTED]: (state, {warning = null, error = null}) => ({
     ...state,
     authWarning: warning,
     error,
+    // encAuthInfo: null,
     token: null,
     pairingKey: null,
   }),
@@ -70,15 +74,17 @@ const auth = createReducer(initialState)({
     paired: false,
     pairing: true,
   }),
-  [REQUEST_PAIR + FULFILLED]: (state, {payload}) => ({
+  [REQUEST_PAIR + FULFILLED]: (state, {payload: {nodePubkey}}) => ({
     ...state,
     paired: true,
+    // nodePubkey,
     pairing: false,
   }),
   [REQUEST_PAIR + REJECTED]: (state, {error}) => ({
     ...state,
     paired: false,
     pairing: false,
+    // nodePubkey: '',
     error,
   }),
 });
