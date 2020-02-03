@@ -19,7 +19,7 @@ class AppLandingScreen extends React.Component {
   }
 
   _bootstrapAsync = async () => {
-    //await this.props.clearAuthInfo();
+    await this.props.clearAuthInfo();
     //await this.props.deleteDevicePgpKeys();
 
     const encAuthInfo = await this.props.loadEncryptedAuthInfo();

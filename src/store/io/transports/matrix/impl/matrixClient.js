@@ -5,7 +5,7 @@ const getAuthedMatrixClient = async ({user, password, server, deviceId}) => {
     const client = await getSyncMatrixClient({
       user,
       password,
-      baseUrl: `https://${server}`,
+      baseUrl: server,
       deviceId,
       request: async (options, cb) => {
         const opts = {
