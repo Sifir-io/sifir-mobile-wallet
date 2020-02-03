@@ -1,6 +1,7 @@
 package com.sifir;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -9,8 +10,6 @@ import com.facebook.react.bridge.WritableMap;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class TorBridgeAsyncTask extends AsyncTask<String, String, HashMap<String, String>> {
+public class TorBridgeAsyncTask extends AsyncTask<String, String, WritableMap> {
     protected static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
     protected OkHttpClient client;
     protected Promise mPromise;
@@ -33,19 +32,20 @@ public class TorBridgeAsyncTask extends AsyncTask<String, String, HashMap<String
     }
 
     @Override
-    protected void onPostExecute(HashMap<String,String> result) {
-        if (this.error != null)
+    protected void onPostExecute(WritableMap result) {
+        if (this.error != null) {
+            Log.d("TorBridge","error onPostExecute" + this.error.toString());
             mPromise.reject(this.error);
-        else {
-            WritableMap resp = Arguments.createMap();
-            resp.putString("headers",result.get("headers"));
-            resp.putString("body",result.get("body"));
-            mPromise.resolve(resp);
         }
+        else {
+            mPromise.resolve(result);
 
+        }
+        this.mPromise = null;
+        this.error = null;
     }
 
-    public HashMap run(String method, String url, String json, String signatureHeader) throws IOException {
+    public WritableMap run(String method, String url, String json, String signatureHeader) throws IOException {
         Request.Builder request;
         switch (method) {
             case "POST":
@@ -67,23 +67,23 @@ public class TorBridgeAsyncTask extends AsyncTask<String, String, HashMap<String
             request.addHeader("Content-Signature", signatureHeader);
         }
         try (Response response = this.client.newCall(request.build()).execute()) {
-            HashMap<String, String> resp = new HashMap<>();
+            WritableMap resp = Arguments.createMap();
             Map<String,List<String>> headers = response.headers().toMultimap();
-            resp.put("headers",new JSONObject(headers).toString());
-            resp.put("body",response.body().string());
+            resp.putString("headers",new JSONObject(headers).toString());
+            resp.putString("body",response.body().string());
             return resp;
         }
     }
 
 
     @Override
-    protected HashMap<String, String> doInBackground(String... params) {
+    protected WritableMap doInBackground(String... params) {
         try {
             return run(params[0], params[1], params[2], params[3]);
         } catch (Exception e) {
             this.error = e;
-            HashMap<String,String> resp = new HashMap<>();
-            resp.put("error",e.toString());
+            WritableMap resp = Arguments.createMap();
+            resp.putString("error",e.toString());
             return resp;
         }
     }

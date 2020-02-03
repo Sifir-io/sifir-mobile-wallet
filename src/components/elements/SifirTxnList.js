@@ -89,6 +89,7 @@ export default class SifirTxnList extends Component {
         data={this.state.txnData}
         style={height}
         width={width}
+        keyExtractor={(item, index) => item.txid}
         renderItem={({item}) => <SifirTxnEntry txn={item} unit={unit} />}
       />
     );

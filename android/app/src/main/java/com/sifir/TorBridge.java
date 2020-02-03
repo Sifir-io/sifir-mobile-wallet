@@ -1,14 +1,14 @@
 package com.sifir;
 
+import android.os.AsyncTask;
+
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
-
-import java.util.Map;
-import java.util.HashMap;
+import android.util.Log;
 
 import okhttp3.OkHttpClient;
 
@@ -43,8 +43,10 @@ public class TorBridge extends ReactContextBaseJavaModule {
     @ReactMethod
     public void sendRequest(String onionUrl, String method, String message, String signatureHeader, Promise promise) {
         try {
-            new TorBridgeAsyncTask(promise, this.client).execute(method, onionUrl, message, signatureHeader);
+//            new TorBridgeAsyncTask(promise, this.client).execute(method, onionUrl, message, signatureHeader);
+            new TorBridgeAsyncTask(promise, this.client).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,method, onionUrl, message, signatureHeader);
         } catch (Exception e) {
+            Log.d("TorBridge","error on sendRequest" + e.toString());
             promise.reject(e);
         }
     }

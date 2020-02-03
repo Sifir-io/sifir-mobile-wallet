@@ -11,7 +11,7 @@ const getTransport = (token, devicePgpKey, nodePubkey) => {
       payload: payload || null,
     });
     const armoredSignature = await signMessage({msg: payloadToSign});
-    return base64.encode(`${armoredSignature};${fingerprint}`);
+    return base64.encode(`${armoredSignature};${fingerprint.toUpperCase()}`);
   };
   const payloadSignatureVerifier = async (payload, headers) => {
     // The reason this is here is that when we're paring for the very first time we don't have the nodes pubkey yet, thus confirming is bit of a hack
@@ -32,8 +32,13 @@ const getTransport = (token, devicePgpKey, nodePubkey) => {
         armoredKey: nodePubkey,
       });
     } catch (err) {
-      error('error validating signature of incoming message', err);
-      return true;
+      error(
+        'error validating signature of incoming message',
+        err,
+        sigfingerprint,
+        sig,
+      );
+      return false;
     }
   };
 

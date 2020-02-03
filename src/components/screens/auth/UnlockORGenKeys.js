@@ -63,7 +63,6 @@ class UnlockORGenKeys extends Component {
         }
         const decryptedAuthInfo = await decryptMessage(encAuthInfo);
         const {token, key, nodePubkey} = JSON.parse(decryptedAuthInfo);
-        log('ieeeeeeecc', token, key, nodePubkey);
         if (!token || !key || !nodePubkey) {
           throw 'Pairing info is invalid or corrupted, please delete and repair';
         }
@@ -103,7 +102,7 @@ class UnlockORGenKeys extends Component {
         event('app.paired', {type: token.eventType});
         await this.props.storeEncryptedAuthInfo({token, key, nodePubkey});
         await this.props.setAuthInfoState({token, key, nodePubkey});
-        log('gogin to app');
+        log('pairing info stored, ready to app');
         this.props.navigation.navigate('App');
         return;
       } else {
