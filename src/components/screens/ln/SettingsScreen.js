@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
   },
-  send_icon: {width: 25, height: 20, marginLeft: 20},
+  send_icon: { width: 25, height: 20, marginLeft: 10 },
   space_between: {
     flexDirection: 'row',
     justifyContent: 'space-between',
