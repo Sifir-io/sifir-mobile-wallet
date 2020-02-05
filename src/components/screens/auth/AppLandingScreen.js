@@ -12,14 +12,16 @@ class AppLandingScreen extends React.Component {
   }
   _bootstrapAsync = async () => {
     await this.props.loadAuthInfo();
-    const {
-      auth: {token, key, paired},
-    } = this.props;
-    if (token && key && paired) {
-      this.props.navigation.navigate('App');
-    } else {
-      this.props.navigation.navigate('Pair');
-    }
+    //const {
+    //  auth: {token, key, paired},
+    //} = this.props;
+    //if (token && key && paired) {
+    //  this.props.navigation.navigate('App');
+    //} else {
+    //  this.props.navigation.navigate('Pair');
+    //}
+    //FIXME remove this
+    this.props.navigation.navigate('App');
   };
 
   render() {
@@ -49,4 +51,7 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = {loadAuthInfo};
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppLandingScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(AppLandingScreen);
