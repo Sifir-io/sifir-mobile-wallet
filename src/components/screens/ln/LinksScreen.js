@@ -1,59 +1,88 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
+import React, { useState, createRef, useRef } from "react";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  Dimensions
+} from "react-native";
 import { AppStyle, Images } from "@common/index";
 import { ProgressBar } from "@elements/ProgressBar";
-import { SwipeUp } from "@elements/SwipeUp";
+import SlidingPanel from "react-native-sliding-up-down-panels";
 
+const { width, height } = Dimensions.get("window");
 export default function LinksScreen(props) {
-  const [rerenderSwipe, setRerenderSwipe] = useState(false);
+  const childRef = useRef();
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
         <View style={[styles.fuding_wrapper]}>
-          <Text style={[styles.textBright, styles.text_normal]}>
+          <Text style={[styles.textBright, styles.text_11, styles.text_bold]}>
             INVOICE AMOUNT
           </Text>
-          <Text style={[styles.text_white, styles.teswipe_stylesxt_x_large]}>
-            0.05 BTC
-          </Text>
-          <Text style={[styles.textBright, styles.text_normal]}>
-            EXPIRES IN{' '}
-            <Text style={[styles.text_white, styles.text_large]}>24 hours</Text>
+          <View style={[styles.textRow]}>
+            <Text style={[styles.text_white, styles.text_x_large]}>0.05</Text>
+            <Text style={[styles.text_29, styles.text_white]}> BTC</Text>
+          </View>
+          <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
+            EXPIRES IN{"    "}
+            <Text style={[styles.text_white, styles.text_18]}>24 hours</Text>
           </Text>
         </View>
 
-        <View style={[styles.margin_15, styles.margin_top_50]}>
+        <View style={[styles.margin_15, styles.margin_top_45]}>
           <View style={[styles.flex1, styles.justify_center]}>
-            <ProgressBar loaded={0} />
+            <ProgressBar loaded={30} />
           </View>
         </View>
         <View style={styles.justify_center}>
-          <TouchableOpacity style={styles.send_button}>
+          <TouchableOpacity style={styles.send_button_disabled}>
             <Text
-              style={[styles.text_large, styles.text_center, styles.text_bold]}>
+              style={[
+                styles.text_large,
+                styles.text_center,
+                styles.text_bold,
+                styles.textBrightLow
+              ]}
+            >
               SEND
             </Text>
-            <Image source={Images.icon_up_dark} style={styles.send_icon} />
+            <Image source={Images.icon_up_blue} style={styles.send_icon} />
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.justify_end}>
-        {rerenderSwipe === true && (
-          <SwipeUp
-            onShowFull={() => {
-              props.navigation.navigate("Settings");
-              setRerenderSwipe(false);
-            }}
-          />
-        )}
-        {rerenderSwipe === false && (
-          <SwipeUp
-            onShowFull={() => {
-              props.navigation.navigate("Settings");
-              setRerenderSwipe(true);
-            }}
-          />
-        )}
+        <SlidingPanel
+          ref={childRef}
+          headerLayoutHeight={100}
+          AnimationSpeed={50}
+          onAnimationStop={() => {
+            childRef.current && childRef.current.onRequestClose();
+            props.navigation.navigate("Settings");
+          }}
+          onDragStop={() => {
+            childRef.current && childRef.current.onRequestClose();
+            props.navigation.navigate("Settings");
+          }}
+          headerLayout={() => (
+            <View style={styles.headerLayoutStyle}>
+              <View style={styles.up_triangle} />
+              <Text
+                style={[
+                  styles.commonTextStyle,
+                  styles.textBrightLight,
+                  styles.text_18
+                ]}
+              >
+                OPEN CHANNEL
+              </Text>
+            </View>
+          )}
+          slidingPanelLayout={() => (
+            <View style={styles.slidingPanelLayoutStyle}></View>
+          )}
+        />
       </View>
     </View>
   );
@@ -77,19 +106,87 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end"
   },
   send_icon: { width: 15, height: 15, marginLeft: 10 },
+  up_triangle: {
+    position: "absolute",
+
+    top: -15,
+    left: "45%",
+
+    borderLeftWidth: 15,
+    borderStyle: "solid",
+    borderLeftColor: "transparent",
+
+    borderRightWidth: 15,
+    borderStyle: "solid",
+    borderRightColor: "transparent",
+
+    borderBottomWidth: 15,
+    borderStyle: "solid",
+    borderBottomColor: "#f6921e"
+  },
+  text_normal: {
+    fontSize: 12
+  },
+  text_11: {
+    fontSize: 11
+  },
+  text_29: {
+    fontSize: 29
+  },
+  text_10: {
+    fontSize: 10
+  },
+  text_14: {
+    fontSize: 14
+  },
+  text_18: {
+    fontSize: 18
+  },
   send_button: {
     backgroundColor: AppStyle.mainColor,
-    padding: 30,
+    paddingVertical: 26,
+    paddingHorizontal: 85,
     borderRadius: 10,
-    marginTop: 80,
+    marginTop: 52,
     width: "85%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center"
   },
+  send_button_disabled: {
+    backgroundColor: "transparent",
+    paddingVertical: 26,
+    paddingHorizontal: 85,
+    borderRadius: 10,
+    marginTop: 52,
+    width: "85%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#53cbc8"
+  },
   space_between: {
     flexDirection: "row",
     justifyContent: "space-between"
+  },
+  headerLayoutStyle: {
+    width,
+    height: 100,
+    backgroundColor: "#f6921e",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  slidingPanelLayoutStyle: {
+    width,
+    height: height - 10,
+    backgroundColor: "#f6921e",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  commonTextStyle: {
+    color: "white",
+    fontSize: 18
   },
   width_60: {
     width: "60%"
@@ -117,6 +214,14 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: AppStyle.mainFont
   },
+  textBrightLight: {
+    color: "#0c1d28",
+    fontFamily: AppStyle.mainFont
+  },
+  textBrightLow: {
+    color: "#53cbc8",
+    fontFamily: AppStyle.mainFont
+  },
   align_center: { alignItems: "center" },
   arrow_up: { transform: [{ rotateX: "120deg" }] },
   textBright: {
@@ -136,10 +241,11 @@ const styles = StyleSheet.create({
   },
   margin_top_30: { marginTop: 30 },
   margin_top_50: { marginTop: 50 },
+  margin_top_45: { marginTop: 45 },
   margin_top_15: { marginTop: 15 },
   fuding_wrapper: {
     alignItems: "center",
-    marginTop: 50
+    marginTop: 47
   },
   text_x_large: {
     fontSize: 60
