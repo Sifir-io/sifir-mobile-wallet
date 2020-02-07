@@ -16,8 +16,10 @@ const getAuthedMatrixClient = async ({user, password, server, deviceId}) => {
         };
         try {
           const resp = await axios.request(opts);
+          console.log('resolvingreq');
           cb(null, resp, JSON.stringify(resp.data));
         } catch (err) {
+          console.log('matrixerr', err);
           cb(err);
         }
       },

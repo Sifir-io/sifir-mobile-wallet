@@ -16,6 +16,7 @@
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/masked-view": "^0.1.6",
     "@react-navigation/native": "^5.0.0",
+    "@react-navigation/native-stack": "^5.0.0",
     "@react-navigation/stack": "^5.0.0",
     "@tradle/react-native-http": "^2.0.1",
     "asyncstorage-down": "^4.2.0",

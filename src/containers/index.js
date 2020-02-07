@@ -81,12 +81,10 @@ class Root extends React.Component {
       this.props.loadEncryptedAuthInfo(),
       this.props.loadDevicePgpKeys(),
     ]);
-    log('app init', encAuthInfo, devicePgpKeys);
     this.setState({initLoading: false, encAuthInfo, devicePgpKeys});
   };
   render() {
     const {
-      // FIXME here elegant way to pass this to root o call ap
       auth: {token, key, nodePubkey},
     } = this.props;
     const {initLoading, encAuthInfo} = this.state;
