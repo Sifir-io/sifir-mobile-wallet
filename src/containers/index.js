@@ -24,18 +24,20 @@ function ContentNav(props) {
   return (
     <ContentStack.Navigator
       initialRouteName={C.STR_WALLET}
+      headerMode="float"
       screenOptions={{
         gestureEnabled: true,
         header: ({scene, previous, navigation}) => {
           return <SifirHeader switchPage={page => navigation.navigate(page)} />;
         },
       }}
-      options={{
-        headerMode: 'float',
-        headerStyle: {
-          height: 50, // Specify the height of your custom header
-        },
-      }}>
+      options={
+        {
+          //headerStyle: {
+          //  height: 50, // Specify the height of your custom header
+          //},
+        }
+      }>
       <ContentStack.Screen name={C.STR_WALLET} component={WalletTab} />
     </ContentStack.Navigator>
   );
@@ -45,19 +47,19 @@ function ContentNav(props) {
 function AuthNav(props) {
   const {encAuthInfo} = props;
   return (
-    <RootStack.Navigator
-      initialRouteName={encAuthInfo ? 'UnlockOrGenKeys' : 'ScanToPairScreen'}>
-      <RootStack.Screen
-        name="ScanToPairScreen"
-        component={ScanToPairScreen}
-        options={{headerShown: false}}
-      />
-      <RootStack.Screen
-        name="UnlockORGenKeys"
-        component={UnlockORGenKeys}
-        initialParams={encAuthInfo}
-        options={{headerShown: false}}
-      />
+    <RootStack.Navigator headerMode="none">
+      {encAuthInfo ? (
+        <RootStack.Screen
+          name="UnlockORGenKeys"
+          component={UnlockORGenKeys}
+          initialParams={{encAuthInfo}}
+        />
+      ) : (
+        <RootStack.Screen
+          name="ScanToPairScreen"
+          component={ScanToPairScreen}
+        />
+      )}
     </RootStack.Navigator>
   );
 }
@@ -79,6 +81,7 @@ class Root extends React.Component {
       this.props.loadEncryptedAuthInfo(),
       this.props.loadDevicePgpKeys(),
     ]);
+    log('app init', encAuthInfo, devicePgpKeys);
     this.setState({initLoading: false, encAuthInfo, devicePgpKeys});
   };
   render() {
@@ -136,6 +139,7 @@ const styles = StyleSheet.create({
   mainView: {flex: 1, backgroundColor: AppStyle.backgroundColor},
   inputTxtStyle: {
     flex: 1,
+    marginTop: 5,
     marginLeft: 10,
     color: 'white',
     textAlign: 'left',

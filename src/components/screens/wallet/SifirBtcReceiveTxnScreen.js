@@ -37,7 +37,7 @@ class SifirBtcReceiveTxnScreen extends Component {
   };
 
   componentDidMount() {
-    const {label, type} = this.props.navigation.getParam('walletInfo');
+    const {label, type} = this.props.route.params.walletInfo;
     this.setState({label, type});
     if (type === C.STR_WATCH_WALLET_TYPE) {
       this.props.getWalletAddress({label, type});

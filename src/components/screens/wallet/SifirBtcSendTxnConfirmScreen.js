@@ -11,7 +11,7 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
   state = {
     btnStatus: 0,
     modalVisible: false,
-    txnInfo: this.props.navigation.getParam('txnInfo'),
+    txnInfo: this.props.route.params.txnInfo,
   };
 
   render() {

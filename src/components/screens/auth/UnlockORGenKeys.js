@@ -34,15 +34,6 @@ class UnlockORGenKeys extends Component {
     retryablePairingError: '',
   };
 
-  // FIXME remove this , done in root now
-  async componentDidMount() {
-    // this._bootstrapAsync();
-  }
-
-  //_bootstrapAsync = async () => {
-  //  await this.props.loadDevicePgpKeys();
-  //};
-
   passphraseUpdated(pass) {
     this.setState({passphrase: pass});
   }
@@ -53,7 +44,6 @@ class UnlockORGenKeys extends Component {
       }
       let {pubkeyArmored, privkeyArmored} = this.props.auth.devicePgpKey;
       const {scannedToken, passphrase, encAuthInfo} = this.state;
-      // paired state, decrypt data and go to app
       if (pubkeyArmored && privkeyArmored && encAuthInfo) {
         const unlockedKeys = await this.props.initAndUnlockDeviceKeys({
           privkeyArmored,
@@ -69,9 +59,7 @@ class UnlockORGenKeys extends Component {
         }
         await this.props.setAuthInfoState({token, key, nodePubkey});
         event('app.init.unlocked');
-        this.props.navigation.navigate('App');
         return;
-        // Just scannedToken
       } else if (scannedToken) {
         const {token, key} = scannedToken;
         if (!pubkeyArmored || !privkeyArmored) {
@@ -109,7 +97,6 @@ class UnlockORGenKeys extends Component {
         //FIXME handle errorin root
         error('unlockOrGenkeys.invalid.state');
         log('invalid state', this.props.auth);
-        this.props.navigation.navigate('AppLandingScreen');
       }
     } catch (err) {
       switch (err) {

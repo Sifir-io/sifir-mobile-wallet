@@ -20,7 +20,7 @@ class SifirAccountScreen extends React.Component {
     super(props, context);
   }
   componentDidMount() {
-    const {label, type} = this.props.navigation.getParam('walletInfo');
+    const {label, type} = this.props.route.params.walletInfo;
     this.setState({label, type});
     this.props.getWalletDetails({label, type});
   }
@@ -50,7 +50,7 @@ class SifirAccountScreen extends React.Component {
           <TouchableOpacity>
             <View
               style={styles.backNavView}
-              onTouchEnd={() => navigate('AccountsList')}>
+              onTouchEnd={() => navigate('AccountList')}>
               <Image source={Images.icon_back} style={styles.backImg} />
               <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
             </View>

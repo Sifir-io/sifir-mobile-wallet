@@ -14,8 +14,8 @@ import {Images, AppStyle, C} from '@common/index';
 
 class SifirBtcTxnConfirmedScreen extends Component {
   state = {
-    isSendTxn: this.props.navigation.getParam('isSendTxn'),
-    txnInfo: this.props.navigation.getParam('txnInfo'),
+    isSendTxn: this.props.route.params.isSendTxn,
+    txnInfo: this.props.route.params.txnInfo,
   };
 
   done = () => {

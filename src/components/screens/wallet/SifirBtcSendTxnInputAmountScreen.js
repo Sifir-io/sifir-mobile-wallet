@@ -18,7 +18,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
   state = {
     btnStatus: 0,
     amount: null,
-    txnInfo: this.props.navigation.getParam('txnInfo'),
+    txnInfo: this.props.route.params.txnInfo,
   };
 
   confirm = () => {

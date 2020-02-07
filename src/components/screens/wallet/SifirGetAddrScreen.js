@@ -18,7 +18,7 @@ export default class SifirGetAddrScreen extends Component {
     showModal: false,
     torchOn: false,
     address: null,
-    txnInfo: this.props.navigation.getParam('txnInfo'),
+    txnInfo: this.props.route.params.txnInfo,
     addrFontSize: 22,
   };
 
