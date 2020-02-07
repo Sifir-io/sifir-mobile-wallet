@@ -13,7 +13,8 @@ const getClient = async token => {
 const getTransport = async (token, devicePgpKey, nodePubkey) => {
   const {user, nodeDeviceId} = token;
   const {fingerprint} = devicePgpKey;
-  const client = await getClient(token);
+  const client = await getClient({...token, deviceId: fingerprint});
+
   const inboundMiddleware = async ({event, acccountUser}) => {
     const {body} = event.getContent();
     const {encryptedData, signature} = JSON.parse(body);
@@ -28,7 +29,6 @@ const getTransport = async (token, devicePgpKey, nodePubkey) => {
       error('invalid inbound message signature', decryptyedData, signature);
       err = 'invalid signature for inbound matrix message';
     }
-
     return {...JSON.parse(decryptyedData), err};
   };
   const outboundMiddleware = async (msg: string) => {
@@ -54,10 +54,10 @@ const getTransport = async (token, devicePgpKey, nodePubkey) => {
   });
 };
 const pairWithNode = async ({token, key, devicePgpKey}) => {
-  const client = await getClient(token);
-  const {user, deviceId, pairingEvent, nodeDeviceId, nodeKeyId} = token;
-  const {pubkeyArmored} = devicePgpKey;
+  const {user, pairingEvent, nodeDeviceId, nodeKeyId} = token;
+  const {fingerprint: deviceId, pubkeyArmored} = devicePgpKey;
 
+  const client = await getClient({...token, deviceId});
   const pairingPromise = new Promise((res, rej) => {
     const timeOut = setTimeout(
       () => rej('Failed to get pairing response'),

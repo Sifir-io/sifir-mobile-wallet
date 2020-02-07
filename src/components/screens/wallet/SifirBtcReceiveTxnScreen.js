@@ -24,29 +24,6 @@ class SifirBtcReceiveTxnScreen extends Component {
     // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
-  componentWillMount() {
-    //   BackHandler.addEventListener(
-    //     'hardwareBackPress',
-    //     this.handleBackButtonClick,
-    //   );
-  }
-
-  componentWillUnmount() {
-    //  BackHandler.removeEventListener(
-    //    'hardwareBackPress',
-    //    this.handleBackButtonClick,
-    //  );
-  }
-
-  handleBackButtonClick() {
-    //  if (this.state.fromRoom) {
-    //    this.props.navigation.navigate('RoomsDetail');
-    //    return true;
-    //  }
-    //  this.props.navigation.goBack(null);
-    //  return true;
-  }
-
   state = {
     btnStatus: 0,
     modalVisible: false,
@@ -57,7 +34,6 @@ class SifirBtcReceiveTxnScreen extends Component {
     showQRCode: false,
     showSelector: false,
     enableWatchSelection: false,
-    fromRoom: this.props.navigation.getParam('fromRoom'),
   };
 
   componentDidMount() {

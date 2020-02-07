@@ -51,7 +51,8 @@ const getTransport = (token, devicePgpKey, nodePubkey) => {
 };
 const pairWithNode = async ({token, key, devicePgpKey}) => {
   const client = getTransport(token, devicePgpKey, null);
-  const {deviceId, nodeKeyId} = token;
+  const {nodeKeyId} = token;
+  const {fingerprint: deviceId} = devicePgpKey;
   const {pubkeyArmored} = devicePgpKey;
   // TODO check nodePubkey's finger print matches the one we scanned in QR
   return await client.post('pairing-event', {

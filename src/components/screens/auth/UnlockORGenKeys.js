@@ -22,6 +22,7 @@ import {
   deleteDevicePgpKeys,
 } from '@actions/auth';
 import {decryptMessage} from '@io/pgp';
+import uuid from 'uuid/v4';
 class UnlockORGenKeys extends Component {
   constructor(props, context) {
     super(props, context);
@@ -67,17 +68,17 @@ class UnlockORGenKeys extends Component {
           throw 'Pairing info is invalid or corrupted, please delete and repair';
         }
         await this.props.setAuthInfoState({token, key, nodePubkey});
-        event('app.unlocked');
+        event('app.init.unlocked');
         this.props.navigation.navigate('App');
         return;
         // Just scannedToken
       } else if (scannedToken) {
         const {token, key} = scannedToken;
-        const {deviceId} = token;
         if (!pubkeyArmored || !privkeyArmored) {
+          const {nodeKeyId} = token;
           const generatedKeys = await this.props.genAndSaveDevicePgpKeys({
-            user: deviceId,
-            email: `${deviceId}@sifir.io`,
+            user: uuid(),
+            email: `${nodeKeyId}@sifir.io`,
             passphrase,
           });
           if (!generatedKeys) {
@@ -95,11 +96,10 @@ class UnlockORGenKeys extends Component {
         if (!unlockedKeys) {
           throw PGP_KEYS_UNLOCK_FAILED;
         }
-        log('keys unlocked!');
         const pairingResult = await this.props.pairPhoneWithToken({token, key});
         if (!pairingResult) throw 'Error pairing with token';
         const {nodePubkey} = pairingResult;
-        event('app.paired', {type: token.eventType});
+        event('app.init.paired', {type: token.eventType});
         await this.props.storeEncryptedAuthInfo({token, key, nodePubkey});
         await this.props.setAuthInfoState({token, key, nodePubkey});
         log('pairing info stored, ready to app');
