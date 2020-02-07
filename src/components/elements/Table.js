@@ -1,16 +1,24 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {AppStyle} from '@common/index';
-import {TouchableOpacity, ScrollView} from 'react-native-gesture-handler';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { AppStyle } from "@common/index";
+import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 
 const data = [
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 1},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 2},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 3},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 4},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 6},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 9},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 80},
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 1 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 2 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 3 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 4 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 6 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 9 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 91 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 92 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 93 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 94 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 945 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 95 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 96 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 97 },
+  { alias: "EMEA#1", connections: 610, hops: 5, id: 80 }
 ];
 
 const Columns = props => {
@@ -31,14 +39,14 @@ const Columns = props => {
   );
 };
 const Row = props => {
-  const {connections, hops, alias, bgIndicator, selected, onSelect} = props;
+  const { connections, hops, alias, bgIndicator, selected, onSelect } = props;
   let backgroundColor = selected
-    ? '#ffa500'
+    ? "#ffa500"
     : bgIndicator % 2 === 0
-    ? '#102c3a'
-    : '#1f4c5f';
+    ? "#102c3a"
+    : "#1f4c5f";
   return (
-    <TouchableOpacity style={{backgroundColor}} onPress={onSelect}>
+    <TouchableOpacity style={{ backgroundColor }} onPress={onSelect}>
       <View style={styles.rowWrapper}>
         <View style={styles.rowBox}>
           <Text style={styles.columnTextRow}>{alias}</Text>
@@ -57,7 +65,7 @@ const Row = props => {
 };
 
 const Table = props => {
-  const {selected, onSelect} = props;
+  const { selected, onSelect } = props;
   return (
     <View style={[styles.table, props.style]}>
       <Columns />
@@ -80,29 +88,39 @@ const Table = props => {
 export default Table;
 
 const styles = StyleSheet.create({
-  table: {flex: 1, backgroundColor: 'black'},
+  table: { backgroundColor: "black", maxHeight: "60%" },
   columnWrapper: {
     padding: 10,
-    flexDirection: 'row',
+    flexDirection: "row"
   },
   rowWrapper: {
     padding: 20,
-    flexDirection: 'row',
+    flexDirection: "row"
   },
   rowBox: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
+    justifyContent: "center"
   },
   columnBox: {
     flex: 1,
     borderRightWidth: 1,
     borderRightColor: AppStyle.mainColor,
-    alignItems: 'center',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center"
   },
-  columnText: {color: 'white', textAlign: 'center', width: '70%'},
+  columnText: {
+    color: "white",
+    textAlign: "center",
+    width: "70%",
+    fontSize: 10,
+    fontWeight: "bold"
+  },
   columnTextRow: {
     color: AppStyle.mainColor,
-    textAlign: 'center',
-    width: '70%',
-  },
+    textAlign: "center",
+    width: "70%",
+    fontSize: 10
+  }
 });
