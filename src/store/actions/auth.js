@@ -117,10 +117,7 @@ const loadEncryptedAuthInfo = () => async dispatch => {
       type: GET_AUTH_STATUS + FULFILLED,
       payload: authInfo,
     });
-    // react store kills new lines to serialize the payload onto online, which F's up PGP messages. So unmangle here.
-    // That stole a day from my life..
     return authInfo;
-    // return authInfo.replace(/\\n/gim, '\r\n');
   } else {
     dispatch({
       type: GET_AUTH_STATUS + REJECTED,

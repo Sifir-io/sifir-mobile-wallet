@@ -35,12 +35,10 @@ class ScanToPairScreen extends Component {
     this.props.navigation.navigate('UnlockORGenKeys', {
       scannedToken: {token, key},
     });
-    // this.props.pairPhoneWithToken({token, key});
   };
 
   continue = () => {
     throw 'shold not get here';
-    // this.props.navigation.navigate('UnlockORGenKeys', {});
   };
 
   render() {

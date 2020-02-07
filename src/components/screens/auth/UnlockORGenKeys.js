@@ -27,21 +27,21 @@ class UnlockORGenKeys extends Component {
   constructor(props, context) {
     super(props, context);
   }
-
   state = {
-    scannedToken: this.props.navigation.getParam('scannedToken'),
-    encAuthInfo: this.props.navigation.getParam('encAuthInfo') || null,
+    scannedToken: this.props.route.params.scannedToken,
+    encAuthInfo: this.props.route.params.encAuthInfo || null,
     passphrase: '',
     retryablePairingError: '',
   };
 
+  // FIXME remove this , done in root now
   async componentDidMount() {
-    this._bootstrapAsync();
+    // this._bootstrapAsync();
   }
 
-  _bootstrapAsync = async () => {
-    await this.props.loadDevicePgpKeys();
-  };
+  //_bootstrapAsync = async () => {
+  //  await this.props.loadDevicePgpKeys();
+  //};
 
   passphraseUpdated(pass) {
     this.setState({passphrase: pass});
@@ -103,10 +103,10 @@ class UnlockORGenKeys extends Component {
         await this.props.storeEncryptedAuthInfo({token, key, nodePubkey});
         await this.props.setAuthInfoState({token, key, nodePubkey});
         log('pairing info stored, ready to app');
-        this.props.navigation.navigate('App');
         return;
       } else {
         //not paired on auth info , send back to Landing
+        //FIXME handle errorin root
         error('unlockOrGenkeys.invalid.state');
         log('invalid state', this.props.auth);
         this.props.navigation.navigate('AppLandingScreen');

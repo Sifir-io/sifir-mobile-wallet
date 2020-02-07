@@ -1,54 +1,145 @@
 import React from 'react';
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-import {View, StyleSheet} from 'react-native';
-
+import {NavigationContainer} from '@react-navigation/native';
+import {ActivityIndicator, StatusBar, StyleSheet, View} from 'react-native';
+import {Images, C, AppStyle} from '@common/index';
 import SifirHeader from '@elements/SifirHeader';
-import {
-  AppLandingScreen,
-  ScanToPairScreen,
-  UnlockORGenKeys,
-} from '@screens/auth/index';
+import {ScanToPairScreen, UnlockORGenKeys} from '@screens/auth/index';
 import WalletTab from './WalletStack';
-import {AppStyle} from '@common/index';
+import {connect} from 'react-redux';
+import {
+  loadEncryptedAuthInfo,
+  loadDevicePgpKeys,
+  deleteDevicePgpKeys,
+  clearAuthInfo,
+} from '@actions/auth';
+import {log, error} from '@io/events/';
+import {createStackNavigator} from '@react-navigation/stack';
 
-const ContentNavigator = createSwitchNavigator(
-  {
-    WALLET: WalletTab,
-  },
-  {
-    initialRouteName: 'WALLET',
-  },
-);
+const RootStack = createStackNavigator();
+const ContentStack = createStackNavigator();
+/**
+ * App tabs
+ */
+function ContentNav(props) {
+  return (
+    <ContentStack.Navigator
+      initialRouteName={C.STR_WALLET}
+      screenOptions={{
+        gestureEnabled: true,
+        header: ({scene, previous, navigation}) => {
+          return <SifirHeader switchPage={page => navigation.navigate(page)} />;
+        },
+      }}
+      options={{
+        headerMode: 'float',
+        headerStyle: {
+          height: 50, // Specify the height of your custom header
+        },
+      }}>
+      <ContentStack.Screen name={C.STR_WALLET} component={WalletTab} />
+    </ContentStack.Navigator>
+  );
+}
 
+/** Root Auth, App etc.. */
+function AuthNav(props) {
+  const {encAuthInfo} = props;
+  return (
+    <RootStack.Navigator
+      initialRouteName={encAuthInfo ? 'UnlockOrGenKeys' : 'ScanToPairScreen'}>
+      <RootStack.Screen
+        name="ScanToPairScreen"
+        component={ScanToPairScreen}
+        options={{headerShown: false}}
+      />
+      <RootStack.Screen
+        name="UnlockORGenKeys"
+        component={UnlockORGenKeys}
+        initialParams={encAuthInfo}
+        options={{headerShown: false}}
+      />
+    </RootStack.Navigator>
+  );
+}
 class Root extends React.Component {
-  static router = ContentNavigator.router;
+  constructor(props, context) {
+    super(props, context);
+  }
+  state = {
+    initLoading: true,
+    encAuthInfo: null,
+    devicePgpKeys: null,
+  };
+  componentDidMount() {
+    this._bootstrapAsync();
+  }
 
+  _bootstrapAsync = async () => {
+    const [encAuthInfo, devicePgpKeys] = await Promise.all([
+      this.props.loadEncryptedAuthInfo(),
+      this.props.loadDevicePgpKeys(),
+    ]);
+    this.setState({initLoading: false, encAuthInfo, devicePgpKeys});
+  };
   render() {
+    const {
+      // FIXME here elegant way to pass this to root o call ap
+      auth: {token, key, nodePubkey},
+    } = this.props;
+    const {initLoading, encAuthInfo} = this.state;
+    const authStateReady = token && key && nodePubkey;
     return (
-      <View style={styles.mainView}>
-        <SifirHeader
-          switchPage={page => this.props.navigation.navigate(page)}
-        />
-        <ContentNavigator navigation={this.props.navigation} />
-      </View>
+      <NavigationContainer>
+        {initLoading ? (
+          <View style={styles.mainViewLoading}>
+            <ActivityIndicator size="large" style={styles.progress} />
+            <StatusBar barStyle="default" />
+          </View>
+        ) : (
+          <View style={styles.mainView}>
+            {authStateReady ? (
+              <ContentNav />
+            ) : (
+              <AuthNav
+                encAuthInfo={encAuthInfo}
+                authStateReady={authStateReady}
+              />
+            )}
+          </View>
+        )}
+      </NavigationContainer>
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    auth: state.auth,
+  };
+};
+const mapDispatchToProps = {
+  loadEncryptedAuthInfo,
+  deleteDevicePgpKeys,
+  loadDevicePgpKeys,
+  clearAuthInfo,
+};
 
-export default createAppContainer(
-  createSwitchNavigator(
-    {
-      AppLandingScreen,
-      UnlockORGenKeys,
-      Pair: ScanToPairScreen,
-      App: Root,
-    },
-    {
-      initialRouteName: 'AppLandingScreen',
-    },
-  ),
-);
-
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Root);
 const styles = StyleSheet.create({
+  mainViewLoading: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
   mainView: {flex: 1, backgroundColor: AppStyle.backgroundColor},
+  inputTxtStyle: {
+    flex: 1,
+    marginLeft: 10,
+    color: 'white',
+    textAlign: 'left',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
 });
