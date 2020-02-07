@@ -11,7 +11,7 @@ class AppLandingScreen extends React.Component {
     this._bootstrapAsync();
   }
   _bootstrapAsync = async () => {
-    await this.props.loadAuthInfo();
+    // await this.props.loadAuthInfo();
     //const {
     //  auth: {token, key, paired},
     //} = this.props;
