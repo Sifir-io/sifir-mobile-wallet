@@ -1,3 +1,4 @@
+// TODO rename this to txnDetails
 import React, {Component} from 'react';
 import {
   View,
@@ -11,18 +12,17 @@ import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 
 class SifirBtcTxnConfirmedScreen extends Component {
-  state = {
-    isSendTxn: this.props.route.params.isSendTxn,
-    txnInfo: this.props.route.params.txnInfo,
-  };
-
+  constructor(props, context) {
+    super(props, context);
+  }
   done = () => {
-    this.props.navigation.navigate('Account', {walletInfo: this.state.txnInfo});
+    const {walletInfo} = this.props.route.params;
+    this.props.navigation.navigate('Account', {walletInfo});
   };
 
   render() {
-    const {isSendTxn, txnInfo} = this.state;
-    const {amount, address} = txnInfo;
+    const {txnInfo:{amount,address,isSendTxn}} = this.props.route.params;
+    // TODO remove from here
     const {loaded, loading, btcSendResult} = this.props.btcWallet;
     const addrTxtFontSize = (C.vw * 250) / address.length;
     return (

@@ -118,13 +118,14 @@ const getWalletDetails = ({label, type}) => async dispatch => {
       default:
         break;
     }
-    const btcUnit = C.STR_BTC;
     log('gott wallet details');
     dispatch({
       type: types.BTC_WALLET_DETAILS + FULFILLED,
-      payload: {btcWalletDetails: {balance, txnData, btcUnit}},
+      // payload: {btcWalletDetails: {balance, txnData, btcUnit}},
     });
     log('goint home');
+    return {balance, txnData};
+
   } catch (err) {
     error(err);
     dispatch({

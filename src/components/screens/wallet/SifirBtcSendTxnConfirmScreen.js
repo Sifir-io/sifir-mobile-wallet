@@ -7,24 +7,26 @@ import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
 class SifirBtcSendTxnConfirmScreen extends Component {
+  constructor(props, context) {
+    super(props, context);
+  }
   onClose = () => this.setState({modalVisible: false});
-
   state = {
     btnStatus: 0,
     modalVisible: false,
-    txnInfo: this.props.route.params.txnInfo,
   };
   async sendBtc() {
-    const {address, amount} = this.state.txnInfo;
-    this.props.sendBitcoin({address, amount});
+    const {txnInfo,walletInfo} = this.state.route.params;
+    const {address,amount} = txnInfo;
+    await this.props.sendBitcoin({address, amount});
     this.props.navigation.navigate('BtcTxnConfirmed', {
-      txnInfo: this.state.txnInfo,
-      isSendTxn: true,
+      txnInfo: {...txnInfo,isSendTxn: true},
+      walletInfo,
     });
   }
 
   render() {
-    const {address, amount, feeSettingEnabled} = this.state.txnInfo;
+    const {walletInfo:{feeSettingEnabled},txnInfo:{address,amount}} = this.props.route.params;
     const amountFontSize = (C.vw * 80) / amount.length;
     const btcUnitFontSize = amountFontSize * 0.6;
     const recTxtFontSize = (C.vw * 70) / address.length;

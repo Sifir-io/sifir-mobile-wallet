@@ -6,9 +6,9 @@ const initialState = {
   loading: false,
   error: null,
   loaded: false,
-  btcClientReady: false,
-  btcWalletList: [],
-  btcWalletDetails: {txnData: null, balance: 0, btcUnit: 'BTC'},
+  // btcClientReady: false,
+  btcWalletList: [], // TODO cache
+  // btcWalletDetails: {txnData: null, balance: 0, btcUnit: 'BTC'},
   address: null,
   btcSendResult: null,
   feeSettingEnabled: false,
@@ -57,13 +57,13 @@ const btcWallet = createReducer(initialState)({
   }),
   [types.BTC_WALLET_DETAILS + FULFILLED]: (
     state,
-    {payload: {btcWalletDetails}},
+    // {payload: {btcWalletDetails}},
   ) => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    btcWalletDetails,
+    // btcWalletDetails,
   }),
   [types.BTC_WALLET_DETAILS + REJECTED]: (state, {payload: {error}}) => ({
     ...state,

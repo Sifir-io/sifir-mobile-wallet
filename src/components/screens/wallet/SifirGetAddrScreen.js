@@ -13,15 +13,17 @@ import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 
 export default class SifirGetAddrScreen extends Component {
+
+  constructor(props, context) {
+    super(props, context);
+  }
   state = {
     btnStatus: 0,
     showModal: false,
     torchOn: false,
     address: null,
-    txnInfo: this.props.route.params.txnInfo,
     addrFontSize: 22,
   };
-
   closeModal = data => {
     if (data === null) {
       this.setState({showModal: false});
@@ -35,9 +37,9 @@ export default class SifirGetAddrScreen extends Component {
   };
 
   continue = () => {
-    let {txnInfo} = this.state;
-    txnInfo.address = this.state.address;
-    this.props.navigation.navigate('BtcSendTxnInputAmount', {txnInfo});
+    const {walletInfo} = this.props.route.params;
+    const {address} = this.state;
+    this.props.navigation.navigate('BtcSendTxnInputAmount', {txnInfo:{address},walletInfo});
   };
 
   inputAddr = address => {
