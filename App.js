@@ -1,10 +1,9 @@
-import 'react-native-gesture-handler';
 import React, {Component} from 'react';
-import Root from '@containers/index';
 import {Provider} from 'react-redux';
-import * as reducers from '@reducers';
 import {createStore, applyMiddleware, combineReducers} from 'redux';
 import thunkMiddleware from 'redux-thunk';
+import * as reducers from '@reducers';
+import Root from '@containers/index';
 const rootReducer = (state, action) => {
   return combineReducers(reducers)(state, action);
 };

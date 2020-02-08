@@ -7,9 +7,7 @@ import {
   Text,
   ActivityIndicator,
 } from 'react-native';
-import {sendBitcoin} from '@actions/btcwallet';
 import {connect} from 'react-redux';
-
 import {Images, AppStyle, C} from '@common/index';
 
 class SifirBtcTxnConfirmedScreen extends Component {
@@ -21,10 +19,6 @@ class SifirBtcTxnConfirmedScreen extends Component {
   done = () => {
     this.props.navigation.navigate('Account', {walletInfo: this.state.txnInfo});
   };
-
-  componentDidMount() {
-    this.props.sendBitcoin(this.state.txnInfo);
-  }
 
   render() {
     const {isSendTxn, txnInfo} = this.state;
@@ -38,6 +32,7 @@ class SifirBtcTxnConfirmedScreen extends Component {
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
         )}
+        // TODO add error handler
         {loaded === true && btcSendResult !== null && (
           <>
             <View style={{alignItems: 'center', flex: 3}}>
@@ -80,7 +75,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {sendBitcoin};
+const mapDispatchToProps = {};
 
 export default connect(
   mapStateToProps,

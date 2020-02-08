@@ -19,6 +19,9 @@ export default function WalletTab() {
     <WalletStack.Navigator
       initialRouteName="AccountList"
       headerMode="none"
+      screenOptions={{
+        gestureEnabled: false,
+      }}
       // @TODO migrate to nav v5 api
       //screenOptions={{
       //  transitionConfig: () => fromRight(700),
@@ -31,7 +34,7 @@ export default function WalletTab() {
       <WalletStack.Screen name="Account" component={SifirAccountScreen} />
       <WalletStack.Screen name="GetAddress" component={SifirGetAddrScreen} />
       <WalletStack.Screen
-        name="SifirBtcSendTxnInputAmountScreen"
+        name="BtcSendTxnInputAmount"
         component={SifirBtcSendTxnInputAmountScreen}
       />
       <WalletStack.Screen

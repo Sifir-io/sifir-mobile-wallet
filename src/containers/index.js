@@ -26,7 +26,7 @@ function ContentNav(props) {
       initialRouteName={C.STR_WALLET}
       headerMode="float"
       screenOptions={{
-        gestureEnabled: true,
+        gestureEnabled: false,
         header: ({scene, previous, navigation}) => {
           return <SifirHeader switchPage={page => navigation.navigate(page)} />;
         },
@@ -47,7 +47,11 @@ function ContentNav(props) {
 function AuthNav(props) {
   const {encAuthInfo} = props;
   return (
-    <RootStack.Navigator headerMode="none">
+    <RootStack.Navigator
+      headerMode="none"
+      screenOptions={{
+        gestureEnabled: false,
+      }}>
       {encAuthInfo ? (
         <RootStack.Screen
           name="UnlockORGenKeys"

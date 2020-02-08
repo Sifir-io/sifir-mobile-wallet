@@ -7,7 +7,6 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  // BackHandler,
 } from 'react-native';
 import {connect} from 'react-redux';
 import Overlay from 'react-native-modal-overlay';
@@ -16,12 +15,12 @@ import Share from 'react-native-share';
 
 import {getWalletAddress} from '@actions/btcwallet';
 import {Images, AppStyle, C} from '@common/index';
+import {log, error} from '@io/events/';
 
 class SifirBtcReceiveTxnScreen extends Component {
   constructor(props) {
     super(props);
     this.qrCode = '';
-    // this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
   }
 
   state = {
@@ -63,9 +62,7 @@ class SifirBtcReceiveTxnScreen extends Component {
           message: address,
         };
       }
-      Share.open(shareOptions)
-        .then(res => console.log(res))
-        .catch(err => console.error(err));
+      Share.open(shareOptions).catch(err => error(err));
     }
   };
 

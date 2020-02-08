@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
-
+import {sendBitcoin} from '@actions/btcwallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
-export default class SifirBtcSendTxnConfirmScreen extends Component {
+class SifirBtcSendTxnConfirmScreen extends Component {
   onClose = () => this.setState({modalVisible: false});
 
   state = {
@@ -13,6 +14,14 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
     modalVisible: false,
     txnInfo: this.props.route.params.txnInfo,
   };
+  async sendBtc() {
+    const {address, amount} = this.state.txnInfo;
+    this.props.sendBitcoin({address, amount});
+    this.props.navigation.navigate('BtcTxnConfirmed', {
+      txnInfo: this.state.txnInfo,
+      isSendTxn: true,
+    });
+  }
 
   render() {
     const {address, amount, feeSettingEnabled} = this.state.txnInfo;
@@ -68,12 +77,7 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
           </View>
         )}
         <TouchableOpacity
-          onLongPress={() =>
-            this.props.navigation.navigate('BtcTxnConfirmed', {
-              txnInfo: this.state.txnInfo,
-              isSendTxn: true,
-            })
-          }
+          onLongPress={() => this.sendBtc()}
           style={{
             marginTop: 50,
             alignItems: 'center',
@@ -108,6 +112,18 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    btcWallet: state.btcWallet,
+  };
+};
+
+const mapDispatchToProps = {sendBitcoin};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirBtcSendTxnConfirmScreen);
 
 const styles = StyleSheet.create({
   mainView: {

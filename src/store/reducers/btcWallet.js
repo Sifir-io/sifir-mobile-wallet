@@ -1,5 +1,6 @@
-import * as types from '@types/index';
-import {createReducer, FULFILLED, PENDING, REJECTED} from '@utils/index';
+import * as types from '@types/';
+import {createReducer} from '@utils/';
+import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
 
 const initialState = {
   loading: false,
@@ -15,17 +16,12 @@ const initialState = {
 
 const btcWallet = createReducer(initialState)({
   // Client Status
-  [types.BTC_CLIENT_STATUS + REJECTED]: (state, {payload: {error}}) => ({
-    ...state,
-    error,
-    loading: false,
-    loaded: false,
-    btcClientReady: false,
-  }),
-  [types.BTC_CLIENT_STATUS + FULFILLED]: state => ({
-    ...state,
-    btcClientReady: true,
-  }),
+  //  btcClientReady: false,
+  //}),
+  //[types.BTC_CLIENT_STATUS + FULFILLED]: state => ({
+  //  ...state,
+  //  btcClientReady: true,
+  //}),
 
   // Wallet List Data
   [types.BTC_WALLET_LIST_DATA_SHOW + PENDING]: state => ({
