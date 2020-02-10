@@ -5,7 +5,7 @@ import {Slider} from 'react-native-elements';
 const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <View style={styles.margin_26}>
+      <View style={styles.margin_30}>
         <View style={styles.textRow}>
           <Image source={Images.icon_indicator} style={styles.back} />
           <TouchableOpacity
@@ -19,41 +19,30 @@ const HomeScreen = ({navigation}) => {
         </View>
 
         <View style={[styles.fuding_wrapper]}>
-          <Text style={[styles.textBright, styles.text_11, styles.text_bold]}>
-            FUDING AMOUNT
+          <Text style={[styles.textBright, styles.text_normal, styles.text_bold]}>
+            FUNDING AMOUNT
           </Text>
-          <View style={[styles.textRow]}>
-            <Text style={[styles.text_white, styles.text_x_large]}>0.05</Text>
-            <Text style={[styles.text_29, styles.text_white]}> BTC</Text>
-          </View>
+          <Text style={[styles.text_white, styles.text_x_large]}>0.05 BTC</Text>
         </View>
 
-        <View style={[styles.margin_15, styles.margin_top_33]}>
-          <Text style={[styles.textBright, styles.text_10]}>Alias</Text>
-          <Text style={[styles.text_white, styles.text_14]}>EMEA#1</Text>
+        <View style={[styles.margin_15, styles.margin_top_30]}>
+          <Text style={[styles.textBright]}>Alias</Text>
+          <Text style={[styles.text_white, styles.text_large]}>EMEA#1</Text>
 
-          <Text
-            style={[styles.textBright, styles.margin_top_10, styles.text_10]}
-          >
+          <Text style={[styles.textBright, styles.margin_top_15]}>
             Node Address
           </Text>
-          <Text style={[styles.text_white, styles.text_14]}>ema.node.co</Text>
-
-          <Text
-            style={[styles.textBright, styles.margin_top_10, styles.text_10]}
-          >
-            Port
+          <Text style={[styles.text_white, styles.text_large]}>
+            ema.node.co
           </Text>
-          <Text style={[styles.text_white, styles.text_14]}>124</Text>
 
-          <Text
-            style={[styles.textBright, styles.margin_top_15, styles.text_10]}
-          >
-            Fees
-          </Text>
-          <View style={styles.space_between}>
+          <Text style={[styles.textBright, styles.margin_top_15]}>Port</Text>
+          <Text style={[styles.text_white, styles.text_large]}>124</Text>
+
+          <Text style={[styles.textBright, styles.margin_top_15]}>Fees</Text>
+          <View style={[styles.space_between, styles.mt7]}>
             <View style={styles.outline_button}>
-              <Text style={[styles.text_white, styles.text_normal]}>
+              <Text style={[styles.text_white, styles.text_large]}>
                 0.015 BTC
               </Text>
             </View>
@@ -67,16 +56,8 @@ const HomeScreen = ({navigation}) => {
                 minimumTrackTintColor="rgb(45, 171, 226)"
               />
               <View style={styles.row}>
-                <Text style={[styles.textBright, styles.text_10]}>
-                  Approximate wait
-                </Text>
-                <Text
-                  style={[
-                    styles.text_white,
-                    styles.text_10,
-                    { marginLeft: "25%" }
-                  ]}
-                >
+                <Text style={styles.textBright}>Approximate wait</Text>
+                <Text style={[styles.text_white, { marginLeft: 40 }]}>
                   4 hours
                 </Text>
               </View>
@@ -85,7 +66,7 @@ const HomeScreen = ({navigation}) => {
         </View>
 
         <TouchableOpacity style={styles.yellow_button}>
-          <Text style={[styles.text_17, styles.text_center, styles.text_bold]}>
+          <Text style={[styles.text_26, styles.text_center, styles.text_bold]}>
             OPEN CHANNEL
           </Text>
         </TouchableOpacity>
@@ -103,20 +84,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppStyle.backgroundColor
   },
+  text_26: { fontSize: 26 },
   row: {
     flexDirection: 'row',
   },
   yellow_button: {
     backgroundColor: "#ffa500",
-    paddingHorizontal: 56,
-    paddingVertical: 14,
+    padding: 25,
     borderRadius: 10,
     marginTop: 50
   },
   space_between: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 4
+    justifyContent: "space-between"
   },
   width_60: {
     width: "60%"
@@ -125,19 +105,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold"
   },
   text_normal: {
-    fontSize: 12
-  },
-  text_11: {
-    fontSize: 11
-  },
-  text_10: {
-    fontSize: 10
-  },
-  text_14: {
-    fontSize: 14
-  },
-  text_17: {
-    fontSize: 17
+    fontSize: 13
   },
   text_center: {
     textAlign: "center"
@@ -157,39 +125,36 @@ const styles = StyleSheet.create({
     color: AppStyle.mainColor,
     fontFamily: AppStyle.mainFont
   },
-  slider_wrapper: { width: "100%" },
+  mt7: {
+    marginTop: 7
+  },
+  slider_wrapper: { width: "100%", marginLeft: 20 },
   back: {
     marginRight: 8,
-    width: 13,
-    height: 14
+    width: 12,
+    height: 12
   },
-  margin_26: {
-    margin: 26
+  margin_30: {
+    margin: 30
   },
   margin_15: {
     margin: 15
   },
   margin_top_30: { marginTop: 30 },
-  margin_top_33: { marginTop: 33 },
   margin_top_15: { marginTop: 15 },
-  margin_top_10: { marginTop: 10 },
   fuding_wrapper: {
     alignItems: "center",
-    marginTop: 31
+    marginTop: 50
   },
   text_x_large: {
-    fontSize: 68
-  },
-  text_29: {
-    fontSize: 29
+    fontSize: 60
   },
   outline_button: {
-    padding: 7,
+    padding: 10,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: AppStyle.mainColor,
-    justifyContent: "center",
-    marginRight: "20%"
+    justifyContent: "center"
   }
 });
 

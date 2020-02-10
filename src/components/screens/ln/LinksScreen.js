@@ -30,32 +30,26 @@ export default function LinksScreen(props) {
             <Text style={[styles.text_white, styles.text_18]}>24 hours</Text>
           </Text>
         </View>
-
-        <View style={[styles.margin_15, styles.margin_top_45]}>
+        <View style={[styles.margin_15, styles.margin_top_50]}>
           <View style={[styles.flex1, styles.justify_center]}>
-            <ProgressBar loaded={30} />
+            <ProgressBar loaded={50} />
           </View>
         </View>
         <View style={styles.justify_center}>
-          <TouchableOpacity style={styles.send_button_disabled}>
+          <TouchableOpacity style={styles.send_button}>
             <Text
-              style={[
-                styles.text_large,
-                styles.text_center,
-                styles.text_bold,
-                styles.textBrightLow
-              ]}
+              style={[styles.text_large, styles.text_center, styles.text_bold]}
             >
               SEND
             </Text>
-            <Image source={Images.icon_up_blue} style={styles.send_icon} />
+            <Image source={Images.icon_up_dark} style={styles.send_icon} />
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.justify_end}>
         <SlidingPanel
           ref={childRef}
-          headerLayoutHeight={100}
+          headerLayoutHeight={80}
           AnimationSpeed={50}
           onAnimationStop={() => {
             childRef.current && childRef.current.onRequestClose();
@@ -72,7 +66,7 @@ export default function LinksScreen(props) {
                 style={[
                   styles.commonTextStyle,
                   styles.textBrightLight,
-                  styles.text_18
+                  styles.text_large
                 ]}
               >
                 OPEN CHANNEL
@@ -122,32 +116,13 @@ const styles = StyleSheet.create({
 
     borderBottomWidth: 15,
     borderStyle: "solid",
-    borderBottomColor: "#f6921e"
-  },
-  text_normal: {
-    fontSize: 12
-  },
-  text_11: {
-    fontSize: 11
-  },
-  text_29: {
-    fontSize: 29
-  },
-  text_10: {
-    fontSize: 10
-  },
-  text_14: {
-    fontSize: 14
-  },
-  text_18: {
-    fontSize: 18
+    borderBottomColor: "#ffa500"
   },
   send_button: {
     backgroundColor: AppStyle.mainColor,
-    paddingVertical: 26,
-    paddingHorizontal: 85,
+    padding: 30,
     borderRadius: 10,
-    marginTop: 52,
+    marginTop: 80,
     width: "85%",
     flexDirection: "row",
     alignItems: "center",
@@ -172,15 +147,15 @@ const styles = StyleSheet.create({
   },
   headerLayoutStyle: {
     width,
-    height: 100,
-    backgroundColor: "#f6921e",
+    height: 80,
+    backgroundColor: "orange",
     justifyContent: "center",
     alignItems: "center"
   },
   slidingPanelLayoutStyle: {
     width,
     height: height - 10,
-    backgroundColor: "#f6921e",
+    backgroundColor: "orange",
     justifyContent: "center",
     alignItems: "center"
   },
@@ -206,6 +181,12 @@ const styles = StyleSheet.create({
   text_large: {
     fontSize: 20
   },
+  text_29: {
+    fontSize: 29
+  },
+  text_18: {
+    fontSize: 18
+  },
   textRow: {
     flexDirection: "row",
     alignItems: "center"
@@ -215,11 +196,7 @@ const styles = StyleSheet.create({
     fontFamily: AppStyle.mainFont
   },
   textBrightLight: {
-    color: "#0c1d28",
-    fontFamily: AppStyle.mainFont
-  },
-  textBrightLow: {
-    color: "#53cbc8",
+    color: "rgb(30, 73, 95)",
     fontFamily: AppStyle.mainFont
   },
   align_center: { alignItems: "center" },
@@ -241,11 +218,10 @@ const styles = StyleSheet.create({
   },
   margin_top_30: { marginTop: 30 },
   margin_top_50: { marginTop: 50 },
-  margin_top_45: { marginTop: 45 },
   margin_top_15: { marginTop: 15 },
   fuding_wrapper: {
     alignItems: "center",
-    marginTop: 47
+    marginTop: 50
   },
   text_x_large: {
     fontSize: 60

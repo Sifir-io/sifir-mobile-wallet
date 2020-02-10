@@ -14,7 +14,7 @@ export const ProgressBar = props => {
   const styles = StyleSheet.create({
     progress_wrapper: {
       flexDirection: "row",
-      flex: 0.4,
+      flex: 0.7,
       position: "relative",
       alignItems: "center"
     },
@@ -34,16 +34,16 @@ export const ProgressBar = props => {
       position: "absolute",
       left: 0,
       backgroundColor: startDotColor,
-      width: 19,
-      height: 19,
+      width: 20,
+      height: 20,
       borderRadius: 10
     },
     endDot: {
       position: "absolute",
       right: 0,
       backgroundColor: endDotColor,
-      width: 19,
-      height: 19,
+      width: 20,
+      height: 20,
       borderRadius: 10,
       justifyContent: "center",
       alignItems: "center"

@@ -5,6 +5,7 @@ export default {
   icon_setting: require('./../assets/images/setting.png'),
   icon_add: require('./../assets/images/add.png'),
   icon_add_clicked: require('./../assets/images/add1.png'),
+  camera_blue: require('./../assets/images/camera-small.png'),
   icon_light_clicked: require('./../assets/images/light1.png'),
   icon_light: require('./../assets/images/light.png'),
   icon_back: require('./../assets/images/back.png'),

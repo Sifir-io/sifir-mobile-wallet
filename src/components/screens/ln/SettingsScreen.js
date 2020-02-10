@@ -15,7 +15,7 @@ export default function SettingsScreen() {
   const [selected, setSelected] = useState(undefined);
   return (
     <View style={styles.container}>
-      <View style={[styles.margin_wrapper, styles.flex1]}>
+      <View style={[styles.margin_30, styles.flex1]}>
         <View style={styles.inputWrapper}>
           <TextInput
             placeholder="Enter Node URL"
@@ -23,18 +23,18 @@ export default function SettingsScreen() {
             style={[styles.input]}
             selectionColor="white"
           />
-          <View style={[styles.justifyCenter]}>
-            <Image source={Images.img_camera_blue} style={styles.camera_icon} />
+          <View style={[styles.space_around]}>
+            <Image source={Images.camera_blue} style={styles.camera_icon} />
             <Image source={Images.icon_setting} style={styles.burger_icon} />
           </View>
         </View>
         <Text
           style={[
-            styles.text_18,
+            styles.text_large,
             styles.text_white,
             styles.text_bold,
-            styles.margin_top_25,
-            styles.mb_15
+            styles.margin_top_30,
+            styles.mb_20
           ]}
         >
           Browse Nodes
@@ -46,10 +46,9 @@ export default function SettingsScreen() {
           // Adding inline style as condition is needed to be evaluated
           style={{
             backgroundColor: selected && selected.id ? "#ffa500" : "lightgrey",
-            paddingVertical: 16,
-            paddingHorizontal: 81,
+            padding: 20,
             borderRadius: 10,
-            marginTop: 28
+            marginTop: 50
           }}
         >
           <Text
@@ -71,9 +70,6 @@ const styles = StyleSheet.create({
   flex1: {
     flex: 1
   },
-  text_18: {
-    fontSize: 18
-  },
   inputWrapper: {
     flexDirection: "row",
     borderColor: AppStyle.mainColor,
@@ -82,26 +78,30 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "visible",
-    height: 52
+    overflow: "visible"
   },
   container: {
     flex: 1,
     backgroundColor: AppStyle.backgroundColor
   },
-  camera_icon: { width: 19, height: 16, marginRight: 10 },
-  burger_icon: { width: 19, height: 16 },
-  justifyCenter: { flexDirection: "row", flex: 1, justifyContent: "flex-end" },
+  camera_icon: { width: 25, height: 20 },
+  burger_icon: { width: 25, height: 20 },
+  space_around: {
+    flexDirection: "row",
+    flex: 1,
+    justifyContent: "space-around",
+    marginLeft: 10
+  },
   space_between: {
     flexDirection: "row",
     justifyContent: "space-between"
   },
-  mb_15: { marginBottom: 15 },
+  mb_20: { marginBottom: 20 },
   input: {
     width: "70%",
     color: "white",
     height: Platform.OS === "android" ? 30 : 25,
-    fontSize: 13
+    fontSize: 12
   },
   text_bold: {
     fontWeight: "bold"
@@ -121,10 +121,8 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12
   },
-  margin_wrapper: {
-    marginTop: 42,
-    marginBottom: 36,
-    marginHorizontal: 26
+  margin_30: {
+    margin: 30
   },
-  margin_top_25: { marginTop: 25 }
+  margin_top_30: { marginTop: 30 }
 });

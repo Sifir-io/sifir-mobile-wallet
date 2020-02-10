@@ -1,7 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView
+} from "react-native";
 import { AppStyle } from "@common/index";
-import { TouchableOpacity, ScrollView } from "react-native-gesture-handler";
 
 const data = [
   { alias: "EMEA#1", connections: 610, hops: 5, id: 1 },
@@ -10,14 +15,6 @@ const data = [
   { alias: "EMEA#1", connections: 610, hops: 5, id: 4 },
   { alias: "EMEA#1", connections: 610, hops: 5, id: 6 },
   { alias: "EMEA#1", connections: 610, hops: 5, id: 9 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 91 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 92 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 93 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 94 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 945 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 95 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 96 },
-  { alias: "EMEA#1", connections: 610, hops: 5, id: 97 },
   { alias: "EMEA#1", connections: 610, hops: 5, id: 80 }
 ];
 
@@ -88,7 +85,7 @@ const Table = props => {
 export default Table;
 
 const styles = StyleSheet.create({
-  table: { backgroundColor: "black", maxHeight: "60%" },
+  table: { flex: 1, backgroundColor: "black" },
   columnWrapper: {
     padding: 10,
     flexDirection: "row"
@@ -99,28 +96,18 @@ const styles = StyleSheet.create({
   },
   rowBox: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: "center"
   },
   columnBox: {
     flex: 1,
     borderRightWidth: 1,
     borderRightColor: AppStyle.mainColor,
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "center"
+    alignItems: "center"
   },
-  columnText: {
-    color: "white",
-    textAlign: "center",
-    width: "70%",
-    fontSize: 10,
-    fontWeight: "bold"
-  },
+  columnText: { color: "white", textAlign: "center", width: "70%" },
   columnTextRow: {
     color: AppStyle.mainColor,
     textAlign: "center",
-    width: "70%",
-    fontSize: 10
+    width: "70%"
   }
 });
