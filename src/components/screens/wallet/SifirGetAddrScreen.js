@@ -13,7 +13,6 @@ import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 
 export default class SifirGetAddrScreen extends Component {
-
   constructor(props, context) {
     super(props, context);
   }
@@ -36,10 +35,13 @@ export default class SifirGetAddrScreen extends Component {
     });
   };
 
-  continue = () => {
+  goToEnterAmount = () => {
     const {walletInfo} = this.props.route.params;
     const {address} = this.state;
-    this.props.navigation.navigate('BtcSendTxnInputAmount', {txnInfo:{address},walletInfo});
+    this.props.navigation.navigate('BtcSendTxnInputAmount', {
+      txnInfo: {address},
+      walletInfo,
+    });
   };
 
   inputAddr = address => {
@@ -98,7 +100,7 @@ export default class SifirGetAddrScreen extends Component {
             <TouchableOpacity>
               <View
                 style={styles.continueBtnView}
-                onTouchEnd={() => this.continue()}>
+                onTouchEnd={() => this.goToEnterAmount()}>
                 <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
                 <Image
                   source={Images.icon_up_blue}

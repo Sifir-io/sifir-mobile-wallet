@@ -35,7 +35,9 @@ const initAndUnlockDeviceKeys = ({
       privatekeyArmored: privkeyArmored,
       passphrase,
     });
-    if (!keyDetails) throw 'Error unlocking key';
+    if (!keyDetails) {
+      throw 'Error unlocking key';
+    }
     dispatch({
       type: PGP_UNLOCK_KEYS + FULFILLED,
       payload: keyDetails,
@@ -58,8 +60,9 @@ const genAndSaveDevicePgpKeys = ({
 }) => async dispatch => {
   try {
     const keys = await dispatch(loadDevicePgpKeys());
-    if (keys)
+    if (keys) {
       throw 'Keys already detected! , please remove keys before generating news ones';
+    }
     const key = await makeNewPgpKey({
       passphrase,
       user,
@@ -155,15 +158,18 @@ const pairPhoneWithToken = ({token = null, key = null} = {}) => async (
   } = getState();
   try {
     // make sure token + keys have been loaded
-    if (!token || !devicePgpKey)
+    if (!token || !devicePgpKey) {
       throw 'Cannot pair phone wihtout setting state first';
+    }
     dispatch({type: REQUEST_PAIR + PENDING});
     const pairResult = await pairDeviceWithNodeUsingToken({
       token,
       key,
       devicePgpKey,
     });
-    if (!pairResult) throw 'Failed to pair';
+    if (!pairResult) {
+      throw 'Failed to pair';
+    }
     const {isValid, nodePubkey} = pairResult;
     if (isValid === true) {
       dispatch({

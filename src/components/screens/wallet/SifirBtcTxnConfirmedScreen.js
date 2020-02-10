@@ -21,7 +21,9 @@ class SifirBtcTxnConfirmedScreen extends Component {
   };
 
   render() {
-    const {txnInfo:{amount,address,isSendTxn}} = this.props.route.params;
+    const {
+      txnInfo: {amount, address, isSendTxn},
+    } = this.props.route.params;
     // TODO remove from here
     const {loaded, loading, btcSendResult} = this.props.btcWallet;
     const addrTxtFontSize = (C.vw * 250) / address.length;
@@ -32,7 +34,6 @@ class SifirBtcTxnConfirmedScreen extends Component {
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
         )}
-        // TODO add error handler
         {loaded === true && btcSendResult !== null && (
           <>
             <View style={{alignItems: 'center', flex: 3}}>

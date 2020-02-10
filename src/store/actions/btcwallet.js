@@ -125,7 +125,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
     });
     log('goint home');
     return {balance, txnData};
-
   } catch (err) {
     error(err);
     dispatch({

@@ -59,10 +59,17 @@ function AuthNav(props) {
           initialParams={{encAuthInfo}}
         />
       ) : (
-        <RootStack.Screen
-          name="ScanToPairScreen"
-          component={ScanToPairScreen}
-        />
+        <>
+          <RootStack.Screen
+            name="ScanToPairScreen"
+            component={ScanToPairScreen}
+          />
+          <RootStack.Screen
+            name="UnlockORGenKeys"
+            component={UnlockORGenKeys}
+            initialParams={{encAuthInfo}}
+          />
+        </>
       )}
     </RootStack.Navigator>
   );

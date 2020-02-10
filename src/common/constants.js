@@ -23,7 +23,7 @@ export const C = {
   SCAN_ORSCAN: 'or scan a QR code',
   STR_Enter_Addr: 'Enter Address',
   STR_ENTER_PASSWORD: 'Enter a password:',
-  STR_ENTER_PASS_TO_UNLOCK_WALLET: 'Enter your wallet\'s password to unlcok it:',
+  STR_ENTER_PASS_TO_UNLOCK_WALLET: "Enter your wallet's password to unlcok it:",
   STR_CONTINUE: 'CONTINUE',
   STR_PAYMENT_RECEIPIENT: 'PAYMENT RECIPIENT',
   STR_PAYMENT_AMOUNT: 'PAYMENT AMOUNT',

@@ -15,18 +15,22 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     btnStatus: 0,
     modalVisible: false,
   };
-  async sendBtc() {
-    const {txnInfo,walletInfo} = this.state.route.params;
-    const {address,amount} = txnInfo;
-    await this.props.sendBitcoin({address, amount});
+  sendBtc = () => {
+    console.log('in send');
+    const {txnInfo, walletInfo} = this.props.route.params;
+    const {address, amount} = txnInfo;
+    this.props.sendBitcoin({address, amount});
     this.props.navigation.navigate('BtcTxnConfirmed', {
-      txnInfo: {...txnInfo,isSendTxn: true},
+      txnInfo: {...txnInfo, isSendTxn: true},
       walletInfo,
     });
-  }
+  };
 
   render() {
-    const {walletInfo:{feeSettingEnabled},txnInfo:{address,amount}} = this.props.route.params;
+    const {
+      walletInfo: {feeSettingEnabled},
+      txnInfo: {address, amount},
+    } = this.props.route.params;
     const amountFontSize = (C.vw * 80) / amount.length;
     const btcUnitFontSize = amountFontSize * 0.6;
     const recTxtFontSize = (C.vw * 70) / address.length;
@@ -35,7 +39,9 @@ class SifirBtcSendTxnConfirmScreen extends Component {
       <View style={styles.mainView}>
         <View
           style={styles.setting}
-          onTouchEnd={() => this.setState({modalVisible: true})}>
+          onTouchEnd={() =>
+            feeSettingEnabled && this.setState({modalVisible: true})
+          }>
           <TouchableOpacity>
             <Image source={Images.icon_setting} style={styles.settingImg} />
           </TouchableOpacity>
@@ -79,7 +85,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
           </View>
         )}
         <TouchableOpacity
-          onLongPress={() => this.sendBtc()}
+          onLongPress={this.sendBtc}
           style={{
             marginTop: 50,
             alignItems: 'center',

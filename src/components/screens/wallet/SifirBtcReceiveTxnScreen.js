@@ -35,13 +35,17 @@ class SifirBtcReceiveTxnScreen extends Component {
     enableWatchSelection: false,
   };
 
-  componentDidMount() {
+  async _bootStrap() {
     const {label, type} = this.props.route.params.walletInfo;
-    this.setState({label, type});
+    // FIXME why setState here ?
+    await this.setState({label, type});
     if (type === C.STR_WATCH_WALLET_TYPE) {
-      this.props.getWalletAddress({label, type});
-      this.setState({showQRCode: true});
+      await this.props.getWalletAddress({label, type});
+      await this.setState({showQRCode: true});
     }
+  }
+  componentDidMount() {
+    this._bootStrap();
   }
 
   onClose = () => this.setState({modalVisible: false, showSelector: false});
@@ -270,6 +274,7 @@ class SifirBtcReceiveTxnScreen extends Component {
                 {title: C.STR_Segwit_Compatible, addrType: 'p2sh-segwit'},
                 {title: C.STR_Bech32, addrType: 'bech32'},
               ]}
+              keyExtractor={(item, index) => item.title}
               renderItem={({item}) => (
                 <TouchableOpacity
                   style={{

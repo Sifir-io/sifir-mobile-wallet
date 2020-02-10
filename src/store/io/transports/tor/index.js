@@ -18,7 +18,9 @@ const getTransport = (token, devicePgpKey, nodePubkey) => {
     // that the is the only time this should be the case, after that the transport should always check the signature on incoming message
     // TODO we need to get the nodes fingerprintt...
     // for now we just check with the public key we have in the token
-    if (!nodePubkey) return true;
+    if (!nodePubkey) {
+      return true;
+    }
     const {'content-signature': signatureb64} = JSON.parse(headers);
     const signature = base64.decode(signatureb64);
     const [sig, sigfingerprint] = signature.split(';');

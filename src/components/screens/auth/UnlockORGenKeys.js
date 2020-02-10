@@ -85,7 +85,9 @@ class UnlockORGenKeys extends Component {
           throw PGP_KEYS_UNLOCK_FAILED;
         }
         const pairingResult = await this.props.pairPhoneWithToken({token, key});
-        if (!pairingResult) throw 'Error pairing with token';
+        if (!pairingResult) {
+          throw 'Error pairing with token';
+        }
         const {nodePubkey} = pairingResult;
         event('app.init.paired', {type: token.eventType});
         await this.props.storeEncryptedAuthInfo({token, key, nodePubkey});

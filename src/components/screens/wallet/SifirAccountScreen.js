@@ -23,26 +23,22 @@ class SifirAccountScreen extends React.Component {
     btnStatus: 0,
     balance: 0,
     txnData: null,
-    btcUnit: C.STR_BTC
+    btcUnit: C.STR_BTC,
   };
-  async _loadWalletFromProps(label,type){
+  async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
-    const {balance,txnData} = await this.props.getWalletDetails({label, type});
-    this.setState({balance,txnData});
+    const {balance, txnData} = await this.props.getWalletDetails({label, type});
+    this.setState({balance, txnData});
   }
   componentDidMount() {
     this._loadWalletFromProps();
   }
 
   render() {
-    const {btnStatus,balance,txnData,btcUnit} = this.state;
+    const {btnStatus, balance, txnData, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
-    const {
-      loading,
-      loaded,
-      feeSettingEnabled,
-    } = this.props.btcWallet;
+    const {loading, loaded, feeSettingEnabled} = this.props.btcWallet;
     const BTN_WIDTH = C.SCREEN_WIDTH / 2;
     return (
       <View style={styles.mainView}>
@@ -106,7 +102,7 @@ class SifirAccountScreen extends React.Component {
               onPressOut={() => {
                 this.setState({btnStatus: 0});
                 navigate('GetAddress', {
-                  walletInfo: {type, label,balance, feeSettingEnabled},
+                  walletInfo: {type, label, balance, feeSettingEnabled},
                 });
               }}>
               <View

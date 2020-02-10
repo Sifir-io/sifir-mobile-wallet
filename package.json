@@ -7,10 +7,10 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "postinstall": "./node_modules/.bin/rn-nodeify --install --hack; npx jetify;",
     "clean": "rm -rf node_modules/ package-lock.json /tmp/metro-cache",
-    "debug:connect": "adb reverse tcp:9090 tcp:9090"
+    "debug:connect": "adb reverse tcp:8097 tcp:8097"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.2",
