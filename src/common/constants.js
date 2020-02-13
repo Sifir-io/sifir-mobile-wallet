@@ -23,7 +23,12 @@ export const C = {
   SCAN_ORSCAN: 'or scan a QR code',
   STR_Enter_Addr: 'Enter Address',
   STR_ENTER_PASSWORD: 'Enter a password:',
-  STR_ENTER_PASS_TO_UNLOCK_WALLET: "Enter your wallet's password to unlcok it:",
+  STR_ENTER_PASS_TO_UNLOCK_WALLET: "Enter your wallet's password to unlock it",
+  STR_ENTER_PASS_TO_ENCRYPT_WITH:
+    'Enter a password to used to encrypt your keys',
+  STR_ENTER_WRONG_KEY_PASSWORD:
+    'Seems like you have made a mistake entering your password, try again',
+
   STR_CONTINUE: 'CONTINUE',
   STR_PAYMENT_RECEIPIENT: 'PAYMENT RECIPIENT',
   STR_PAYMENT_AMOUNT: 'PAYMENT AMOUNT',
@@ -52,7 +57,7 @@ export const C = {
   STR_AUTH_SUCCESS: 'You are paired with Sifir Service',
   STR_AUTH_INVALID_TOKEN: 'Scanned token is invalid',
   STR_AUTH_PAIR_FAILED: 'Your token is not paired',
-  STR_WELCOME_NEW: 'Welcome to Sifir!',
+  STR_WELCOME_NEW: 'One more thing...',
   STR_WELCOME_BACK: 'Welcome Back !',
   STR_WATCH_WALLET_TYPE: 'pub32Watching',
   STR_WATCHING: 'Watching',
@@ -70,7 +75,9 @@ export const C = {
   STR_COIN_REQUEST: 'COIN_REQUEST',
   STR_COIN_SENT: 'COIN_SENT',
   STR_INVALID_TOKEN_ERR_MSG: 'Invalid token from the QR Code',
-  STR_LEGACY: 'Legacy',
-  STR_Segwit_Compatible: 'Segwit Compatible',
-  STR_Bech32: 'Bech32',
+  STR_LEGACY: 'Legacy (P2PKH)',
+  STR_PAIRING_METHOD: 'Pairing will be done using',
+  STR_PAIRING_METHOD_IN_PROGRESS: 'Pairing in progress...',
+  STR_Segwit_Compatible: 'Segwit Compatible (P2SH)',
+  STR_Bech32: 'Segwit Native (Bech32)',
 };

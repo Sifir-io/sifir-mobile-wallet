@@ -127,65 +127,57 @@ class UnlockORGenKeys extends Component {
     } = this.state;
     const {devicePgpKey, pairing, paired} = this.props.auth;
     const {pubkeyArmored} = devicePgpKey;
+
     let view;
-    if (pairing) {
+    if (pairing || paired) {
       view = (
-        <View style={styles.mainContent}>
-          <Text style={styles.commentTxt}>{'Pairing in progress'}</Text>
-          <ActivityIndicator size="large" style={styles.progress} />
+        <View style={styles.mainView}>
+          <View style={styles.progressView}>
+            <ActivityIndicator size="large" style={styles.progress} />
+          </View>
+          <View style={styles.mainContent}>
+            <Image
+              source={pairing ? Images.icon_done : Images.icon_header}
+              style={styles.checkImg}
+            />
+            <Text style={styles.resultTxt}>
+              {pairing ? C.STR_PAIRING_METHOD_IN_PROGRESS : C.STR_SUCCESS}
+            </Text>
+          </View>
         </View>
       );
       return view;
     }
-    if (paired) {
-      view = (
-        <>
-          <View style={styles.mainContent}>
-            <Text style={styles.commentTxt}>{'Paired sucess!!'}</Text>
-            <ActivityIndicator size="large" style={styles.progress} />
-          </View>
-          <TouchableOpacity
-            onPress={() => this.props.navigator.navigate('App')}
-            style={styles.doneTouch}>
-            <View shadowColor="black" shadowOffset="30" style={styles.doneView}>
-              <Text style={styles.doneTxt}>{C.STR_CONTINUE}</Text>
-            </View>
-          </TouchableOpacity>
-        </>
-      );
-      return view;
-    }
-    // FIXME these shit views
     if (retryablePairingError) {
       view = (
-        <View style={styles.mainContent}>
-          <TouchableOpacity
-            onPress={() => this.props.navigator.navigate('AppLandingScreen')}
-            style={styles.doneTouch}>
-            <Image source={Images.icon_failure} style={styles.checkImg} />
-          </TouchableOpacity>
-          <Text style={styles.resultTxt}>{C.STR_FAILED}</Text>
-          <Text style={styles.resultTxt}>{retryablePairingError}</Text>
+        <View style={styles.mainView}>
+          <View style={styles.mainContent}>
+            <Text style={styles.resultTxt}>{C.STR_FAILED}</Text>
+            <Text style={styles.descriptionTxt}>{retryablePairingError}</Text>
+            <TouchableOpacity
+              onPress={() => this.setState({retryablePairingError: null})}
+              style={styles.doneTouch}>
+              <View
+                shadowColor="black"
+                shadowOffset="30"
+                style={styles.doneView}>
+                <Text style={styles.doneTxt}>C.STR_TRY_AGAIN</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       );
       return view;
     }
     const [welcomeText, ctaText, mainText] =
       pubkeyArmored && encAuthInfo
-        ? [
-            C.STR_WELCOME_BACK,
-            C.STR_ENTER_PASS_TO_UNLOCK_WALLET,
-            `Lorem ipsum dolor sit amet, te mei appetere pertinacia, idque mucius
-          pri et. No nulla periculis persecuti mei, at pro iusto repudiare, cum
-          at alia discere disputationi. Dicant mollis eum eu, facilisi convenire
-          urbanitas ne vis`,
-          ]
+        ? [C.STR_WELCOME_BACK, C.STR_ENTER_PASS_TO_UNLOCK_WALLET, '']
         : [
-            C.STR_WELCOME_NEW,
-            C.STR_ENTER_WORD,
-            scannedToken
-              ? `Will be pairiing ${scannedToken.token.eventType.toUpperCase()}`
-              : '',
+            `${
+              C.STR_PAIRING_METHOD
+            } ${scannedToken.token.eventType.toUpperCase()}`,
+            C.STR_ENTER_PASS_TO_ENCRYPT_WITH,
+            'For maximum privacy and security, Sifir encrypts and signs all data it stores and communicates using PGP keys. PGP keys them selfs are encrypted and protected with a password so they can only be used by you',
           ];
     view = (
       <>
