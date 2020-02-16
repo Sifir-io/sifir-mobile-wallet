@@ -67,7 +67,6 @@ function AuthNav(props) {
           <RootStack.Screen
             name="UnlockORGenKeys"
             component={UnlockORGenKeys}
-            initialParams={{encAuthInfo}}
           />
         </>
       )}
@@ -112,10 +111,7 @@ class Root extends React.Component {
             {authStateReady ? (
               <ContentNav />
             ) : (
-              <AuthNav
-                encAuthInfo={encAuthInfo}
-                authStateReady={authStateReady}
-              />
+              <AuthNav encAuthInfo={encAuthInfo} />
             )}
           </View>
         )}

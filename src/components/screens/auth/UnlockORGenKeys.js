@@ -89,10 +89,9 @@ class UnlockORGenKeys extends Component {
           throw 'Error pairing with token';
         }
         const {nodePubkey} = pairingResult;
-        event('app.init.paired', {type: token.eventType});
         await this.props.storeEncryptedAuthInfo({token, key, nodePubkey});
         await this.props.setAuthInfoState({token, key, nodePubkey});
-        log('pairing info stored, ready to app');
+        event('app.init.paired', {type: token.eventType});
         return;
       } else {
         //not paired on auth info , send back to Landing
@@ -134,7 +133,12 @@ class UnlockORGenKeys extends Component {
       retryablePairingError,
       encAuthInfo,
     } = this.state;
-    const {devicePgpKey, pairing, paired} = this.props.auth;
+    const {
+      devicePgpKey,
+      pairing,
+      paired,
+      error: pairingError,
+    } = this.props.auth;
     const {pubkeyArmored} = devicePgpKey;
 
     let view;
@@ -163,6 +167,7 @@ class UnlockORGenKeys extends Component {
           <View style={styles.mainContent}>
             <Text style={styles.resultTxt}>{C.STR_FAILED}</Text>
             <Text style={styles.descriptionTxt}>{retryablePairingError}</Text>
+            <Text style={styles.descriptionTxt}>{pairingError}</Text>
             <TouchableOpacity
               onPress={() => this.setState({retryablePairingError: null})}
               style={styles.doneTouch}>
@@ -178,16 +183,19 @@ class UnlockORGenKeys extends Component {
       );
       return view;
     }
-    const [welcomeText, ctaText, mainText] =
-      pubkeyArmored && encAuthInfo
-        ? [C.STR_WELCOME_BACK, C.STR_ENTER_PASS_TO_UNLOCK_WALLET, '']
-        : [
-            `${
-              C.STR_PAIRING_METHOD
-            } ${scannedToken.token.eventType.toUpperCase()}`,
-            C.STR_ENTER_PASS_TO_ENCRYPT_WITH,
-            'For maximum privacy and security, Sifir encrypts and signs all data it stores and communicates using PGP keys. PGP keys them selfs are encrypted and protected with a password so they can only be used by you',
-          ];
+    const [welcomeText, ctaText, mainText] = [
+      encAuthInfo
+        ? C.STR_WELCOME_BACK
+        : `${
+            C.STR_PAIRING_METHOD
+          } ${scannedToken.token.eventType.toUpperCase()}`,
+      pubkeyArmored
+        ? C.STR_ENTER_PASS_TO_UNLOCK_WALLET
+        : C.STR_ENTER_PASS_TO_ENCRYPT_WITH,
+      pubkeyArmored
+        ? ''
+        : 'For maximum privacy and security, Sifir encrypts and signs all data it stores and communicates using PGP keys. PGP keys them selfs are encrypted and protected with a password so they can only be used by you',
+    ];
     view = (
       <>
         <Text style={styles.resultTxt}>{welcomeText}</Text>
@@ -231,12 +239,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     fontFamily: AppStyle.mainFontBold,
+    textAlign: 'center',
   },
   resultTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
     fontSize: 8 * C.vh,
     marginTop: 0,
+    textAlign: 'center',
   },
   inputView: {
     flexDirection: 'row',
