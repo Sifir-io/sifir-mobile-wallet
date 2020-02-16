@@ -14,10 +14,6 @@ const initBtcClient = () => async (dispatch, getState) => {
     } = getState();
 
     if (!token || !key || !nodePubkey) {
-      //dispatch({
-      //  type: types.BTC_CLIENT_STATUS + REJECTED,
-      //  payload: {error: 'NO TOKEN'},
-      //});
       throw 'Unable to init btc client';
     }
     const transport = await getTransportFromToken({
@@ -25,21 +21,8 @@ const initBtcClient = () => async (dispatch, getState) => {
       nodePubkey,
       devicePgpKey,
     });
-    //try {
     btcClient = await _btc({transport});
-    ///} catch (err) {
-    //error('error creating btc client', err);
-    //dispatch({
-    //  type: types.BTC_CLIENT_STATUS + REJECTED,
-    //  payload: {error: 'Error creating btc client'},
-    //});
-    ///throw 'Unable to create btc client';
-    //}
   }
-  //dispatch({
-  //  type: types.BTC_CLIENT_STATUS + FULFILLED,
-  //});
-
   return btcClient;
 };
 

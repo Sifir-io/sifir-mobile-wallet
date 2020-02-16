@@ -40,7 +40,7 @@ class UnlockORGenKeys extends Component {
   async passwordEntered() {
     try {
       if (!this.state.passphrase.length || this.state.passphrase.length < 6) {
-        throw 'Enter password first';
+        throw 'ERROR_ENTER_PASSWORD';
       }
       let {pubkeyArmored, privkeyArmored} = this.props.auth.devicePgpKey;
       const {scannedToken, passphrase, encAuthInfo} = this.state;
@@ -104,17 +104,26 @@ class UnlockORGenKeys extends Component {
       switch (err) {
         case PGP_KEYS_UNLOCK_FAILED:
           this.setState({
-            retryablePairingError: 'Error unlocking your keys, wrong password',
+            retryablePairingError:
+              'Error unlocking your keys, probably wrong password.',
+          });
+          break;
+        case 'ERROR_ENTER_PASSWORD':
+          this.setState({
+            retryablePairingError:
+              'Please make sure you enter a valid password that is at least 6 characters long',
           });
           break;
         default:
+          // more serious error, notify and try again
           error('unlockOrGenkeys.pairingError', err);
-          log('A non retryable error occured while pairing', err);
-          //
-          // something more serious so bug out
+          this.setState({
+            retryablePairingError:
+              'An unexpected error happened while trying to pair:' +
+              err.toString(),
+          });
           break;
       }
-      // problem unlocking key
     }
   }
 
@@ -137,7 +146,7 @@ class UnlockORGenKeys extends Component {
           </View>
           <View style={styles.mainContent}>
             <Image
-              source={pairing ? Images.icon_done : Images.icon_header}
+              source={pairing ? Images.icon_header : Images.icon_done}
               style={styles.checkImg}
             />
             <Text style={styles.resultTxt}>
@@ -161,7 +170,7 @@ class UnlockORGenKeys extends Component {
                 shadowColor="black"
                 shadowOffset="30"
                 style={styles.doneView}>
-                <Text style={styles.doneTxt}>C.STR_TRY_AGAIN</Text>
+                <Text style={styles.doneTxt}>{C.STR_TRY_AGAIN}</Text>
               </View>
             </TouchableOpacity>
           </View>
