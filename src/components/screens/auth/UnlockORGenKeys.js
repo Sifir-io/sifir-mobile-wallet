@@ -207,6 +207,8 @@ class UnlockORGenKeys extends Component {
             style={[styles.inputTxtStyle]}
             value={passphrase}
             onChangeText={pass => this.passphraseUpdated(pass)}
+            secureTextEntry={true}
+            autoCorrect={false}
           />
         </View>
         <TouchableOpacity

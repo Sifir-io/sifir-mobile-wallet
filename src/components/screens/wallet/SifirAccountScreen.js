@@ -14,6 +14,7 @@ import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import SifirTxnList from '@elements/SifirTxnList';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
+import {Alert} from 'react-native';
 
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
@@ -38,8 +39,21 @@ class SifirAccountScreen extends React.Component {
     const {btnStatus, balance, txnData, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
-    const {loading, loaded, feeSettingEnabled} = this.props.btcWallet;
+    const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
     const BTN_WIDTH = C.SCREEN_WIDTH / 2;
+    if (error) {
+      Alert.alert(
+        C.STR_ERROR_btc_action,
+        C.STR_ERROR_account_screen,
+        [
+          {
+            text: 'Try again',
+            onPress: () => this._loadWalletFromProps(),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
     return (
       <View style={styles.mainView}>
         <View style={{flex: 0.7}}>
@@ -86,7 +100,6 @@ class SifirAccountScreen extends React.Component {
                   <Text style={styles.balAmountTxt}>
                     <SifirBTCAmount amount={balance} unit={btcUnit} />
                   </Text>
-                  <Text style={styles.satTxt}>{btcUnit}</Text>
                 </View>
                 <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
               </>

@@ -3,15 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "./node_modules/react-native/cli.js run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start",
+    "start": "./node_modules/react-native/cli.js start",
     "test": "jest",
     "lint": "eslint . --fix",
     "postinstall": "./node_modules/.bin/rn-nodeify --install 'stream,console,dgram,url' --hack; npx jetify;",
     "clean": "rm -rf node_modules/ package-lock.json /tmp/metro-cache",
     "debug:connect": "adb reverse tcp:8097 tcp:8097",
-    "android:release": "react-native run-android --variant=release",
+    "android:release": "./node_modules/react-native/cli.js run-android --variant=release",
     "android:apk": "cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && cp app-release.apk sifir-android-app-release-$(git log | head -n 1 | awk '{print substr($2,1,6)}').apk"
   },
   "dependencies": {
