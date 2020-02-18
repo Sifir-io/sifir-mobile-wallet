@@ -100,7 +100,6 @@ class SifirAccountScreen extends React.Component {
                   <Text style={styles.balAmountTxt}>
                     <SifirBTCAmount amount={balance} unit={btcUnit} />
                   </Text>
-                  <Text style={styles.satTxt}>{btcUnit}</Text>
                 </View>
                 <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
               </>

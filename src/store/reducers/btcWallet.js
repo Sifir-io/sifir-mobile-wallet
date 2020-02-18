@@ -6,26 +6,16 @@ const initialState = {
   loading: false,
   error: null,
   loaded: false,
-  // btcClientReady: false,
   btcWalletList: [], // TODO cache
-  // btcWalletDetails: {txnData: null, balance: 0, btcUnit: 'BTC'},
   address: null,
   btcSendResult: null,
   feeSettingEnabled: false,
 };
 
 const btcWallet = createReducer(initialState)({
-  // Client Status
-  //  btcClientReady: false,
-  //}),
-  //[types.BTC_CLIENT_STATUS + FULFILLED]: state => ({
-  //  ...state,
-  //  btcClientReady: true,
-  //}),
-
-  // Wallet List Data
   [types.BTC_WALLET_LIST_DATA_SHOW + PENDING]: state => ({
     ...state,
+    error: null,
     loading: true,
     loaded: false,
   }),
@@ -52,6 +42,7 @@ const btcWallet = createReducer(initialState)({
   // Get Wallet Details
   [types.BTC_WALLET_DETAILS + PENDING]: state => ({
     ...state,
+    error: null,
     loading: true,
     loaded: false,
   }),
@@ -75,6 +66,7 @@ const btcWallet = createReducer(initialState)({
   // Get Wallet Address
   [types.BTC_WALLET_ADDRESS + PENDING]: state => ({
     ...state,
+    error: null,
     loading: true,
     loaded: false,
   }),
@@ -95,6 +87,7 @@ const btcWallet = createReducer(initialState)({
   // Send Bitcoin
   [types.SEND_BITCOIN + PENDING]: state => ({
     ...state,
+    error: null,
     loading: true,
     loaded: false,
   }),

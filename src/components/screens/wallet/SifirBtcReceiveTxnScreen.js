@@ -126,21 +126,21 @@ class SifirBtcReceiveTxnScreen extends Component {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.selectBtnView}>
-              <Image
-                source={Images.icon_vertical_line}
-                style={styles.selectLineImg}
-              />
-              <TouchableOpacity
-                onPressOut={() => {
-                  this.setState({modalVisible: !this.state.modalVisible});
-                }}>
+            <TouchableOpacity
+              onPressOut={() => {
+                this.setState({modalVisible: !this.state.modalVisible});
+              }}>
+              <View style={styles.selectBtnView}>
+                <Image
+                  source={Images.icon_vertical_line}
+                  style={styles.selectLineImg}
+                />
                 <Image
                   source={Images.icon_check_blue}
                   style={{height: 20, width: 20}}
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -285,7 +285,7 @@ class SifirBtcReceiveTxnScreen extends Component {
                 {title: C.STR_Segwit_Compatible, addrType: 'p2sh-segwit'},
                 {title: C.STR_Bech32, addrType: 'bech32'},
               ]}
-              keyExtractor={(item, index) => item.title}
+              keyExtractor={item => item.title}
               renderItem={({item}) => (
                 <TouchableOpacity
                   style={{

@@ -83,6 +83,13 @@ class Root extends React.Component {
     encAuthInfo: null,
     devicePgpKeys: null,
   };
+  _bootstrapAsync = async () => {
+    const [encAuthInfo, devicePgpKeys] = await Promise.all([
+      this.props.loadEncryptedAuthInfo(),
+      this.props.loadDevicePgpKeys(),
+    ]);
+    this.setState({initLoading: false, encAuthInfo, devicePgpKeys});
+  };
   componentDidMount() {
     this._bootstrapAsync();
   }
@@ -100,13 +107,6 @@ class Root extends React.Component {
       {cancelable: false},
     );
   }
-  _bootstrapAsync = async () => {
-    const [encAuthInfo, devicePgpKeys] = await Promise.all([
-      this.props.loadEncryptedAuthInfo(),
-      this.props.loadDevicePgpKeys(),
-    ]);
-    this.setState({initLoading: false, encAuthInfo, devicePgpKeys});
-  };
   render() {
     const {
       auth: {token, key, nodePubkey},

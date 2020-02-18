@@ -10,7 +10,7 @@ const rootReducer = (state, action) => {
 
 let store;
 store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
-console.disableYellowBox = true;
+// console.disableYellowBox = true;
 export default class SifirApp extends Component {
   render() {
     return (

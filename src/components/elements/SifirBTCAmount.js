@@ -1,6 +1,6 @@
 import {PureComponent} from 'react';
 import {C} from '@common/index';
-
+import {log} from '@io/events';
 export default class SifirBTCAmount extends PureComponent {
   formatAmount = (amount, unit = C.STR_BTC) => {
     const amountStr = amount;

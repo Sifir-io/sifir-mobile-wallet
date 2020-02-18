@@ -57,7 +57,7 @@ class SifirAccountsListScreen extends React.Component {
             loading === false &&
             btcWalletList.map((wallet, i) => (
               <SifirWalletButton
-                key={i}
+                key={wallet.label}
                 width={CARD_SIZE}
                 height={CARD_SIZE * 1.1}
                 walletInfo={wallet}
