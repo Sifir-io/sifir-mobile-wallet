@@ -15,7 +15,8 @@ import Share from 'react-native-share';
 
 import {getWalletAddress} from '@actions/btcwallet';
 import {Images, AppStyle, C} from '@common/index';
-import {log, error} from '@io/events/';
+import {log} from '@io/events/';
+import {Alert} from 'react-native';
 
 class SifirBtcReceiveTxnScreen extends Component {
   constructor(props) {
@@ -27,8 +28,6 @@ class SifirBtcReceiveTxnScreen extends Component {
     btnStatus: 0,
     modalVisible: false,
     checkStatus: true,
-    label: '',
-    type: '',
     addrType: C.STR_SELECT_ADDRTYPE,
     showQRCode: false,
     showSelector: false,
@@ -37,8 +36,6 @@ class SifirBtcReceiveTxnScreen extends Component {
 
   async _bootStrap() {
     const {label, type} = this.props.route.params.walletInfo;
-    // FIXME why setState here ?
-    await this.setState({label, type});
     if (type === C.STR_WATCH_WALLET_TYPE) {
       await this.props.getWalletAddress({label, type});
       await this.setState({showQRCode: true});
@@ -66,19 +63,33 @@ class SifirBtcReceiveTxnScreen extends Component {
           message: address,
         };
       }
-      Share.open(shareOptions).catch(err => error(err));
+      Share.open(shareOptions).catch(err => log(err));
     }
   };
 
   getSpendWalletAddr = async addrType => {
-    const {label, type} = this.state;
+    const {label, type} = this.props.route.params.walletInfo;
     await this.props.getWalletAddress({label, type, addrType});
     this.setState({showQRCode: true});
   };
   render() {
     const {navigate} = this.props.navigation;
-    const {type, label, showQRCode, enableWatchSelection} = this.state;
+    const {label, type} = this.props.route.params.walletInfo;
+    const {showQRCode, enableWatchSelection} = this.state;
     const {loaded, loading, address, error} = this.props.btcWallet;
+    if (error) {
+      Alert.alert(
+        C.STR_ERROR_btc_action,
+        C.STR_ERROR_account_screen,
+        [
+          {
+            text: 'Try again',
+            onPress: () => this._bootStrap(),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
 
     return (
       <View style={styles.mainView}>

@@ -80,4 +80,12 @@ export const C = {
   STR_PAIRING_METHOD_IN_PROGRESS: 'Pairing in progress...',
   STR_Segwit_Compatible: 'Segwit Compatible (P2SH)',
   STR_Bech32: 'Segwit Native (Bech32)',
+  STR_ERROR_app: 'Error',
+  STR_ERROR_app_unhandled:
+    'An undetermined error has occured, this will be logged',
+  STR_ERROR_btc_action: 'BTC wallet error',
+  STR_ERROR_account_screen:
+    'An error occured while trying to load your Wallet details',
+  STR_ERROR_account_list_screen:
+    'An error occured while trying to load your wallet list',
 };

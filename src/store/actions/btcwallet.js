@@ -82,7 +82,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
 
   let balance = 0,
     txnData = [];
-  log('getwalletdetails');
   try {
     await dispatch(initBtcClient());
     switch (type) {
@@ -101,12 +100,10 @@ const getWalletDetails = ({label, type}) => async dispatch => {
       default:
         break;
     }
-    log('gott wallet details');
     dispatch({
       type: types.BTC_WALLET_DETAILS + FULFILLED,
       // payload: {btcWalletDetails: {balance, txnData, btcUnit}},
     });
-    log('goint home');
     return {balance, txnData};
   } catch (err) {
     error(err);

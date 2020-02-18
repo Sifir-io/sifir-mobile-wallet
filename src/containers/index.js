@@ -1,18 +1,19 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {ActivityIndicator, StatusBar, StyleSheet, View} from 'react-native';
-import {Images, C, AppStyle} from '@common/index';
+import {C, AppStyle} from '@common/index';
 import SifirHeader from '@elements/SifirHeader';
 import {ScanToPairScreen, UnlockORGenKeys} from '@screens/auth/index';
 import WalletTab from './WalletStack';
 import {connect} from 'react-redux';
+import {event} from '@io/events';
+import {Alert} from 'react-native';
 import {
   loadEncryptedAuthInfo,
   loadDevicePgpKeys,
   deleteDevicePgpKeys,
   clearAuthInfo,
 } from '@actions/auth';
-import {log, error} from '@io/events/';
 import {createStackNavigator} from '@react-navigation/stack';
 
 const RootStack = createStackNavigator();
@@ -85,7 +86,20 @@ class Root extends React.Component {
   componentDidMount() {
     this._bootstrapAsync();
   }
-
+  componentDidCatch(errorThrown, info) {
+    event('error.root.componentDidCatch', {errorThrown, info});
+    Alert.alert(
+      C.STR_ERROR_app,
+      C.STR_ERROR_app_unhandled,
+      [
+        {
+          text: 'Reload',
+          onPress: () => this._bootstrapAsync(),
+        },
+      ],
+      {cancelable: false},
+    );
+  }
   _bootstrapAsync = async () => {
     const [encAuthInfo, devicePgpKeys] = await Promise.all([
       this.props.loadEncryptedAuthInfo(),

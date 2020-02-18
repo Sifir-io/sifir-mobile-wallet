@@ -10,6 +10,7 @@ import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
 import {getBtcWalletList} from '@actions/btcwallet';
 import {Images, AppStyle, C} from '@common/index';
+import {Alert} from 'react-native';
 
 class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
@@ -24,8 +25,21 @@ class SifirAccountsListScreen extends React.Component {
     const CARD_SIZE = C.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
     const {
-      btcWallet: {btcWalletList, loaded, loading},
+      btcWallet: {btcWalletList, loaded, loading, error},
     } = this.props;
+    if (error) {
+      Alert.alert(
+        C.STR_ERROR_btc_action,
+        C.STR_ERROR_account_list_screen,
+        [
+          {
+            text: 'Try again',
+            onPress: () => this.props.getBtcWalletList(),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
