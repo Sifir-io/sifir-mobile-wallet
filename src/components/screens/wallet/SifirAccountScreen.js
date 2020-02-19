@@ -14,43 +14,53 @@ import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import SifirTxnList from '@elements/SifirTxnList';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
+import {Alert} from 'react-native';
 
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
   }
-  componentDidMount() {
-    const {label, type} = this.props.navigation.getParam('walletInfo');
-    this.setState({label, type});
-    this.props.getWalletDetails({label, type});
-  }
   state = {
     btnStatus: 0,
-    label: '',
-    type: '',
+    balance: 0,
+    txnData: null,
+    btcUnit: C.STR_BTC,
   };
+  async _loadWalletFromProps() {
+    const {label, type} = this.props.route.params.walletInfo;
+    const {balance, txnData} = await this.props.getWalletDetails({label, type});
+    this.setState({balance, txnData});
+  }
+  componentDidMount() {
+    this._loadWalletFromProps();
+  }
 
   render() {
-    const BTN_WIDTH = C.SCREEN_WIDTH / 2;
-
+    const {btnStatus, balance, txnData, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
-    const {btnStatus} = this.state;
-    const {
-      loaded,
-      loading,
-      btcWalletDetails,
-      feeSettingEnabled,
-    } = this.props.btcWallet;
-    const {txnData, balance, btcUnit} = btcWalletDetails;
-    const {label, type} = this.state;
-
+    const {label, type} = this.props.route.params.walletInfo;
+    const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
+    const BTN_WIDTH = C.SCREEN_WIDTH / 2;
+    if (error) {
+      Alert.alert(
+        C.STR_ERROR_btc_action,
+        C.STR_ERROR_account_screen,
+        [
+          {
+            text: 'Try again',
+            onPress: () => this._loadWalletFromProps(),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
     return (
       <View style={styles.mainView}>
         <View style={{flex: 0.7}}>
           <TouchableOpacity>
             <View
               style={styles.backNavView}
-              onTouchEnd={() => navigate('AccountsList')}>
+              onTouchEnd={() => navigate('AccountList')}>
               <Image source={Images.icon_back} style={styles.backImg} />
               <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
             </View>
@@ -90,7 +100,6 @@ class SifirAccountScreen extends React.Component {
                   <Text style={styles.balAmountTxt}>
                     <SifirBTCAmount amount={balance} unit={btcUnit} />
                   </Text>
-                  <Text style={styles.satTxt}>{btcUnit}</Text>
                 </View>
                 <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
               </>
@@ -106,7 +115,7 @@ class SifirAccountScreen extends React.Component {
               onPressOut={() => {
                 this.setState({btnStatus: 0});
                 navigate('GetAddress', {
-                  txnInfo: {type, label, feeSettingEnabled},
+                  walletInfo: {type, label, balance, feeSettingEnabled},
                 });
               }}>
               <View
@@ -182,7 +191,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {getWalletDetails};
 
-export default connect(mapStateToProps, mapDispatchToProps)(SifirAccountScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirAccountScreen);
 
 const styles = StyleSheet.create({
   mainView: {

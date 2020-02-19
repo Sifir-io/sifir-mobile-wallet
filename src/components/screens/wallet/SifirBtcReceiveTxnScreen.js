@@ -15,31 +15,34 @@ import Share from 'react-native-share';
 
 import {getWalletAddress} from '@actions/btcwallet';
 import {Images, AppStyle, C} from '@common/index';
+import {log} from '@io/events/';
+import {Alert} from 'react-native';
 
 class SifirBtcReceiveTxnScreen extends Component {
   constructor(props) {
     super(props);
     this.qrCode = '';
   }
+
   state = {
     btnStatus: 0,
     modalVisible: false,
     checkStatus: true,
-    label: '',
-    type: '',
     addrType: C.STR_SELECT_ADDRTYPE,
     showQRCode: false,
     showSelector: false,
     enableWatchSelection: false,
   };
 
-  componentDidMount() {
-    const {label, type} = this.props.navigation.getParam('walletInfo');
-    this.setState({label, type});
+  async _bootStrap() {
+    const {label, type} = this.props.route.params.walletInfo;
     if (type === C.STR_WATCH_WALLET_TYPE) {
-      this.props.getWalletAddress({label, type});
-      this.setState({showQRCode: true});
+      await this.props.getWalletAddress({label, type});
+      await this.setState({showQRCode: true});
     }
+  }
+  componentDidMount() {
+    this._bootStrap();
   }
 
   onClose = () => this.setState({modalVisible: false, showSelector: false});
@@ -60,21 +63,33 @@ class SifirBtcReceiveTxnScreen extends Component {
           message: address,
         };
       }
-      Share.open(shareOptions)
-        .then(res => console.log(res))
-        .catch(err => console.error(err));
+      Share.open(shareOptions).catch(err => log(err));
     }
   };
 
   getSpendWalletAddr = async addrType => {
-    const {label, type} = this.state;
+    const {label, type} = this.props.route.params.walletInfo;
     await this.props.getWalletAddress({label, type, addrType});
     this.setState({showQRCode: true});
   };
   render() {
     const {navigate} = this.props.navigation;
-    const {type, label, showQRCode, enableWatchSelection} = this.state;
+    const {label, type} = this.props.route.params.walletInfo;
+    const {showQRCode, enableWatchSelection} = this.state;
     const {loaded, loading, address, error} = this.props.btcWallet;
+    if (error) {
+      Alert.alert(
+        C.STR_ERROR_btc_action,
+        C.STR_ERROR_account_screen,
+        [
+          {
+            text: 'Try again',
+            onPress: () => this._bootStrap(),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
 
     return (
       <View style={styles.mainView}>
@@ -111,21 +126,21 @@ class SifirBtcReceiveTxnScreen extends Component {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.selectBtnView}>
-              <Image
-                source={Images.icon_vertical_line}
-                style={styles.selectLineImg}
-              />
-              <TouchableOpacity
-                onPressOut={() => {
-                  this.setState({modalVisible: !this.state.modalVisible});
-                }}>
+            <TouchableOpacity
+              onPressOut={() => {
+                this.setState({modalVisible: !this.state.modalVisible});
+              }}>
+              <View style={styles.selectBtnView}>
+                <Image
+                  source={Images.icon_vertical_line}
+                  style={styles.selectLineImg}
+                />
                 <Image
                   source={Images.icon_check_blue}
                   style={{height: 20, width: 20}}
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -266,10 +281,11 @@ class SifirBtcReceiveTxnScreen extends Component {
             <FlatList
               style={styles.addList}
               data={[
-                {title: 'Legacy', addrType: 'legacy'},
-                {title: 'Segwit Compatible', addrType: 'p2sh-segwit'},
-                {title: 'Bech32', addrType: 'bech32'},
+                {title: C.STR_LEGACY, addrType: 'legacy'},
+                {title: C.STR_Segwit_Compatible, addrType: 'p2sh-segwit'},
+                {title: C.STR_Bech32, addrType: 'bech32'},
               ]}
+              keyExtractor={item => item.title}
               renderItem={({item}) => (
                 <TouchableOpacity
                   style={{

@@ -27,7 +27,7 @@ class SifirTxnEntry extends PureComponent {
           imgURL = Images.icon_receive;
           break;
         default:
-          txIDStr = 'Unknon - #' + txIDStr;
+          txIDStr = 'Unknown - #' + txIDStr;
           imgURL = Images.icon_receive;
           break;
       }
@@ -89,6 +89,7 @@ export default class SifirTxnList extends Component {
         data={this.state.txnData}
         style={height}
         width={width}
+        keyExtractor={(item, index) => item.category + item.txid}
         renderItem={({item}) => <SifirTxnEntry txn={item} unit={unit} />}
       />
     );

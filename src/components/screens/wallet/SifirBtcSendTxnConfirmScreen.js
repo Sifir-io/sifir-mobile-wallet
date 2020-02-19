@@ -1,30 +1,47 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
-
+import {sendBitcoin} from '@actions/btcwallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
-export default class SifirBtcSendTxnConfirmScreen extends Component {
+class SifirBtcSendTxnConfirmScreen extends Component {
+  constructor(props, context) {
+    super(props, context);
+  }
   onClose = () => this.setState({modalVisible: false});
-
   state = {
     btnStatus: 0,
     modalVisible: false,
-    txnInfo: this.props.navigation.getParam('txnInfo'),
+  };
+  sendBtc = () => {
+    console.log('in send');
+    const {txnInfo, walletInfo} = this.props.route.params;
+    const {address, amount} = txnInfo;
+    this.props.sendBitcoin({address, amount});
+    this.props.navigation.navigate('BtcTxnConfirmed', {
+      txnInfo: {...txnInfo, isSendTxn: true},
+      walletInfo,
+    });
   };
 
   render() {
-    const {address, amount, feeSettingEnabled} = this.state.txnInfo;
-    const amountFontSize = (C.vw * 100) / amount.length;
+    const {
+      walletInfo: {feeSettingEnabled},
+      txnInfo: {address, amount},
+    } = this.props.route.params;
+    const amountFontSize = (C.vw * 80) / amount.length;
     const btcUnitFontSize = amountFontSize * 0.6;
-    const recTxtFontSize = (C.vw * 250) / address.length;
+    const recTxtFontSize = (C.vw * 70) / address.length;
 
     return (
       <View style={styles.mainView}>
         <View
           style={styles.setting}
-          onTouchEnd={() => this.setState({modalVisible: true})}>
+          onTouchEnd={() =>
+            feeSettingEnabled && this.setState({modalVisible: true})
+          }>
           <TouchableOpacity>
             <Image source={Images.icon_setting} style={styles.settingImg} />
           </TouchableOpacity>
@@ -63,25 +80,12 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
         {feeSettingEnabled && (
           <View style={styles.setArea}>
             <Text style={styles.setTxt}>{C.STR_FEES}</Text>
-            <Text
-              style={{
-                fontSize: 23,
-                color: 'white',
-                marginLeft: 10,
-                marginRight: 10,
-              }}>
-              {amount} BTC
-            </Text>
+            <Text style={styles.btcAmountTxt}>{amount} BTC</Text>
             <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
           </View>
         )}
         <TouchableOpacity
-          onLongPress={() =>
-            this.props.navigation.navigate('BtcTxnConfirmed', {
-              txnInfo: this.state.txnInfo,
-              isSendTxn: true,
-            })
-          }
+          onLongPress={this.sendBtc}
           style={{
             marginTop: 50,
             alignItems: 'center',
@@ -116,6 +120,18 @@ export default class SifirBtcSendTxnConfirmScreen extends Component {
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    btcWallet: state.btcWallet,
+  };
+};
+
+const mapDispatchToProps = {sendBitcoin};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirBtcSendTxnConfirmScreen);
 
 const styles = StyleSheet.create({
   mainView: {
@@ -205,5 +221,11 @@ const styles = StyleSheet.create({
   dlgChild: {
     marginTop: 12 * C.vh,
     backgroundColor: 'transparent',
+  },
+  btcAmountTxt: {
+    fontSize: 23,
+    color: 'white',
+    marginLeft: 10,
+    marginRight: 10,
   },
 });

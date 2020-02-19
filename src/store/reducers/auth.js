@@ -1,45 +1,90 @@
-import * as types from '@types/index';
-import {createReducer, FULFILLED, PENDING, REJECTED} from '@utils/index';
+import {
+  GET_AUTH_STATUS,
+  REQUEST_PAIR,
+  PGP_GET_KEYS,
+  PGP_UNLOCK_KEYS,
+} from '@types/';
+import {createReducer} from '@utils/';
+import {FULFILLED, PENDING, REJECTED, READY} from '@utils/constants';
+
 const initialState = {
   loading: false,
   loaded: false,
   pairing: false,
   paired: false,
+  keyWarning: '',
+  keyError: '',
+  authWarning: '',
+  error: '',
+  unlocked: false,
+  // ---
   token: null,
   key: null,
-  error: '',
+  // encAuthInfo: null,
+  // pubkey,privkey,fingerprint,keyhexid
+  devicePgpKey: {},
+  nodePubkey: '',
 };
 
 const auth = createReducer(initialState)({
-  [types.GET_AUTH_STATUS + REJECTED]: state => ({
+  [PGP_UNLOCK_KEYS + FULFILLED]: (state, {payload}) => ({
     ...state,
-    loading: false,
-    loaded: false,
-    token: null,
-    key: null,
+    unlocked: true,
+    keyError: null,
+    keyWarning: null,
   }),
-  [types.GET_AUTH_STATUS + FULFILLED]: (state, {payload: {token, key}}) => ({
+  [PGP_UNLOCK_KEYS + REJECTED]: (state, {warning = null, error = null}) => ({
     ...state,
-    loading: false,
-    loaded: true,
-    paired: true,
+    unlocked: false,
+    keyWarning: warning,
+    keyError: error,
+  }),
+  [PGP_GET_KEYS + FULFILLED]: (state, {payload}) => ({
+    ...state,
+    devicePgpKey: payload,
+  }),
+  [PGP_GET_KEYS + REJECTED]: (state, {warning = null, error = null}) => ({
+    ...state,
+    keyWarning: warning,
+    error,
+    devicePgpKey: {},
+  }),
+  // Encrypted authinfo loaded
+  [GET_AUTH_STATUS + FULFILLED]: (state, {payload: {authInfo}}) => ({
+    ...state,
+    // encAuthInfo: authInfo,
+  }),
+  // this is the only call that should modify the auth state, the rest act as status updaters
+  [GET_AUTH_STATUS + READY]: (state, {payload: {token, key, nodePubkey}}) => ({
+    ...state,
     token,
+    nodePubkey,
     key,
   }),
-  [types.REQUEST_PAIR + PENDING]: state => ({
+  [GET_AUTH_STATUS + REJECTED]: (state, {warning = null, error = null}) => ({
+    ...state,
+    authWarning: warning,
+    error,
+    // encAuthInfo: null,
+    token: null,
+    pairingKey: null,
+  }),
+  [REQUEST_PAIR + PENDING]: state => ({
     ...state,
     paired: false,
     pairing: true,
   }),
-  [types.REQUEST_PAIR + FULFILLED]: (state, {payload: {token, key}}) => ({
+  [REQUEST_PAIR + FULFILLED]: (state, {payload: {nodePubkey}}) => ({
     ...state,
     paired: true,
+    // nodePubkey,
     pairing: false,
   }),
-  [types.REQUEST_PAIR + REJECTED]: (state, {error}) => ({
+  [REQUEST_PAIR + REJECTED]: (state, {error}) => ({
     ...state,
     paired: false,
     pairing: false,
+    // nodePubkey: '',
     error,
   }),
 });

@@ -11,7 +11,7 @@ export default class SirFirHeader extends Component {
   };
 
   render() {
-    const menus = [C.STR_WALLET, C.STR_ROOMS, C.STR_SETTINGS];
+    const menus = [C.STR_WALLET];
     const {curMenu} = this.state;
     const {switchPage} = this.props;
 
@@ -22,11 +22,13 @@ export default class SirFirHeader extends Component {
         </View>
         <View style={styles.tabsStyle}>
           {menus.map((item, i) => (
-            <TouchableOpacity key={i}>
+            <TouchableOpacity
+              hitSlop={{top: 2, bottom: 2, left: 2, right: 2}}
+              key={i}>
               <View
                 onTouchEnd={() => {
                   this.setState({curMenu: i});
-                  switchPage(i);
+                  switchPage(menus[i]);
                 }}
                 style={curMenu === i ? styles.activeMenuItem : {}}>
                 {this.state.showMsgNotify && (
@@ -93,10 +95,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     marginTop: 0,
-    marginBottom: 15,
+    // marginBottom: 15,
     backgroundColor: AppStyle.backgroundColor,
     justifyContent: 'center',
-
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.58,
     shadowRadius: 16.0,
-
     elevation: 24,
   },
   badgeCont: {

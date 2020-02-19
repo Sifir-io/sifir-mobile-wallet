@@ -1,4 +1,5 @@
-import React, {Component, PureComponent} from 'react';
+// TODO rename this to txnDetails
+import React, {Component} from 'react';
 import {
   View,
   Image,
@@ -7,28 +8,23 @@ import {
   Text,
   ActivityIndicator,
 } from 'react-native';
-import {sendBitcoin} from '@actions/btcwallet';
 import {connect} from 'react-redux';
-
 import {Images, AppStyle, C} from '@common/index';
 
 class SifirBtcTxnConfirmedScreen extends Component {
-  state = {
-    isSendTxn: this.props.navigation.getParam('isSendTxn'),
-    txnInfo: this.props.navigation.getParam('txnInfo'),
-  };
-
-  done = () => {
-    this.props.navigation.navigate('Account', {walletInfo: this.state.txnInfo});
-  };
-
-  componentDidMount() {
-    this.props.sendBitcoin(this.state.txnInfo);
+  constructor(props, context) {
+    super(props, context);
   }
+  done = () => {
+    const {walletInfo} = this.props.route.params;
+    this.props.navigation.navigate('Account', {walletInfo});
+  };
 
   render() {
-    const {isSendTxn, txnInfo} = this.state;
-    const {amount, address} = txnInfo;
+    const {
+      txnInfo: {amount, address, isSendTxn},
+    } = this.props.route.params;
+    // TODO remove from here
     const {loaded, loading, btcSendResult} = this.props.btcWallet;
     const addrTxtFontSize = (C.vw * 250) / address.length;
     return (
@@ -80,7 +76,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {sendBitcoin};
+const mapDispatchToProps = {};
 
 export default connect(
   mapStateToProps,

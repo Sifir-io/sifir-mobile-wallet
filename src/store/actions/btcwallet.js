@@ -1,37 +1,28 @@
-import * as types from '@types/index';
-import {FULFILLED, PENDING, REJECTED} from '@utils/index';
+import * as types from '@types/';
+import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
 import _btc from '@io/btcClient';
-import {getClient, getTransport} from '@io/matrix';
 import {Images, C} from '@common/index';
-
+import {getTransportFromToken} from '@io/transports';
+import {log, error} from '@io/events/';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
-  if (btcClient) {
-    return btcClient;
-  }
+  if (!btcClient) {
+    log('btcWallet:starting btc client');
+    const {
+      auth: {token, key, nodePubkey, devicePgpKey},
+    } = getState();
 
-  const {
-    auth: {token},
-  } = getState();
-
-  if (!token) {
-    dispatch({
-      type: types.BTC_CLIENT_STATUS + REJECTED,
-      payload: {error: 'NO TOKEN'},
+    if (!token || !key || !nodePubkey) {
+      throw 'Unable to init btc client';
+    }
+    const transport = await getTransportFromToken({
+      token,
+      nodePubkey,
+      devicePgpKey,
     });
-    return;
+    btcClient = await _btc({transport});
   }
-
-  const client = await getClient(token);
-  const transport = await getTransport(client, token);
-
-  btcClient = await _btc({transport});
-
-  dispatch({
-    type: types.BTC_CLIENT_STATUS + FULFILLED,
-  });
-
   return btcClient;
 };
 
@@ -50,10 +41,8 @@ const getBtcWalletList = () => async dispatch => {
 
   try {
     await dispatch(initBtcClient());
-
     const watchedPub32 = await btcClient.getWatchedPub32();
-
-    watchedPub32.forEach(async ({pub32, label}) =>
+    watchedPub32.forEach(({pub32, label}) =>
       btcWalletList.push({
         pub32,
         label,
@@ -79,10 +68,11 @@ const getBtcWalletList = () => async dispatch => {
       type: types.BTC_WALLET_LIST_DATA_SHOW + FULFILLED,
       payload: {btcWalletList},
     });
-  } catch (error) {
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.BTC_WALLET_LIST_DATA_SHOW + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };
@@ -92,7 +82,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
 
   let balance = 0,
     txnData = [];
-
   try {
     await dispatch(initBtcClient());
     switch (type) {
@@ -111,21 +100,22 @@ const getWalletDetails = ({label, type}) => async dispatch => {
       default:
         break;
     }
-    const btcUnit = C.STR_BTC;
     dispatch({
       type: types.BTC_WALLET_DETAILS + FULFILLED,
-      payload: {btcWalletDetails: {balance, txnData, btcUnit}},
+      // payload: {btcWalletDetails: {balance, txnData, btcUnit}},
     });
-  } catch (error) {
-    console.error(error);
+    return {balance, txnData};
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.BTC_WALLET_DETAILS + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };
 
 const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
+  log('getwalletaddress');
   dispatch({type: types.BTC_WALLET_ADDRESS + PENDING});
   let address = null;
 
@@ -133,8 +123,8 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
     await dispatch(initBtcClient());
     switch (type) {
       case C.STR_WATCH_WALLET_TYPE:
-        address = await btcClient.getUnusedAddressesByPub32Label(label);
-        address = address[0]['address'];
+        const result = await btcClient.getUnusedAddressesByPub32Label(label);
+        [{address}] = result; // result[0].address;
         break;
       case C.STR_SPEND_WALLET_TYPE:
         address = await btcClient.getNewAddress(addrType);
@@ -142,15 +132,17 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
       default:
         break;
     }
+    log('dispatch getwalletaddress');
     dispatch({
       type: types.BTC_WALLET_ADDRESS + FULFILLED,
       payload: {address},
     });
-  } catch (error) {
-    console.error(error);
+    log('getwalletaddress goinghome');
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.BTC_WALLET_ADDRESS + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };
@@ -158,18 +150,21 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
 const sendBitcoin = ({address, amount}) => async dispatch => {
   dispatch({type: types.SEND_BITCOIN + PENDING});
   try {
-    if (isNaN(amount)) throw C.STR_AMOUNT_BENUMBER;
     await dispatch(initBtcClient());
+    if (isNaN(amount)) {
+      throw C.STR_AMOUNT_BENUMBER;
+    }
     const btcSendResult = await btcClient.spend(address, Number(amount));
     dispatch({
       type: types.SEND_BITCOIN + FULFILLED,
       payload: {btcSendResult},
     });
-  } catch (error) {
-    console.error(error);
+    return btcSendResult;
+  } catch (err) {
+    error(err);
     dispatch({
       type: types.SEND_BITCOIN + REJECTED,
-      payload: {error},
+      payload: {error: err},
     });
   }
 };

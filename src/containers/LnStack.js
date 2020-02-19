@@ -1,3 +1,4 @@
+// FIXME to new navgirattor schema
 import {fromRight} from 'react-navigation-transitions';
 import {createStackNavigator} from 'react-navigation-stack';
 

@@ -14,5 +14,10 @@ module.exports = {
       },
     }),
   },
-  resolver: {},
+  resolver: {
+    extraNodeModules: {
+      // ...require('node-libs-react-native'),
+      // vm: require.resolve('vm-browserify'),
+    },
+  },
 };

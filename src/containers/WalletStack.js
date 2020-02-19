@@ -1,5 +1,6 @@
-import {fromRight} from 'react-navigation-transitions';
-import {createStackNavigator} from 'react-navigation-stack';
+// import {fromRight} from 'react-navigation-transitions';
+import {createStackNavigator} from '@react-navigation/stack';
+import React from 'react';
 
 import {
   SifirGetAddrScreen,
@@ -9,64 +10,46 @@ import {
   SifirAccountScreen,
   SifirBtcReceiveTxnScreen,
   SifirBtcTxnConfirmedScreen,
-  SifrAddWalletScreen,
+  SifirAddWalletScreen,
 } from '@screens/wallet/index';
 
-const WalletStack = createStackNavigator(
-  {
-    AccountsList: {
-      screen: SifirAccountsListScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    Account: {
-      screen: SifirAccountScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    GetAddress: {
-      screen: SifirGetAddrScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    BtcSendTxnInputAmount: {
-      screen: SifirBtcSendTxnInputAmountScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    BtcSendTxnConfirm: {
-      screen: SifirBtcSendTxnConfirmScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    BtcReceiveTxn: {
-      screen: SifirBtcReceiveTxnScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    BtcTxnConfirmed: {
-      screen: SifirBtcTxnConfirmedScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    AddWallet: {
-      screen: SifrAddWalletScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-  },
-  {
-    initialRouteName: 'AccountsList',
-    transitionConfig: () => fromRight(700),
-  },
-);
-
-export default WalletStack;
+const WalletStack = createStackNavigator();
+export default function WalletTab() {
+  return (
+    <WalletStack.Navigator
+      initialRouteName="AccountList"
+      headerMode="none"
+      screenOptions={{
+        gestureEnabled: false,
+      }}
+      // @TODO migrate to nav v5 api
+      //screenOptions={{
+      //  transitionConfig: () => fromRight(700),
+      //}}
+    >
+      <WalletStack.Screen
+        name="AccountList"
+        component={SifirAccountsListScreen}
+      />
+      <WalletStack.Screen name="Account" component={SifirAccountScreen} />
+      <WalletStack.Screen name="GetAddress" component={SifirGetAddrScreen} />
+      <WalletStack.Screen
+        name="BtcSendTxnInputAmount"
+        component={SifirBtcSendTxnInputAmountScreen}
+      />
+      <WalletStack.Screen
+        name="BtcSendTxnConfirm"
+        component={SifirBtcSendTxnConfirmScreen}
+      />
+      <WalletStack.Screen
+        name="BtcReceiveTxn"
+        component={SifirBtcReceiveTxnScreen}
+      />
+      <WalletStack.Screen
+        name="BtcTxnConfirmed"
+        component={SifirBtcTxnConfirmedScreen}
+      />
+      <WalletStack.Screen name="AddWallet" component={SifirAddWalletScreen} />
+    </WalletStack.Navigator>
+  );
+}

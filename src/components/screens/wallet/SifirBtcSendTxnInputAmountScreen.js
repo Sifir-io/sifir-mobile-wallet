@@ -10,20 +10,27 @@ import {
 import {AppStyle, C} from '@common/index';
 
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
+  constructor(props, context) {
+    super(props, context);
+  }
   state = {
     btnStatus: 0,
-    amount: null,
-    txnInfo: this.props.navigation.getParam('txnInfo'),
+    amount: 0,
   };
-
-  confirm = () => {
-    let {txnInfo} = this.state;
-    txnInfo.amount = this.state.amount;
-    this.props.navigation.navigate('BtcSendTxnConfirm', {txnInfo});
+  goToConfirm = () => {
+    const {txnInfo, walletInfo} = this.props.route.params;
+    const {amount} = this.state;
+    this.props.navigation.navigate('BtcSendTxnConfirm', {
+      txnInfo: {...txnInfo, amount},
+      walletInfo,
+    });
   };
-
   render() {
-    const {address} = this.state.txnInfo;
+    const {amount} = this.state;
+    const {
+      txnInfo: {address},
+      walletInfo: {balance},
+    } = this.props.route.params;
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
@@ -35,28 +42,32 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
           <View style={{marginTop: 15}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <TextInput
+                placeholder={`Wallet Balance: ${balance}`}
                 style={styles.inputStyle}
                 keyboardType="decimal-pad"
+                autoCorrect={false}
+                autoFocus={true}
                 onChangeText={amount => this.setState({amount: amount})}
               />
               <Text style={styles.btcTxt}>{C.STR_BTC}</Text>
             </View>
             <View style={styles.lineStyle} />
           </View>
-          {this.state.amount !== null && (
+          {amount > 0 && (
             <TouchableOpacity
               style={{
                 marginTop: C.SCREEN_HEIGHT - 520,
               }}
               shadowColor="black"
               shadowOffset="30">
-              <View style={styles.btnStyle} onTouchEnd={() => this.confirm()}>
+              <View
+                style={styles.btnStyle}
+                onTouchEnd={() => this.goToConfirm()}>
                 <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
               </View>
             </TouchableOpacity>
           )}
-          {(this.state.amount === null ||
-            parseInt(this.state.amount, 10) === 0) && (
+          {(amount <= 0 || parseInt(amount, 10) === 0) && (
             <View
               style={[
                 styles.btnStyle,

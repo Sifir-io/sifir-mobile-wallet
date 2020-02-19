@@ -8,5 +8,13 @@ export const SEND_BITCOIN = 'SEND_BITCOIN';
 // Auth
 export const REQUEST_PAIR = 'REQUEST_PAIR';
 export const GET_AUTH_STATUS = 'GET_AUTH_STATUS';
+export const AUTH_INFO_STATUS = 'AUTH_INFO_STATUS';
+export const PGP_GET_KEYS = 'GET_PGP_KEYS';
+export const PGP_UNLOCK_KEYS = 'PGP_UNLOCK_KEYS';
+
 export const GET_TOKEN_FROM_QR = 'GET_TOKEN_FROM_QR';
 export const MATRIX_CLIENT = 'ACTION_MATRIX_CLIENT';
+
+// Rooms
+export const GET_ROOMS_LIST = 'GET_ROOMS_LIST';
+export const GET_ROOM_MSG = 'GET_ROOM_MSG';

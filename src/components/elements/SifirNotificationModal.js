@@ -19,9 +19,7 @@ export default class SifirNotificationModal extends Component {
           {hideModal => (
             <View style={styles.receivedModal}>
               <Text style={styles.titleTxt}>{this.props.title}</Text>
-              <Text style={{color: 'white', fontSize: 25, fontWeight: 'bold'}}>
-                {this.props.content}
-              </Text>
+              <Text style={styles.descTxt}>{this.props.content}</Text>
               <TouchableOpacity
                 onPressOut={() => {
                   hideModal();
@@ -69,4 +67,5 @@ const styles = StyleSheet.create({
     marginTop: 100,
     backgroundColor: 'transparent',
   },
+  descTxt: {color: 'white', fontSize: 25, fontWeight: 'bold'},
 });

@@ -1,4 +1,4 @@
-import AppLandingScreen from './AppLandingScreen';
-import PairWithTokenScreen from './PairWithTokenScreen';
+import ScanToPairScreen from './ScanToPairScreen';
+import UnlockORGenKeys from './UnlockORGenKeys';
 
-export {AppLandingScreen, PairWithTokenScreen};
+export {ScanToPairScreen, UnlockORGenKeys};
