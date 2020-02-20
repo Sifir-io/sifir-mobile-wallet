@@ -12,14 +12,16 @@ const HomeScreen = ({navigation}) => {
             onPress={() => {
               navigation.navigate('Links');
             }}>
-            <Text style={[styles.text_white, styles.text_normal, styles.text_bold]}>
+            <Text
+              style={[styles.text_white, styles.text_normal, styles.text_bold]}>
               Open Channel{' '}
             </Text>
           </TouchableOpacity>
         </View>
 
         <View style={[styles.fuding_wrapper]}>
-          <Text style={[styles.textBright, styles.text_normal, styles.text_bold]}>
+          <Text
+            style={[styles.textBright, styles.text_normal, styles.text_bold]}>
             FUNDING AMOUNT
           </Text>
           <Text style={[styles.text_white, styles.text_x_large]}>0.05 BTC</Text>
@@ -57,7 +59,7 @@ const HomeScreen = ({navigation}) => {
               />
               <View style={styles.row}>
                 <Text style={styles.textBright}>Approximate wait</Text>
-                <Text style={[styles.text_white, { marginLeft: 40 }]}>
+                <Text style={[styles.text_white, {marginLeft: 40}]}>
                   4 hours
                 </Text>
               </View>
@@ -82,80 +84,80 @@ HomeScreen.navigationOptions = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppStyle.backgroundColor
+    backgroundColor: AppStyle.backgroundColor,
   },
-  text_26: { fontSize: 26 },
+  text_26: {fontSize: 26},
   row: {
     flexDirection: 'row',
   },
   yellow_button: {
-    backgroundColor: "#ffa500",
+    backgroundColor: '#ffa500',
     padding: 25,
     borderRadius: 10,
-    marginTop: 50
+    marginTop: 50,
   },
   space_between: {
-    flexDirection: "row",
-    justifyContent: "space-between"
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   width_60: {
-    width: "60%"
+    width: '60%',
   },
   text_bold: {
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   text_normal: {
-    fontSize: 13
+    fontSize: 13,
   },
   text_center: {
-    textAlign: "center"
+    textAlign: 'center',
   },
   text_large: {
-    fontSize: 20
+    fontSize: 20,
   },
   textRow: {
-    flexDirection: "row",
-    alignItems: "center"
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text_white: {
-    color: "white",
-    fontFamily: AppStyle.mainFont
+    color: 'white',
+    fontFamily: AppStyle.mainFont,
   },
   textBright: {
     color: AppStyle.mainColor,
-    fontFamily: AppStyle.mainFont
+    fontFamily: AppStyle.mainFont,
   },
   mt7: {
-    marginTop: 7
+    marginTop: 7,
   },
-  slider_wrapper: { width: "100%", marginLeft: 20 },
+  slider_wrapper: {width: '100%', marginLeft: 20},
   back: {
     marginRight: 8,
     width: 12,
-    height: 12
+    height: 12,
   },
   margin_30: {
-    margin: 30
+    margin: 30,
   },
   margin_15: {
-    margin: 15
+    margin: 15,
   },
-  margin_top_30: { marginTop: 30 },
-  margin_top_15: { marginTop: 15 },
+  margin_top_30: {marginTop: 30},
+  margin_top_15: {marginTop: 15},
   fuding_wrapper: {
-    alignItems: "center",
-    marginTop: 50
+    alignItems: 'center',
+    marginTop: 50,
   },
   text_x_large: {
-    fontSize: 60
+    fontSize: 60,
   },
   outline_button: {
     padding: 10,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: AppStyle.mainColor,
-    justifyContent: "center"
-  }
+    justifyContent: 'center',
+  },
 });
 
 export default HomeScreen;
