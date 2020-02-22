@@ -1,34 +1,64 @@
-// FIXME to new navgirattor schema
-import {fromRight} from 'react-navigation-transitions';
-import {createStackNavigator} from 'react-navigation-stack';
+import React from 'react';
+import {createStackNavigator} from '@react-navigation/stack';
+import {
+  SifirLNChannelFundingScreen,
+  SifirLNNodeSelectScreen,
+  SifirLNInvoiceConfirmScreen,
+} from '@screens/ln/';
+import {SifirBtcTxnConfirmedScreen, SifirGetAddrScreen} from '@screens/wallet/';
 
-import {HomeScreen, SettingsScreen, LinksScreen} from '@screens/ln/index';
+const LNPayInvoiceStack = createStackNavigator();
+const LNChannelStack = createStackNavigator();
 
-const LnStack = createStackNavigator(
-  {
-    Home: {
-      screen: HomeScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    Settings: {
-      screen: SettingsScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    Links: {
-      screen: LinksScreen,
-      navigationOptions: {
-        header: null,
-      },
-    },
-  },
-  {
-    initialRouteName: 'Home',
-    transitionConfig: () => fromRight(700),
-  },
-);
+const LNPayInvoiceRoute = () => {
+  return (
+    <LNPayInvoiceStack.Navigator
+      initialRouteName="LnScanBolt"
+      headerMode="none"
+      screenOptions={{
+        gestureEnabled: false,
+      }}>
+      <LNPayInvoiceStack.Screen
+        name="LnScanBolt"
+        component={SifirGetAddrScreen}
+        initialParams={{type: 'bolt'}}
+      />
+      <LNPayInvoiceStack.Screen
+        name="LnInvoiceConfirm"
+        component={SifirLNInvoiceConfirmScreen}
+      />
+      <LNPayInvoiceStack.Screen
+        name="LnInvoicePaymentConfirmed"
+        component={SifirBtcTxnConfirmedScreen}
+        initialParams={{type: 'lnInvoice'}}
+      />
+    </LNPayInvoiceStack.Navigator>
+  );
+};
+const LNChannelRoute = () => {
+  return (
+    <LNChannelStack.Navigator
+      initialRouteName="LnNodeSelect"
+      headerMode="none"
+      screenOptions={{
+        gestureEnabled: false,
+      }}>
+      <LNChannelStack.Screen
+        name="LnNodeSelect"
+        component={SifirLNNodeSelectScreen}
+        initialParams={{type: 'bolt'}}
+      />
+      <LNChannelStack.Screen
+        name="LnChannelFunding"
+        component={SifirLNChannelFundingScreen}
+      />
+      <LNChannelStack.Screen
+        name="LnChannelConfirmed"
+        component={SifirBtcTxnConfirmedScreen}
+        initialParams={{type: 'lnChannel'}}
+      />
+    </LNChannelStack.Navigator>
+  );
+};
 
-export default LnStack;
+export {LNPayInvoiceRoute, LNChannelRoute};

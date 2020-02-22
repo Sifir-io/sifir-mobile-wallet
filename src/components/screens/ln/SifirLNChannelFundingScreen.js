@@ -2,7 +2,12 @@ import React from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {Slider} from 'react-native-elements';
-const HomeScreen = ({navigation}) => {
+import SifirBTCAmount from '@elements/SifirBTCAmount';
+const SifirLNChannelFundingScreen = ({navigation, props}) => {
+  // FIXME these
+  const {fundingAmount, nodeDetails} = props.route.params;
+  const {nodeAlias, nodeId, nodeAddress} = nodeDetails;
+
   return (
     <View style={styles.container}>
       <View style={styles.margin_30}>
@@ -24,18 +29,24 @@ const HomeScreen = ({navigation}) => {
             style={[styles.textBright, styles.text_normal, styles.text_bold]}>
             FUNDING AMOUNT
           </Text>
-          <Text style={[styles.text_white, styles.text_x_large]}>0.05 BTC</Text>
+          <Text style={[styles.text_white, styles.text_x_large]}>
+            <SifirBTCAmount amount={fundingAmount} unit="SATS" />
+          </Text>
         </View>
 
         <View style={[styles.margin_15, styles.margin_top_30]}>
           <Text style={[styles.textBright]}>Alias</Text>
-          <Text style={[styles.text_white, styles.text_large]}>EMEA#1</Text>
+          <Text style={[styles.text_white, styles.text_large]}>
+            {nodeAlias}
+          </Text>
+          <Text style={[styles.textBright, styles.margin_top_15]}>Node Id</Text>
+          <Text style={[styles.text_white, styles.text_large]}>{nodeId}</Text>
 
           <Text style={[styles.textBright, styles.margin_top_15]}>
             Node Address
           </Text>
           <Text style={[styles.text_white, styles.text_large]}>
-            ema.node.co
+            {nodeAddress}
           </Text>
 
           <Text style={[styles.textBright, styles.margin_top_15]}>Port</Text>
@@ -77,7 +88,7 @@ const HomeScreen = ({navigation}) => {
   );
 };
 
-HomeScreen.navigationOptions = {
+SifirLNChannelFundingScreen.navigationOptions = {
   header: null,
 };
 
@@ -160,4 +171,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default SifirLNChannelFundingScreen;

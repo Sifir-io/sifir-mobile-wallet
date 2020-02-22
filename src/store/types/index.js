@@ -5,6 +5,10 @@ export const BTC_WALLET_DETAILS = 'WALLET_DATA_SHOW';
 export const BTC_WALLET_ADDRESS = 'WALLET_ADDRESS';
 export const SEND_BITCOIN = 'SEND_BITCOIN';
 
+// Ln
+export const LN_WALLET_GET_FUNDS = 'LN_WALLET_GET_FUNDS';
+export const LN_WALLET_NODEINFO = 'LN_WALLET_NODEINFO';
+
 // Auth
 export const REQUEST_PAIR = 'REQUEST_PAIR';
 export const GET_AUTH_STATUS = 'GET_AUTH_STATUS';

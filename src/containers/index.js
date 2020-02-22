@@ -5,7 +5,6 @@ import {C, AppStyle} from '@common/index';
 import SifirHeader from '@elements/SifirHeader';
 import {ScanToPairScreen, UnlockORGenKeys} from '@screens/auth/index';
 import WalletTab from './WalletStack';
-import LnStack from './LnStack';
 import {connect} from 'react-redux';
 import {event} from '@io/events';
 import {Alert} from 'react-native';
@@ -19,7 +18,6 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 const RootStack = createStackNavigator();
 const ContentStack = createStackNavigator();
-const LNStack = createStackNavigator();
 /**
  * App tabs
  */

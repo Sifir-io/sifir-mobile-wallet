@@ -1,5 +1,9 @@
-import HomeScreen from './HomeScreen';
-import LinksScreen from './LinksScreen';
-import SettingsScreen from './SettingsScreen';
+import SifirLNChannelFundingScreen from './SifirLNChannelFundingScreen';
+import SifirLNInvoiceConfirmScreen from './SifirLNInvoiceConfirmScreen';
+import SifirLNNodeSelectScreen from './SifirLNNodeSelectScreen';
 
-export {HomeScreen, LinksScreen, SettingsScreen};
+export {
+  SifirLNChannelFundingScreen,
+  SifirLNInvoiceConfirmScreen,
+  SifirLNNodeSelectScreen,
+};

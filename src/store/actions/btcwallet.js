@@ -54,7 +54,7 @@ const getBtcWalletList = () => async dispatch => {
       }),
     );
 
-    // Add spending walet
+    // Add spending wallet
     btcWalletList.push({
       label: 'Spending',
       desc: C.STR_WALLET,

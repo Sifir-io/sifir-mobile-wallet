@@ -12,6 +12,7 @@ import {
   SifirBtcTxnConfirmedScreen,
   SifirAddWalletScreen,
 } from '@screens/wallet/index';
+import {LNChannelRoute, LNPayInvoiceRoute} from './LnStack';
 
 const WalletStack = createStackNavigator();
 export default function WalletTab() {
@@ -31,6 +32,8 @@ export default function WalletTab() {
         name="AccountList"
         component={SifirAccountsListScreen}
       />
+      <WalletStack.Screen name="AddWallet" component={SifirAddWalletScreen} />
+
       <WalletStack.Screen name="Account" component={SifirAccountScreen} />
       <WalletStack.Screen name="GetAddress" component={SifirGetAddrScreen} />
       <WalletStack.Screen
@@ -49,7 +52,12 @@ export default function WalletTab() {
         name="BtcTxnConfirmed"
         component={SifirBtcTxnConfirmedScreen}
       />
-      <WalletStack.Screen name="AddWallet" component={SifirAddWalletScreen} />
+
+      <WalletStack.Screen name="LNChannelRoute" component={LNChannelRoute} />
+      <WalletStack.Screen
+        name="LNPayInvoiceRoute"
+        component={LNPayInvoiceRoute}
+      />
     </WalletStack.Navigator>
   );
 }

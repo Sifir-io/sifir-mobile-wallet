@@ -9,9 +9,9 @@ import {
   Platform,
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
-import Table from '@elements/Table';
+import SifirNodesTable from '@elements/SifirNodesTable';
 
-export default function SettingsScreen() {
+export default function SifirLNNodeSelectScreen() {
   const [selected, setSelected] = useState(undefined);
   return (
     <View style={styles.container}>
@@ -38,7 +38,7 @@ export default function SettingsScreen() {
           ]}>
           Browse Nodes
         </Text>
-        <Table selected={selected} onSelect={setSelected} />
+        <SifirNodesTable selected={selected} onSelect={setSelected} />
 
         <TouchableOpacity
           disabled={selected ? !selected.id : true}
@@ -59,7 +59,7 @@ export default function SettingsScreen() {
   );
 }
 
-SettingsScreen.navigationOptions = {
+SifirLNNodeSelectScreen.navigationOptions = {
   header: null,
 };
 

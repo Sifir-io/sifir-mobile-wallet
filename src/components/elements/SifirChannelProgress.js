@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {AppStyle} from '@common/index';
 
-export const ProgressBar = props => {
+export const SifirChannelProgress = props => {
   let {loaded} = props;
   let completed = loaded;
   let remaining = 100 - loaded;
