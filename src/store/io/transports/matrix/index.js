@@ -18,10 +18,10 @@ const getTransport = async (token, devicePgpKey, nodePubkey) => {
   const inboundMiddleware = async ({event, acccountUser}) => {
     const {body} = event.getContent();
     const {encryptedData, signature} = JSON.parse(body);
-    const decryptyedData = await decryptMessage(encryptedData);
+    const decryptyedData = await decryptMessage(base64.decode(encryptedData));
     const isValid = await verifySignedMessage({
       msg: decryptyedData,
-      armoredSignature: signature,
+      armoredSignature: base64.decode(signature),
       armoredKey: nodePubkey,
     });
     let err = null;
@@ -41,7 +41,10 @@ const getTransport = async (token, devicePgpKey, nodePubkey) => {
       msg: payloadToEnc,
       pubKey: nodePubkey,
     });
-    return JSON.stringify({encryptedData: encryptedMsg, signature});
+    return JSON.stringify({
+      encryptedData: base64.encode(encryptedMsg),
+      signature: base64.encode(signature),
+    });
   };
   const nodeUser = user.replace('-dev', '');
   return await cypherNodeMatrixTransport({
