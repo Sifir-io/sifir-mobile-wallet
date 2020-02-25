@@ -2,6 +2,7 @@ import {getAuthedMatrixClient} from './impl/matrixClient.js';
 import {cypherNodeMatrixTransport} from 'cyphernode-js-sdk-transports';
 import {log, error} from '@io/events/';
 import {decryptMessage, encryptMessage, verifySignedMessage} from '@io/pgp';
+import base64 from 'base-64';
 let _client = null;
 const getClient = async token => {
   if (_client) {
