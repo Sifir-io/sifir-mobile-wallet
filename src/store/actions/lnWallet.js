@@ -89,4 +89,4 @@ const getFunds = () => async dispatch => {
   }
 };
 
-export {getFunds};
+export {getFunds, getLnNodeInfo, getWalletDetails};
