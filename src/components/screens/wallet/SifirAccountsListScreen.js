@@ -35,7 +35,7 @@ class SifirAccountsListScreen extends React.Component {
         error: btcError,
       },
       lnWallet: {
-        getLnNodeInfo,
+        nodeInfo,
         loaded: lnLoaded,
         loading: lnLoading,
         error: lnError,
@@ -93,14 +93,14 @@ class SifirAccountsListScreen extends React.Component {
             ))}
           {lnLoaded === true &&
             lnLoading === false &&
-            getLnNodeInfo.map((nodeInfo, i) => (
+            nodeInfo.map((info, i) => (
               <SifirWalletButton
-                key={nodeInfo.alias}
+                key={info.alias}
                 width={CARD_SIZE}
                 height={CARD_SIZE * 1.1}
                 walletInfo={{
-                  ...nodeInfo,
-                  label: nodeInfo.alias,
+                  ...info,
+                  label: info.alias,
                   type: 'ln',
                 }}
                 navigate={navigate}

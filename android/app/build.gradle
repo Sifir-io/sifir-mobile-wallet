@@ -191,9 +191,17 @@ android {
     aaptOptions {  
         cruncherEnabled = false  
     }
+    // react-native-v8 mod
+    packagingOptions {
+        // Make sure libjsc.so does not packed in APK
+        exclude "**/libjsc.so"
+    }
+    //eof react-native-v8 mod
 }
 
 dependencies {
+    // Add v8-android - prebuilt libv8android.so into APK 
+    implementation 'org.chromium:v8-android:+'
     implementation project(':react-native-randombytes')
     implementation project(':react-native-share')
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -216,5 +224,6 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
