@@ -93,19 +93,22 @@ class SifirAccountsListScreen extends React.Component {
             ))}
           {lnLoaded === true &&
             lnLoading === false &&
-            nodeInfo.map((info, i) => (
-              <SifirWalletButton
-                key={info.alias}
-                width={CARD_SIZE}
-                height={CARD_SIZE * 1.1}
-                walletInfo={{
-                  ...info,
-                  label: info.alias,
-                  type: 'ln',
-                }}
-                navigate={navigate}
-              />
-            ))}
+            nodeInfo.map((info, i) => {
+              return (
+                <SifirWalletButton
+                  key={info.alias}
+                  width={CARD_SIZE}
+                  height={CARD_SIZE * 1.1}
+                  walletInfo={{
+                    ...info,
+                    label: info.alias,
+                    type: C.STR_LN_WALLET_TYPE,
+                    pageURL: 'Account',
+                  }}
+                  navigate={navigate}
+                />
+              );
+            })}
         </View>
       </View>
     );

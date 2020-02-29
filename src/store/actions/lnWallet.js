@@ -41,14 +41,14 @@ const getLnNodeInfo = () => async dispatch => {
   }
 };
 
-const getWalletDetails = () => async dispatch => {
+const getLnWalletDetails = () => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
     await dispatch(initLnClient());
-    const [{channels, outputs}, invoices] = await Promise.all(
+    const [{channels, outputs}, invoices] = await Promise.all([
       lnClient.listFunds(),
       lnClient.getInvoice(),
-    );
+    ]);
     const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
       balance += channel_sat;
       return balance;
@@ -89,4 +89,4 @@ const getFunds = () => async dispatch => {
   }
 };
 
-export {getFunds, getLnNodeInfo, getWalletDetails};
+export {getFunds, getLnNodeInfo, getLnWalletDetails};

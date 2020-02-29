@@ -12,6 +12,7 @@ import {connect} from 'react-redux';
 import LinearGradient from 'react-native-linear-gradient';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
+import {getLnWalletDetails} from '@actions/lnWallet';
 import SifirTxnList from '@elements/SifirTxnList';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import {Alert} from 'react-native';
@@ -24,23 +25,43 @@ class SifirAccountScreen extends React.Component {
     btnStatus: 0,
     balance: 0,
     txnData: null,
+    invoices: null,
     btcUnit: C.STR_BTC,
   };
   async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
-    const {balance, txnData} = await this.props.getWalletDetails({label, type});
-    this.setState({balance, txnData});
+    if (type === C.STR_LN_WALLET_TYPE) {
+      const {
+        inChannelBalance,
+        outputBalance,
+        invoices,
+      } = await this.props.getLnWalletDetails({
+        label,
+        type,
+      });
+      const balance = inChannelBalance + outputBalance;
+      this.setState({balance, invoices});
+    } else {
+      const {balance, txnData} = await this.props.getWalletDetails({
+        label,
+        type,
+      });
+      this.setState({balance, txnData});
+    }
   }
   componentDidMount() {
     this._loadWalletFromProps();
   }
 
   render() {
-    const {btnStatus, balance, txnData, btcUnit} = this.state;
+    const {btnStatus, balance, invoices, txnData, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
     const BTN_WIDTH = C.SCREEN_WIDTH / 2;
+    const walletIcon =
+      type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
+
     if (error) {
       Alert.alert(
         C.STR_ERROR_btc_action,
@@ -73,7 +94,7 @@ class SifirAccountScreen extends React.Component {
             colors={['#52d4cd', '#54a5b1', '#57658c']}
             style={styles.gradient}>
             <View>
-              <Image source={Images.icon_bitcoin} style={styles.boxImage} />
+              <Image source={walletIcon} style={styles.boxImage} />
               {loading === true && (
                 <ActivityIndicator size="large" color={AppStyle.mainColor} />
               )}
@@ -169,14 +190,17 @@ class SifirAccountScreen extends React.Component {
           {loading === true && (
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           )}
-          {loaded === true && loading === false && txnData !== null && (
-            <SifirTxnList
-              txnData={txnData}
-              unit={btcUnit}
-              width={BTN_WIDTH * 2 - 50}
-              height={200}
-            />
-          )}
+          {loaded === true &&
+            loading === false &&
+            (txnData !== null || invoices !== null) && (
+              <SifirTxnList
+                txnData={txnData}
+                invoices={invoices}
+                unit={btcUnit}
+                width={BTN_WIDTH * 2 - 50}
+                height={200}
+              />
+            )}
         </View>
       </View>
     );
@@ -189,12 +213,12 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {getWalletDetails};
+const mapDispatchToProps = {
+  getWalletDetails,
+  getLnWalletDetails,
+};
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SifirAccountScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SifirAccountScreen);
 
 const styles = StyleSheet.create({
   mainView: {
