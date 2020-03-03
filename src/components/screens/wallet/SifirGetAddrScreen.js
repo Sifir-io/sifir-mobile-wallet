@@ -11,8 +11,10 @@ import {
 
 import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
+import {decodeBolt} from '@actions/lnWallet';
+import {connect} from 'react-redux';
 
-export default class SifirGetAddrScreen extends Component {
+class SifirGetAddrScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
@@ -22,26 +24,49 @@ export default class SifirGetAddrScreen extends Component {
     torchOn: false,
     address: null,
     addrFontSize: 22,
+    invoice: null,
   };
   closeModal = data => {
     if (data === null) {
       this.setState({showModal: false});
       return;
     }
-    this.setState({
-      address: data,
-      showModal: false,
-      addrFontSize: (1.2 * C.SCREEN_WIDTH) / data.length,
-    });
+    // FIXME add condition to check if it's a valid bolt11.
+    if (typeof data === 'string') {
+      this.setState({address: data, showModal: false}, this.handleBoltScanned);
+    } else {
+      this.setState({
+        address: data,
+        showModal: false,
+        addrFontSize: (1.2 * C.SCREEN_WIDTH) / data.length,
+      });
+    }
   };
 
-  goToEnterAmount = () => {
+  handleBoltScanned = async () => {
+    const invoice = await this.props.decodeBolt(this.state.address);
+    console.warn('decoded bolt invoice-------', invoice);
+    if (invoice.amount_msat) {
+      this.setState({invoice});
+    }
+  };
+
+  handleContinueBtn = () => {
     const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
     const {address} = this.state;
-    this.props.navigation.navigate('BtcSendTxnInputAmount', {
-      txnInfo: {address},
-      walletInfo,
-    });
+    if (type === C.STR_LN_WALLET_TYPE) {
+      this.props.navigation.navigate('LnInvoiceConfirm', {
+        invoice: this.state.invoice,
+        walletInfo,
+        bolt11: address,
+      });
+    } else {
+      this.props.navigation.navigate('BtcSendTxnInputAmount', {
+        txnInfo: {address},
+        walletInfo,
+      });
+    }
   };
 
   inputAddr = address => {
@@ -58,36 +83,46 @@ export default class SifirGetAddrScreen extends Component {
   render() {
     const {navigate} = this.props.navigation;
     const {showModal, address, addrFontSize} = this.state;
+    const {
+      walletInfo: {type},
+    } = this.props.route.params;
+
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
-          <TouchableOpacity>
-            <View
-              style={styles.backNavView}
-              onTouchEnd={() => navigate('Account')}>
-              <Image source={Images.icon_back} style={styles.backImg} />
-              <Image source={Images.icon_btc_cir} style={styles.btcImg} />
-              <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
-            </View>
-          </TouchableOpacity>
+          {type !== C.STR_LN_WALLET_TYPE && (
+            <>
+              <TouchableOpacity>
+                <View
+                  style={styles.backNavView}
+                  onTouchEnd={() => navigate('Account')}>
+                  <Image source={Images.icon_back} style={styles.backImg} />
+                  <Image source={Images.icon_btc_cir} style={styles.btcImg} />
+                  <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
+                </View>
+              </TouchableOpacity>
 
-          <View style={styles.titleStyle}>
-            <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
-            <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
-          </View>
+              <View style={styles.titleStyle}>
+                <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
+                <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
+              </View>
 
-          <View style={styles.inputView}>
-            <TextInput
-              placeholder={C.STR_Enter_Addr}
-              placeholderTextColor="white"
-              style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
-              value={address}
-              onChangeText={add => this.inputAddr(add)}
-            />
-          </View>
-
+              <View style={styles.inputView}>
+                <TextInput
+                  placeholder={C.STR_Enter_Addr}
+                  placeholderTextColor="white"
+                  style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
+                  value={address}
+                  onChangeText={add => this.inputAddr(add)}
+                />
+              </View>
+            </>
+          )}
           <View
-            style={styles.qrScanView}
+            style={[
+              styles.qrScanView,
+              {marginTop: type === C.STR_LN_WALLET_TYPE ? '50%' : 0},
+            ]}
             onTouchEnd={() => {
               this.setState({showModal: true});
             }}>
@@ -96,28 +131,17 @@ export default class SifirGetAddrScreen extends Component {
             </TouchableOpacity>
           </View>
 
-          {address != null && (
-            <TouchableOpacity>
-              <View
-                style={styles.continueBtnView}
-                onTouchEnd={() => this.goToEnterAmount()}>
-                <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
-                <Image
-                  source={Images.icon_up_blue}
-                  style={{width: 20, height: 20, marginLeft: 20}}
-                />
-              </View>
-            </TouchableOpacity>
-          )}
-          {address == null && (
-            <View style={[styles.continueBtnView, {opacity: 0.5}]}>
+          <TouchableOpacity disabled={this.state.address ? false : true}>
+            <View
+              style={styles.continueBtnView}
+              onTouchEnd={() => this.handleContinueBtn()}>
               <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
               <Image
                 source={Images.icon_up_blue}
                 style={{width: 20, height: 20, marginLeft: 20}}
               />
             </View>
-          )}
+          </TouchableOpacity>
         </View>
         <Modal
           visible={showModal}
@@ -129,6 +153,18 @@ export default class SifirGetAddrScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    lnWallet: state.lnWallet,
+  };
+};
+
+const mapDispatchToProps = {
+  decodeBolt,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SifirGetAddrScreen);
 
 const styles = StyleSheet.create({
   mainView: {
