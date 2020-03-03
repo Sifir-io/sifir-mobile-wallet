@@ -24,10 +24,7 @@ const SifirLNInvoiceConfirmScreen = props => {
       const {invoice} = props.route.params;
       // FIXME no routes found against my node, so using node provided by Gus as ex.
       // replace below params with invoice.payee,invoice.msatoshi.
-      const allroutes = await props.getRoute(
-        '0277622bf4c497475960bf91bd3c673a4cb4e9b589cebfde9700c197b3989cc1b8',
-        1000,
-      );
+      const allroutes = await props.getRoute(invoice.payee, invoice.msatoshi);
       setRoutes(allroutes);
       const allPeers = await props.getPeers();
       setPeers(allPeers);
@@ -46,7 +43,7 @@ const SifirLNInvoiceConfirmScreen = props => {
     const {loading} = props.lnWallet;
     if (loading) {
       setTimeout(() => {
-        setProgress(progress + 2);
+        progress === 100 ? setProgress(10) : setProgress(progress + 1);
       }, 250);
     }
   }, [props.lnWallet, progress]);
