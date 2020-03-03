@@ -6,6 +6,7 @@ import {
   SifirLNInvoiceConfirmScreen,
 } from '@screens/ln/';
 import {SifirBtcTxnConfirmedScreen, SifirGetAddrScreen} from '@screens/wallet/';
+import {C} from '@common/index';
 
 const LNPayInvoiceStack = createStackNavigator();
 const LNChannelStack = createStackNavigator();
@@ -21,7 +22,7 @@ const LNPayInvoiceRoute = () => {
       <LNPayInvoiceStack.Screen
         name="LnScanBolt"
         component={SifirGetAddrScreen}
-        initialParams={{type: 'bolt'}}
+        initialParams={{walletInfo: {type: C.STR_LN_WALLET_TYPE}}}
       />
       <LNPayInvoiceStack.Screen
         name="LnInvoiceConfirm"
