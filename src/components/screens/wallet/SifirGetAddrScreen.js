@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
@@ -24,15 +25,17 @@ class SifirGetAddrScreen extends Component {
     torchOn: false,
     address: null,
     addrFontSize: 22,
-    invoice: null,
+    invoice: {},
   };
   closeModal = data => {
     if (data === null) {
       this.setState({showModal: false});
       return;
     }
-    // FIXME add condition to check if it's a valid bolt11.
-    if (typeof data === 'string') {
+    const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
+    // TODO Refactor this to minimize if statement.
+    if (type === C.STR_LN_WALLET_TYPE) {
       this.setState({address: data, showModal: false}, this.handleBoltScanned);
     } else {
       this.setState({
@@ -45,7 +48,6 @@ class SifirGetAddrScreen extends Component {
 
   handleBoltScanned = async () => {
     const invoice = await this.props.decodeBolt(this.state.address);
-    console.warn('decoded bolt invoice-------', invoice);
     if (invoice.amount_msat) {
       this.setState({invoice});
     }
@@ -86,7 +88,8 @@ class SifirGetAddrScreen extends Component {
     const {
       walletInfo: {type},
     } = this.props.route.params;
-
+    const isValidBolt11 = this.state.invoice?.amount_msat ? true : false;
+    const {loading} = this.props.lnWallet;
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
@@ -130,11 +133,16 @@ class SifirGetAddrScreen extends Component {
               <Image source={Images.img_camera} style={styles.cameraImg} />
             </TouchableOpacity>
           </View>
+          {loading && <ActivityIndicator size="large" />}
 
-          <TouchableOpacity disabled={this.state.address ? false : true}>
+          <TouchableOpacity
+            onPress={() => this.handleContinueBtn()}
+            disabled={isValidBolt11 ? false : true}>
             <View
-              style={styles.continueBtnView}
-              onTouchEnd={() => this.handleContinueBtn()}>
+              style={[
+                styles.continueBtnView,
+                {opacity: isValidBolt11 ? 1 : 0.5},
+              ]}>
               <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
               <Image
                 source={Images.icon_up_blue}

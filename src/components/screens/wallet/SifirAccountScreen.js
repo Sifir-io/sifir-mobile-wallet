@@ -74,6 +74,7 @@ class SifirAccountScreen extends React.Component {
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
+    const {loading: loadingLN} = this.props.lnWallet;
     const BTN_WIDTH = C.SCREEN_WIDTH / 2;
     const walletIcon =
       type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
@@ -203,7 +204,7 @@ class SifirAccountScreen extends React.Component {
           </TouchableOpacity>
         </View>
         <View style={styles.txnListView}>
-          {loading === true && (
+          {(loading || loadingLN) && (
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           )}
           {loaded === true &&
@@ -226,6 +227,7 @@ class SifirAccountScreen extends React.Component {
 const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
   };
 };
 
