@@ -50,6 +50,24 @@ const lnWallet = createReducer(initialState)({
     loading: false,
     loaded: false,
   }),
+  [types.LN_WALLET_DETAILS + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_DETAILS + FULFILLED]: state => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+  }),
+  [types.LN_WALLET_DETAILS + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
 
   [types.LN_WALLET_DECODE_BOLT + PENDING]: state => ({
     ...state,
@@ -57,15 +75,11 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_DECODE_BOLT + FULFILLED]: (
-    state,
-    {payload: {decodedBolt}},
-  ) => ({
+  [types.LN_WALLET_DECODE_BOLT + FULFILLED]: state => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    decodedBolt,
   }),
   [types.LN_WALLET_DECODE_BOLT + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
@@ -80,12 +94,11 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_GET_ROUTE + FULFILLED]: (state, {payload: {route}}) => ({
+  [types.LN_WALLET_GET_ROUTE + FULFILLED]: state => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    route,
   }),
   [types.LN_WALLET_GET_ROUTE + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
