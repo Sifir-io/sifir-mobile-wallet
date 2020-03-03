@@ -1,4 +1,4 @@
-import React, {useState, createRef, useRef} from 'react';
+import React, {useState, useEffect, createRef, useRef} from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,13 +10,39 @@ import {
 import {AppStyle, Images} from '@common/index';
 import {SifirChannelProgress} from '@elements/SifirChannelProgress';
 import SlidingPanel from 'react-native-sliding-up-down-panels';
-
+import {getRoute, getPeers} from '@actions/lnWallet';
+import {connect} from 'react-redux';
 // FIXME this comes from styles vh not window
 const {width, height} = Dimensions.get('window');
-export default function SifirLNInvoiceConfirmScreen(props) {
+const SifirLNInvoiceConfirmScreen = props => {
+  const [routes, setRoutes] = useState([]);
+  const [peers, setPeers] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const {invoice} = props.route.params;
+      // FIXME no routes found against my node, so using node provided by Gus as ex.
+      // replace below params with invoice.payee,invoice.msatoshi.
+      const allroutes = await props.getRoute(
+        '0277622bf4c497475960bf91bd3c673a4cb4e9b589cebfde9700c197b3989cc1b8',
+        1000,
+      );
+      setRoutes(allroutes);
+      const allPeers = await props.getPeers();
+      setPeers(allPeers);
+    })();
+  }, []);
+
+  const handleSendButton = () => {
+    const {invoice, bolt11} = props.route.params;
+    props.navigation.navigate('LnInvoicePaymentConfirmed', {
+      bolt11,
+      route: peers[0].id,
+    });
+  };
   const childRef = useRef();
   // FIXME get invoice details from route.params;
 
+  const {amount_msat, description, expiry} = props.route.params.invoice;
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -25,12 +51,15 @@ export default function SifirLNInvoiceConfirmScreen(props) {
             INVOICE AMOUNT
           </Text>
           <View style={[styles.textRow]}>
-            <Text style={[styles.text_white, styles.text_x_large]}>0.05</Text>
+            <Text style={[styles.text_white, styles.text_x_large]}>
+              {amount_msat}
+            </Text>
             <Text style={[styles.text_29, styles.text_white]}> BTC</Text>
           </View>
+          <Text style={[styles.text_white, styles.text_18]}>{description}</Text>
           <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
-            EXPIRES IN{'    '}
-            <Text style={[styles.text_white, styles.text_18]}>24 hours</Text>
+            EXPIRES IN{'  '}
+            <Text style={[styles.text_white, styles.text_18]}>{expiry}</Text>
           </Text>
         </View>
         <View style={[styles.margin_15, styles.margin_top_50]}>
@@ -39,7 +68,9 @@ export default function SifirLNInvoiceConfirmScreen(props) {
           </View>
         </View>
         <View style={styles.justify_center}>
-          <TouchableOpacity style={styles.send_button}>
+          <TouchableOpacity
+            style={styles.send_button}
+            onLongPress={() => handleSendButton()}>
             <Text
               style={[styles.text_large, styles.text_center, styles.text_bold]}>
               SEND
@@ -55,11 +86,11 @@ export default function SifirLNInvoiceConfirmScreen(props) {
           AnimationSpeed={50}
           onAnimationStop={() => {
             childRef.current && childRef.current.onRequestClose();
-            props.navigation.navigate('Settings');
+            props.navigation.navigate('LNChannelRoute');
           }}
           onDragStop={() => {
             childRef.current && childRef.current.onRequestClose();
-            props.navigation.navigate('Settings');
+            props.navigation.navigate('LNChannelRoute');
           }}
           headerLayout={() => (
             <View style={styles.headerLayoutStyle}>
@@ -81,7 +112,23 @@ export default function SifirLNInvoiceConfirmScreen(props) {
       </View>
     </View>
   );
-}
+};
+
+const mapStateToProps = state => {
+  return {
+    lnWallet: state.lnWallet,
+  };
+};
+
+const mapDispatchToProps = {
+  getRoute,
+  getPeers,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirLNInvoiceConfirmScreen);
 
 SifirLNInvoiceConfirmScreen.navigationOptions = {
   header: null,
