@@ -6,6 +6,7 @@ import {
   View,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
 import {SifirChannelProgress} from '@elements/SifirChannelProgress';
@@ -17,6 +18,7 @@ const {width, height} = Dimensions.get('window');
 const SifirLNInvoiceConfirmScreen = props => {
   const [routes, setRoutes] = useState([]);
   const [peers, setPeers] = useState([]);
+  const [progress, setProgress] = useState(10);
   useEffect(() => {
     (async () => {
       const {invoice} = props.route.params;
@@ -39,10 +41,18 @@ const SifirLNInvoiceConfirmScreen = props => {
       route: peers[0].id,
     });
   };
-  const childRef = useRef();
-  // FIXME get invoice details from route.params;
 
+  useEffect(() => {
+    const {loading} = props.lnWallet;
+    if (loading) {
+      setTimeout(() => {
+        setProgress(progress + 2);
+      }, 250);
+    }
+  }, [props.lnWallet, progress]);
+  const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
+  const {loading, loaded} = props.lnWallet;
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -64,7 +74,10 @@ const SifirLNInvoiceConfirmScreen = props => {
         </View>
         <View style={[styles.margin_15, styles.margin_top_50]}>
           <View style={[styles.flex1, styles.justify_center]}>
-            <SifirChannelProgress loaded={50} />
+            <SifirChannelProgress
+              isGoldenColor={routes.length ? true : false}
+              loaded={loading ? progress : loaded ? 100 : 0}
+            />
           </View>
         </View>
         <View style={styles.justify_center}>
