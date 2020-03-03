@@ -6,4 +6,5 @@ export default {
   mainFont: 'RobotoCondensed-Regular',
   secondaryColor: '#4B53FF',
   errorColor: '#D0021B',
+  orange: 'orange',
 };
