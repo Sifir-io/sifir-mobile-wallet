@@ -96,7 +96,6 @@ const decodeBolt = bolt11 => async dispatch => {
     const invoice = await lnClient.decodeBolt(bolt11);
     dispatch({
       type: types.LN_WALLET_DECODE_BOLT + FULFILLED,
-      payload: invoice,
     });
     return invoice;
   } catch (err) {
@@ -114,12 +113,11 @@ const getRoute = (nodeId, msatoshi) => async dispatch => {
     await dispatch(initLnClient());
     console.log('(nodeId------', nodeId);
     console.log('(msatosh------i', msatoshi);
-    const route = await lnClient.getRoute(nodeId, msatoshi);
+    const routes = await lnClient.getRoute(nodeId, msatoshi);
     dispatch({
       type: types.LN_WALLET_GET_ROUTE + FULFILLED,
-      payload: route,
     });
-    return route;
+    return routes;
   } catch (err) {
     error(err);
     dispatch({
@@ -149,10 +147,13 @@ const payBolt = (bolt11, route) => async dispatch => {
 };
 
 const getPeers = () => async dispatch => {
-  dispatch({type: types.LN_WALLET_PAY_BOLT + PENDING});
+  // dispatch({type: types.LN_WALLET_PAY_BOLT + PENDING});
   try {
     await dispatch(initLnClient());
     const peers = await lnClient.listPeers();
+    // dispatch({
+    //   type: types.LN_WALLET_PAY_BOLT + FULFILLED,
+    // });
     return peers;
   } catch (err) {
     error(err);
