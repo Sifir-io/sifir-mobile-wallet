@@ -50,6 +50,68 @@ const lnWallet = createReducer(initialState)({
     loading: false,
     loaded: false,
   }),
+
+  [types.LN_WALLET_DECODE_BOLT + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_DECODE_BOLT + FULFILLED]: (
+    state,
+    {payload: {decodedBolt}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    decodedBolt,
+  }),
+  [types.LN_WALLET_DECODE_BOLT + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
+
+  [types.LN_WALLET_GET_ROUTE + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_GET_ROUTE + FULFILLED]: (state, {payload: {route}}) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    route,
+  }),
+  [types.LN_WALLET_GET_ROUTE + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
+  [types.LN_WALLET_PAY_BOLT + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_PAY_BOLT + FULFILLED]: (state, {payload: {payBolt}}) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    payBolt,
+  }),
+  [types.LN_WALLET_PAY_BOLT + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
 });
 
 export default lnWallet;

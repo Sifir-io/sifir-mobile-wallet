@@ -89,4 +89,82 @@ const getFunds = () => async dispatch => {
   }
 };
 
-export {getFunds, getLnNodeInfo, getLnWalletDetails};
+const decodeBolt = bolt11 => async dispatch => {
+  dispatch({type: types.LN_WALLET_DECODE_BOLT + PENDING});
+  try {
+    await dispatch(initLnClient());
+    const invoice = await lnClient.decodeBolt(bolt11);
+    dispatch({
+      type: types.LN_WALLET_DECODE_BOLT + FULFILLED,
+      payload: invoice,
+    });
+    return invoice;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.LN_WALLET_DECODE_BOLT + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
+
+const getRoute = (nodeId, msatoshi) => async dispatch => {
+  dispatch({type: types.LN_WALLET_GET_ROUTE + PENDING});
+  try {
+    await dispatch(initLnClient());
+    console.log('(nodeId------', nodeId);
+    console.log('(msatosh------i', msatoshi);
+    const route = await lnClient.getRoute(nodeId, msatoshi);
+    dispatch({
+      type: types.LN_WALLET_GET_ROUTE + FULFILLED,
+      payload: route,
+    });
+    return route;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.LN_WALLET_GET_ROUTE + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
+
+const payBolt = (bolt11, route) => async dispatch => {
+  dispatch({type: types.LN_WALLET_PAY_BOLT + PENDING});
+  try {
+    await dispatch(initLnClient());
+    const route = await lnClient.payBolt11(bolt11, route);
+    dispatch({
+      type: types.LN_WALLET_PAY_BOLT + FULFILLED,
+      payload: route,
+    });
+    return route;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.LN_WALLET_PAY_BOLT + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
+
+const getPeers = () => async dispatch => {
+  dispatch({type: types.LN_WALLET_PAY_BOLT + PENDING});
+  try {
+    await dispatch(initLnClient());
+    const peers = await lnClient.listPeers();
+    return peers;
+  } catch (err) {
+    error(err);
+  }
+};
+
+export {
+  getFunds,
+  getLnNodeInfo,
+  getLnWalletDetails,
+  decodeBolt,
+  getRoute,
+  payBolt,
+  getPeers,
+};

@@ -53,6 +53,22 @@ class SifirAccountScreen extends React.Component {
     this._loadWalletFromProps();
   }
 
+  handleSendBtn = () => {
+    this.setState({btnStatus: 0});
+    const {navigate} = this.props.navigation;
+    const {label, type} = this.props.route.params.walletInfo;
+    if (type === C.STR_LN_WALLET_TYPE) {
+      // LN WALLET
+      navigate('LNPayInvoiceRoute', {
+        screen: 'LnScanBolt',
+        params: {walletInfo: this.props.route.params.walletInfo},
+      });
+    } else {
+      navigate('BtcReceiveTxn', {
+        walletInfo: {type, label},
+      });
+    }
+  };
   render() {
     const {btnStatus, balance, invoices, txnData, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
@@ -129,16 +145,12 @@ class SifirAccountScreen extends React.Component {
         </View>
 
         <View style={styles.btnAreaView}>
-          {type === C.STR_SPEND_WALLET_TYPE && (
+          {(type === C.STR_SPEND_WALLET_TYPE ||
+            type === C.STR_LN_WALLET_TYPE) && (
             <TouchableWithoutFeedback
               style={{flex: 1}}
               onPressIn={() => this.setState({btnStatus: 1})}
-              onPressOut={() => {
-                this.setState({btnStatus: 0});
-                navigate('GetAddress', {
-                  walletInfo: {type, label, balance, feeSettingEnabled},
-                });
-              }}>
+              onPressOut={() => this.handleSendBtn()}>
               <View
                 style={[
                   styles.txnBtnView,
@@ -154,28 +166,32 @@ class SifirAccountScreen extends React.Component {
               </View>
             </TouchableWithoutFeedback>
           )}
-          <TouchableWithoutFeedback
-            style={{flex: 1}}
-            onPressIn={() => this.setState({btnStatus: 2})}
-            onPressOut={() => {
-              this.setState({btnStatus: 0});
-              navigate('BtcReceiveTxn', {walletInfo: {type, label}});
-            }}>
-            <View
-              style={[
-                styles.txnBtnView,
-                styles.leftTxnBtnView,
-                btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
-              ]}>
-              <Text style={[{color: 'white', fontSize: 15}]}>
-                {C.STR_RECEIVE}
-              </Text>
-              <Image
-                source={Images.icon_down_arrow}
-                style={{width: 11, height: 11, marginLeft: 10}}
-              />
-            </View>
-          </TouchableWithoutFeedback>
+          {type !== C.STR_LN_WALLET_TYPE && (
+            <TouchableWithoutFeedback
+              style={{flex: 1}}
+              onPressIn={() => this.setState({btnStatus: 2})}
+              onPressOut={() => {
+                this.setState({btnStatus: 0});
+                navigate('BtcReceiveTxn', {walletInfo: {type, label}});
+              }}>
+              <View
+                style={[
+                  styles.txnBtnView,
+                  styles.leftTxnBtnView,
+                  btnStatus === 2
+                    ? {backgroundColor: 'black', opacity: 0.7}
+                    : {},
+                ]}>
+                <Text style={[{color: 'white', fontSize: 15}]}>
+                  {C.STR_RECEIVE}
+                </Text>
+                <Image
+                  source={Images.icon_down_arrow}
+                  style={{width: 11, height: 11, marginLeft: 10}}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          )}
         </View>
         <View style={styles.txnSetView}>
           <Text style={styles.txnLblTxt}>{C.TRANSACTIONS}</Text>
