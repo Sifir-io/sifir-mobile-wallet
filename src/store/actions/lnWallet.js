@@ -160,6 +160,24 @@ const getPeers = () => async dispatch => {
   }
 };
 
+const createInvoice = invoice => async dispatch => {
+  dispatch({type: types.LN_WALLET_CREATE_INVOICE + PENDING});
+  try {
+    await dispatch(initLnClient());
+    const createdInvoice = await lnClient.createInvoice(invoice);
+    dispatch({
+      type: types.LN_WALLET_CREATE_INVOICE + FULFILLED,
+    });
+    console.log('createdInvoice-----------', createdInvoice);
+    return createdInvoice;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.LN_WALLET_CREATE_INVOICE + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
 export {
   getFunds,
   getLnNodeInfo,
@@ -168,4 +186,5 @@ export {
   getRoute,
   payBolt,
   getPeers,
+  createInvoice,
 };
