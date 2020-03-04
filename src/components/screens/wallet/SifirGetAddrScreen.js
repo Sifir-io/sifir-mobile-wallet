@@ -8,11 +8,12 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
-import {decodeBolt} from '@actions/lnWallet';
+import {decodeBolt, createInvoice} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 
 class SifirGetAddrScreen extends Component {
@@ -25,7 +26,6 @@ class SifirGetAddrScreen extends Component {
     torchOn: false,
     address: null,
     addrFontSize: 22,
-    invoice: {},
   };
   closeModal = data => {
     if (data === null) {
@@ -48,21 +48,32 @@ class SifirGetAddrScreen extends Component {
 
   handleBoltScanned = async () => {
     const invoice = await this.props.decodeBolt(this.state.address);
+    const {walletInfo} = this.props.route.params;
+    const {address} = this.state;
     if (invoice.amount_msat) {
-      this.setState({invoice});
+      this.props.navigation.navigate('LnInvoiceConfirm', {
+        invoice,
+        walletInfo,
+        bolt11: address,
+      });
     }
   };
 
-  handleContinueBtn = () => {
+  handleContinueBtn = async () => {
     const {walletInfo} = this.props.route.params;
     const {type} = walletInfo;
     const {address} = this.state;
     if (type === C.STR_LN_WALLET_TYPE) {
-      this.props.navigation.navigate('LnInvoiceConfirm', {
-        invoice: this.state.invoice,
-        walletInfo,
-        bolt11: address,
-      });
+      const invoice = await this.props.decodeBolt(this.state.address);
+      if (invoice.amount_msat) {
+        this.props.navigation.navigate('LnInvoiceConfirm', {
+          invoice,
+          walletInfo,
+          bolt11: address,
+        });
+      } else {
+        Alert.alert('Oops', "Entered address isn't a a valid bolt11");
+      }
     } else {
       this.props.navigation.navigate('BtcSendTxnInputAmount', {
         txnInfo: {address},
@@ -85,47 +96,36 @@ class SifirGetAddrScreen extends Component {
   render() {
     const {navigate} = this.props.navigation;
     const {showModal, address, addrFontSize} = this.state;
-    const {
-      walletInfo: {type},
-    } = this.props.route.params;
-    const isValidBolt11 = this.state.invoice?.amount_msat ? true : false;
     const {loading} = this.props.lnWallet;
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
-          {type !== C.STR_LN_WALLET_TYPE && (
-            <>
-              <TouchableOpacity>
-                <View
-                  style={styles.backNavView}
-                  onTouchEnd={() => navigate('Account')}>
-                  <Image source={Images.icon_back} style={styles.backImg} />
-                  <Image source={Images.icon_btc_cir} style={styles.btcImg} />
-                  <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
-                </View>
-              </TouchableOpacity>
+          <TouchableOpacity>
+            <View
+              style={styles.backNavView}
+              onTouchEnd={() => navigate('Account')}>
+              <Image source={Images.icon_back} style={styles.backImg} />
+              <Image source={Images.icon_btc_cir} style={styles.btcImg} />
+              <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
+            </View>
+          </TouchableOpacity>
 
-              <View style={styles.titleStyle}>
-                <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
-                <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
-              </View>
+          <View style={styles.titleStyle}>
+            <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
+            <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
+          </View>
 
-              <View style={styles.inputView}>
-                <TextInput
-                  placeholder={C.STR_Enter_Addr}
-                  placeholderTextColor="white"
-                  style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
-                  value={address}
-                  onChangeText={add => this.inputAddr(add)}
-                />
-              </View>
-            </>
-          )}
+          <View style={styles.inputView}>
+            <TextInput
+              placeholder={C.STR_Enter_Addr}
+              placeholderTextColor="white"
+              style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
+              value={address}
+              onChangeText={add => this.inputAddr(add)}
+            />
+          </View>
           <View
-            style={[
-              styles.qrScanView,
-              {marginTop: type === C.STR_LN_WALLET_TYPE ? '50%' : 0},
-            ]}
+            style={[styles.qrScanView]}
             onTouchEnd={() => {
               this.setState({showModal: true});
             }}>
@@ -133,15 +133,14 @@ class SifirGetAddrScreen extends Component {
               <Image source={Images.img_camera} style={styles.cameraImg} />
             </TouchableOpacity>
           </View>
-          {loading && <ActivityIndicator size="large" />}
-
+          {loading && <ActivityIndicator size="large" style={styles.spinner} />}
           <TouchableOpacity
             onPress={() => this.handleContinueBtn()}
-            disabled={isValidBolt11 ? false : true}>
+            disabled={address && !loading ? false : true}>
             <View
               style={[
                 styles.continueBtnView,
-                {opacity: isValidBolt11 ? 1 : 0.5},
+                {opacity: address && !loading ? 1 : 0.5},
               ]}>
               <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
               <Image
@@ -182,6 +181,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   contentView: {
+    paddingTop: 20,
     position: 'absolute',
     left: 0,
     top: 0,
@@ -270,5 +270,8 @@ const styles = StyleSheet.create({
   cameraImg: {
     height: C.SCREEN_HEIGHT - 495,
     width: (C.SCREEN_HEIGHT - 495) * 1.06,
+  },
+  spinner: {
+    marginTop: 20,
   },
 });
