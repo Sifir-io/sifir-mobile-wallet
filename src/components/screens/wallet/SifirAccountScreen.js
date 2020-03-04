@@ -9,12 +9,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {connect} from 'react-redux';
-import LinearGradient from 'react-native-linear-gradient';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import {getLnWalletDetails} from '@actions/lnWallet';
 import SifirTxnList from '@elements/SifirTxnList';
-import SifirBTCAmount from '@elements/SifirBTCAmount';
+import SifirAccountHeader from '@elements/SifirAccountHeader';
 import {Alert} from 'react-native';
 
 class SifirAccountScreen extends React.Component {
@@ -73,11 +72,9 @@ class SifirAccountScreen extends React.Component {
     const {btnStatus, balance, invoices, txnData, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
-    const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
+    const {loading, loaded, error} = this.props.btcWallet;
     const {loading: loadingLN} = this.props.lnWallet;
     const BTN_WIDTH = C.SCREEN_WIDTH / 2;
-    const walletIcon =
-      type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
 
     if (error) {
       Alert.alert(
@@ -104,47 +101,14 @@ class SifirAccountScreen extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
-        <View style={styles.headerView}>
-          <LinearGradient
-            height={BTN_WIDTH - 50}
-            width={BTN_WIDTH - 40}
-            colors={['#52d4cd', '#54a5b1', '#57658c']}
-            style={styles.gradient}>
-            <View>
-              <Image source={walletIcon} style={styles.boxImage} />
-              {loading === true && (
-                <ActivityIndicator size="large" color={AppStyle.mainColor} />
-              )}
-              {loaded === true && loading === false && (
-                <>
-                  <Text style={styles.boxTxt}>{label}</Text>
-                  {type === C.STR_WATCH_WALLET_TYPE && (
-                    <Text style={styles.boxTxt}>{C.STR_WATCHING}</Text>
-                  )}
-                </>
-              )}
-            </View>
-          </LinearGradient>
-          <View
-            height={BTN_WIDTH - 30}
-            width={BTN_WIDTH - 30}
-            style={styles.balanceView}>
-            {loading === true && (
-              <ActivityIndicator size="large" color={AppStyle.mainColor} />
-            )}
-            {loaded === true && loading === false && (
-              <>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.balAmountTxt}>
-                    <SifirBTCAmount amount={balance} unit={btcUnit} />
-                  </Text>
-                </View>
-                <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
-              </>
-            )}
-          </View>
-        </View>
-
+        <SifirAccountHeader
+          loading={loading}
+          loaded={loaded}
+          type={type}
+          label={label}
+          balance={balance}
+          btcUnit={btcUnit}
+        />
         <View style={styles.btnAreaView}>
           {(type === C.STR_SPEND_WALLET_TYPE ||
             type === C.STR_LN_WALLET_TYPE) && (
@@ -250,13 +214,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 0,
     borderTopLeftRadius: 0,
   },
-  headerView: {
-    flex: 3,
-    marginTop: 0,
-    marginLeft: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
+
   btnAreaView: {
     flex: 1,
     flexDirection: 'row',
@@ -274,21 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginLeft: 25,
   },
-  boxTxt: {
-    color: 'white',
-    fontFamily: AppStyle.mainFont,
-    fontSize: 24,
-    marginLeft: 13,
-    marginBottom: -10,
-  },
-  boxImage: {
-    marginBottom: 10,
-    marginTop: 15,
-    marginLeft: 13,
-    width: 43,
-    height: 43,
-    opacity: 0.6,
-  },
+
   backNavView: {
     display: 'flex',
     flexDirection: 'row',
@@ -308,11 +252,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 2,
   },
-  gradient: {
-    flex: 4.6,
-    borderWidth: 1,
-    borderRadius: 15,
-  },
+
   txnBtnView: {
     flex: 1,
     flexDirection: 'row',
@@ -343,12 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: -5,
     marginLeft: 5,
   },
-  balanceView: {
-    flex: 5,
-    flexDirection: 'column-reverse',
-    marginLeft: 25,
-    paddingBottom: 15,
-  },
+
   txnLblTxt: {
     color: 'white',
     fontSize: 23,
@@ -359,10 +294,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 26,
     marginTop: 30,
-  },
-  balAmountTxt: {
-    color: 'white',
-    fontFamily: AppStyle.mainFont,
-    fontSize: 50,
   },
 });
