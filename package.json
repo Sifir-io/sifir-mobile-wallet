@@ -11,7 +11,8 @@
     "clean": "rm -rf node_modules/ package-lock.json /tmp/metro-cache",
     "debug:connect": "adb reverse tcp:8097 tcp:8097",
     "android:release": "./node_modules/react-native/cli.js run-android --variant=release",
-    "android:apk": "cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && cp app-release.apk sifir-android-app-release-$(git log | head -n 1 | awk '{print substr($2,1,6)}').apk"
+    "android:apk": "cd android && ./gradlew assembleRelease && cd app/build/outputs/apk/release && cp app-release.apk sifir-android-app-release-$(git log | head -n 1 | awk '{print substr($2,1,6)}').apk",
+    "usb": "adb reverse tcp:8081 tcp:8081"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.6.2",
