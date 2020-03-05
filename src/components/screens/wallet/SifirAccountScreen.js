@@ -14,6 +14,8 @@ import {getWalletDetails} from '@actions/btcwallet';
 import {getLnWalletDetails} from '@actions/lnWallet';
 import SifirTxnList from '@elements/SifirTxnList';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
+import SifirAccountActions from '@elements/SifirAccountActions';
+import SifirAccountHistory from '@elements/SifirAccountHistory';
 import {Alert} from 'react-native';
 
 class SifirAccountScreen extends React.Component {
@@ -52,30 +54,13 @@ class SifirAccountScreen extends React.Component {
     this._loadWalletFromProps();
   }
 
-  handleSendBtn = () => {
-    this.setState({btnStatus: 0});
-    const {navigate} = this.props.navigation;
-    const {label, type} = this.props.route.params.walletInfo;
-    if (type === C.STR_LN_WALLET_TYPE) {
-      // LN WALLET
-      navigate('LNPayInvoiceRoute', {
-        screen: 'LnScanBolt',
-        params: {walletInfo: this.props.route.params.walletInfo},
-      });
-    } else {
-      navigate('BtcReceiveTxn', {
-        walletInfo: {type, label},
-      });
-    }
-  };
   render() {
-    const {btnStatus, balance, invoices, txnData, btcUnit} = this.state;
+    const {balance, invoices, btcUnit} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, error} = this.props.btcWallet;
     const {loading: loadingLN} = this.props.lnWallet;
-    const BTN_WIDTH = C.SCREEN_WIDTH / 2;
-
+    const {walletInfo} = this.props.route.params;
     if (error) {
       Alert.alert(
         C.STR_ERROR_btc_action,
@@ -109,80 +94,18 @@ class SifirAccountScreen extends React.Component {
           balance={balance}
           btcUnit={btcUnit}
         />
-        <View style={styles.btnAreaView}>
-          {(type === C.STR_SPEND_WALLET_TYPE ||
-            type === C.STR_LN_WALLET_TYPE) && (
-            <TouchableWithoutFeedback
-              style={{flex: 1}}
-              onPressIn={() => this.setState({btnStatus: 1})}
-              onPressOut={() => this.handleSendBtn()}>
-              <View
-                style={[
-                  styles.txnBtnView,
-                  btnStatus === 1
-                    ? {backgroundColor: 'black', opacity: 0.7}
-                    : {},
-                ]}>
-                <Text style={{color: 'white', fontSize: 15}}>{C.STR_SEND}</Text>
-                <Image
-                  source={Images.icon_up_arrow}
-                  style={{width: 11, height: 11, marginLeft: 10}}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          )}
-          {type !== C.STR_LN_WALLET_TYPE && (
-            <TouchableWithoutFeedback
-              style={{flex: 1}}
-              onPressIn={() => this.setState({btnStatus: 2})}
-              onPressOut={() => {
-                this.setState({btnStatus: 0});
-                navigate('BtcReceiveTxn', {walletInfo: {type, label}});
-              }}>
-              <View
-                style={[
-                  styles.txnBtnView,
-                  styles.leftTxnBtnView,
-                  btnStatus === 2
-                    ? {backgroundColor: 'black', opacity: 0.7}
-                    : {},
-                ]}>
-                <Text style={[{color: 'white', fontSize: 15}]}>
-                  {C.STR_RECEIVE}
-                </Text>
-                <Image
-                  source={Images.icon_down_arrow}
-                  style={{width: 11, height: 11, marginLeft: 10}}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          )}
-        </View>
-        <View style={styles.txnSetView}>
-          <Text style={styles.txnLblTxt}>{C.TRANSACTIONS}</Text>
-          <TouchableOpacity>
-            <Image
-              source={Images.icon_setting}
-              style={{width: 20, height: 20, marginLeft: 20, marginTop: 7}}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.txnListView}>
-          {(loading || loadingLN) && (
-            <ActivityIndicator size="large" color={AppStyle.mainColor} />
-          )}
-          {loaded === true &&
-            loading === false &&
-            (txnData !== null || invoices !== null) && (
-              <SifirTxnList
-                txnData={txnData}
-                invoices={invoices}
-                unit={btcUnit}
-                width={BTN_WIDTH * 2 - 50}
-                height={200}
-              />
-            )}
-        </View>
+        <SifirAccountActions
+          navigate={navigate}
+          type={type}
+          label={label}
+          walletInfo={walletInfo}
+        />
+        <SifirAccountHistory
+          loading={loading}
+          loadingLN={loadingLN}
+          loaded={loaded}
+          invoices={invoices}
+        />
       </View>
     );
   }
@@ -207,31 +130,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
   },
-  leftTxnBtnView: {
-    borderRightColor: 'transparent',
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-    borderBottomLeftRadius: 0,
-    borderTopLeftRadius: 0,
-  },
-
-  btnAreaView: {
-    flex: 1,
-    flexDirection: 'row',
-    borderColor: AppStyle.mainColor,
-    borderWidth: 1,
-    borderRadius: 7,
-    height: 55,
-    marginLeft: 26,
-    marginRight: 26,
-    marginTop: 30,
-  },
-  txnListView: {
-    flex: 3,
-    height: '100%',
-    marginBottom: 20,
-    marginLeft: 25,
-  },
 
   backNavView: {
     display: 'flex',
@@ -253,20 +151,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  txnBtnView: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    borderRightColor: AppStyle.mainColor,
-    borderTopColor: 'transparent',
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    height: '100%',
-    borderWidth: 1,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-    alignItems: 'center',
-  },
   satTxt: {
     color: 'white',
     fontSize: 26,
@@ -274,25 +158,5 @@ const styles = StyleSheet.create({
     textAlignVertical: 'bottom',
     marginBottom: 7,
     marginLeft: 5,
-  },
-  balanceTxt: {
-    color: AppStyle.mainColor,
-    fontFamily: AppStyle.mainFont,
-    fontSize: 16,
-    textAlignVertical: 'bottom',
-    marginBottom: -5,
-    marginLeft: 5,
-  },
-
-  txnLblTxt: {
-    color: 'white',
-    fontSize: 23,
-    fontWeight: 'bold',
-  },
-  txnSetView: {
-    flex: 1,
-    flexDirection: 'row',
-    marginLeft: 26,
-    marginTop: 30,
   },
 });

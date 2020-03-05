@@ -98,5 +98,13 @@ const styles = StyleSheet.create({
     fontFamily: AppStyle.mainFont,
     fontSize: 50,
   },
+  balanceTxt: {
+    color: AppStyle.mainColor,
+    fontFamily: AppStyle.mainFont,
+    fontSize: 16,
+    textAlignVertical: 'bottom',
+    marginBottom: -5,
+    marginLeft: 5,
+  },
 });
 export default SifirAccountHeader;
