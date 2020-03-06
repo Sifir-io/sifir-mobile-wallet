@@ -16,7 +16,7 @@ import Share from 'react-native-share';
 import {getWalletAddress} from '@actions/btcwallet';
 import {Images, AppStyle, C} from '@common/index';
 import {log} from '@io/events/';
-import {Alert} from 'react-native';
+import {ErrorScreen} from '@screens/error';
 
 class SifirBtcReceiveTxnScreen extends Component {
   constructor(props) {
@@ -78,19 +78,23 @@ class SifirBtcReceiveTxnScreen extends Component {
     const {showQRCode, enableWatchSelection} = this.state;
     const {loaded, loading, address, error} = this.props.btcWallet;
     if (error) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this._bootStrap(),
-          },
-        ],
-        {cancelable: false},
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_generating_address}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () => this._bootStrap(),
+            },
+            {
+              text: C.GO_BACK,
+              onPress: () => this.navigation.navigate('Account', {label, type}),
+            },
+          ]}
+        />
       );
     }
-
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>

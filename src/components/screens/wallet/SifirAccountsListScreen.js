@@ -10,7 +10,7 @@ import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
 import {getBtcWalletList} from '@actions/btcwallet';
 import {Images, AppStyle, C} from '@common/index';
-import {Alert} from 'react-native';
+import {ErrorScreen} from '@screens/error';
 
 class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
@@ -18,7 +18,14 @@ class SifirAccountsListScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getBtcWalletList();
+    const {
+      props: {getBtcWalletList: getWallets},
+    } = this;
+    this.stopLoading = this.props.navigation.addListener('focus', getWallets);
+    // getWallets();
+  }
+  componentWillUnmount(): void {
+    this.stopLoading();
   }
 
   render() {
@@ -28,16 +35,17 @@ class SifirAccountsListScreen extends React.Component {
       btcWallet: {btcWalletList, loaded, loading, error},
     } = this.props;
     if (error) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_list_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this.props.getBtcWalletList(),
-          },
-        ],
-        {cancelable: false},
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_account_list_screen}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () => this.props.getBtcWalletList(),
+            },
+          ]}
+        />
       );
     }
     return (
@@ -52,7 +60,7 @@ class SifirAccountsListScreen extends React.Component {
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
         )}
-        <View style={styles.girdView}>
+        <View style={styles.gridView}>
           {loaded === true &&
             loading === false &&
             btcWalletList.map((wallet, i) => (
@@ -89,7 +97,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: AppStyle.backgroundColor,
   },
-  girdView: {
+  gridView: {
     flex: 1,
     width: '100%',
     display: 'flex',

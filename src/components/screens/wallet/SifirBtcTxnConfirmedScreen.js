@@ -10,12 +10,13 @@ import {
 } from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
+import {ErrorScreen} from '@screens/error';
 
 class SifirBtcTxnConfirmedScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
-  done = () => {
+  backToAccount = () => {
     const {walletInfo} = this.props.route.params;
     this.props.navigation.navigate('Account', {walletInfo});
   };
@@ -24,8 +25,22 @@ class SifirBtcTxnConfirmedScreen extends Component {
     const {
       txnInfo: {amount, address, isSendTxn},
     } = this.props.route.params;
-    // TODO remove from here
-    const {loaded, loading, btcSendResult} = this.props.btcWallet;
+    const {loaded, loading, btcSendResult, error} = this.props.btcWallet;
+    if (error) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_txn_error}
+          error={error}
+          actions={[
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => this.backToAccount(),
+            },
+          ]}
+        />
+      );
+    }
     const addrTxtFontSize = (C.vw * 250) / address.length;
     return (
       <View style={styles.mainView}>
@@ -55,7 +70,7 @@ class SifirBtcTxnConfirmedScreen extends Component {
             </View>
             <TouchableOpacity
               style={styles.doneTouch}
-              onPressOut={() => this.done()}>
+              onPressOut={() => this.backToAccount()}>
               <View
                 shadowColor="black"
                 shadowOffset="30"

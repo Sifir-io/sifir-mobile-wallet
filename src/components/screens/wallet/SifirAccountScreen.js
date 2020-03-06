@@ -14,7 +14,7 @@ import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import SifirTxnList from '@elements/SifirTxnList';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
-import {Alert} from 'react-native';
+import {ErrorScreen} from '@screens/error';
 
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
@@ -26,34 +26,48 @@ class SifirAccountScreen extends React.Component {
     txnData: null,
     btcUnit: C.STR_BTC,
   };
+  stopLoading = null;
+
   async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
     const {balance, txnData} = await this.props.getWalletDetails({label, type});
     this.setState({balance, txnData});
   }
   componentDidMount() {
-    this._loadWalletFromProps();
+    const {_loadWalletFromProps} = this;
+    this.stopLoading = this.props.navigation.addListener(
+      'focus',
+      _loadWalletFromProps.bind(this),
+    );
+  }
+  componentWillUnmount() {
+    this.stopLoading();
   }
 
   render() {
-    const {btnStatus, balance, txnData, btcUnit} = this.state;
-    const {navigate} = this.props.navigation;
-    const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
     const BTN_WIDTH = C.SCREEN_WIDTH / 2;
+    const {navigate} = this.props.navigation;
     if (error) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this._loadWalletFromProps(),
-          },
-        ],
-        {cancelable: false},
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_account_screen}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () => this._loadWalletFromProps(),
+            },
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => navigate('AccountList'),
+            },
+          ]}
+        />
       );
     }
+    const {btnStatus, balance, txnData, btcUnit} = this.state;
+    const {label, type} = this.props.route.params.walletInfo;
     return (
       <View style={styles.mainView}>
         <View style={{flex: 0.7}}>

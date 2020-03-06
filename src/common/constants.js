@@ -30,11 +30,14 @@ export const C = {
     'Seems like you have made a mistake entering your password, try again',
 
   STR_CONTINUE: 'CONTINUE',
+  STR_GO_BACK: 'GO BACK',
+  STR_RELOAD_APP: 'RELOAD APP',
   STR_PAYMENT_RECEIPIENT: 'PAYMENT RECIPIENT',
   STR_PAYMENT_AMOUNT: 'PAYMENT AMOUNT',
   STR_BTC: 'BTC',
   STR_CONFIRM: 'CONFIRM',
   STR_DONE: 'DONE',
+  STR_PLEASE: 'PLEASE',
   STR_PAYMENT: 'PAYMENT',
   STR_SENT: 'SENT',
   STR_RECEIVED: 'RECEIVED',
@@ -80,12 +83,17 @@ export const C = {
   STR_PAIRING_METHOD_IN_PROGRESS: 'Pairing in progress...',
   STR_Segwit_Compatible: 'Segwit Compatible (P2SH)',
   STR_Bech32: 'Segwit Native (Bech32)',
-  STR_ERROR_app: 'Error',
+  STR_Wallet_balance: 'Wallet Balance',
+  // --- ERRORS --
+  STR_ERROR_app: 'App Error',
   STR_ERROR_app_unhandled:
     'An undetermined error has occured, this will be logged',
-  STR_ERROR_btc_action: 'BTC wallet error',
+  STR_ERROR_btc_action: 'BTC Wallet Error',
   STR_ERROR_account_screen:
     'An error occured while trying to load your Wallet details',
   STR_ERROR_account_list_screen:
     'An error occured while trying to load your wallet list',
+  STR_ERROR_generating_address:
+    'An error occured while trying to generate an address.',
+  STR_ERROR_txn_error: 'A transaction error occured',
 };
