@@ -18,15 +18,13 @@ class SifirBtcTxnConfirmedScreen extends Component {
   }
   componentDidMount() {
     if (this.props.route.params.type === 'lnInvoice') {
-      console.log('lnInvoice in CDM------');
       this.payBolt();
     }
   }
 
   payBolt = async () => {
-    const {bolt11, route} = this.props.route.params;
-    console.log('calling payBolt() with param', {bolt11, route});
-    const info = await this.props.payBolt(bolt11, route);
+    const {bolt11} = this.props.route.params;
+    const info = await this.props.payBolt(bolt11);
     console.warn('payBolt() response----------', info);
   };
 

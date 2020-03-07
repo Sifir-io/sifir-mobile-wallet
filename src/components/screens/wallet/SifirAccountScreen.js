@@ -23,7 +23,6 @@ class SifirAccountScreen extends React.Component {
     super(props, context);
   }
   state = {
-    btnStatus: 0,
     balance: 0,
     txnData: null,
     invoices: null,
@@ -55,7 +54,7 @@ class SifirAccountScreen extends React.Component {
   }
 
   render() {
-    const {balance, invoices, btcUnit} = this.state;
+    const {balance, invoices, btcUnit, txnData} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, error} = this.props.btcWallet;
@@ -105,6 +104,7 @@ class SifirAccountScreen extends React.Component {
           loadingLN={loadingLN}
           loaded={loaded}
           invoices={invoices}
+          txnData={txnData}
         />
       </View>
     );

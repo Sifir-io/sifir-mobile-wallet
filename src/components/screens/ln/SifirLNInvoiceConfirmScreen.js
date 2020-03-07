@@ -32,10 +32,10 @@ const SifirLNInvoiceConfirmScreen = props => {
   }, []);
 
   const handleSendButton = () => {
-    const {invoice, bolt11} = props.route.params;
+    const {bolt11} = props.route.params;
     props.navigation.navigate('LnInvoicePaymentConfirmed', {
       bolt11,
-      route: peers[0].id,
+      route: routes[0].id,
     });
   };
 
@@ -44,7 +44,7 @@ const SifirLNInvoiceConfirmScreen = props => {
     if (loading) {
       setTimeout(() => {
         progress === 100 ? setProgress(10) : setProgress(progress + 1);
-      }, 250);
+      }, 100);
     }
   }, [props.lnWallet, progress]);
   const childRef = useRef();

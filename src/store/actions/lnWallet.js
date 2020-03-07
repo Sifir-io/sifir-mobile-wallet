@@ -31,7 +31,15 @@ const getLnNodeInfo = () => async dispatch => {
   await dispatch(initLnClient());
   try {
     const nodeInfo = await lnClient.getNodeInfo();
-    dispatch({type: types.LN_WALLET_NODEINFO + FULFILLED, payload: {nodeInfo}});
+    nodeInfo.pageURL = 'Account';
+    nodeInfo.type = C.STR_LN_WALLET_TYPE;
+    nodeInfo.label = nodeInfo.alias;
+    nodeInfo.iconURL = Images.icon_light;
+    nodeInfo.iconClickedURL = Images.icon_light_clicked;
+    dispatch({
+      type: types.LN_WALLET_NODEINFO + FULFILLED,
+      payload: {nodeInfo},
+    });
   } catch (err) {
     error(err);
     dispatch({
@@ -127,11 +135,12 @@ const getRoute = (nodeId, msatoshi) => async dispatch => {
   }
 };
 
-const payBolt = (bolt11, route) => async dispatch => {
+const payBolt = bolt11 => async dispatch => {
+  console.log('bolt11 in payBolt----', bolt11);
   dispatch({type: types.LN_WALLET_PAY_BOLT + PENDING});
   try {
     await dispatch(initLnClient());
-    const route = await lnClient.payBolt11(bolt11, route);
+    const route = await lnClient.payBolt11(bolt11);
     dispatch({
       type: types.LN_WALLET_PAY_BOLT + FULFILLED,
       payload: route,

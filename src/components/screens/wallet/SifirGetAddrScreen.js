@@ -13,7 +13,7 @@ import {
 
 import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
-import {decodeBolt, createInvoice} from '@actions/lnWallet';
+import {decodeBolt} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 
 class SifirGetAddrScreen extends Component {
