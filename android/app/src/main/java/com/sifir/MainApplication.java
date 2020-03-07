@@ -30,7 +30,9 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           packages.add(new TorBridgePackage());
           packages.add(new PgpBridgePackage());
-          return packages;
+          packages.add(new RudderPackage());
+
+            return packages;
         }
 
         @Override

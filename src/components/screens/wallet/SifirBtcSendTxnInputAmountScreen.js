@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 
 import {AppStyle, C} from '@common/index';
-
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
   constructor(props, context) {
     super(props, context);
@@ -16,6 +15,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
   state = {
     btnStatus: 0,
     amount: 0,
+    validAmount: false,
   };
   goToConfirm = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
@@ -25,8 +25,27 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
       walletInfo,
     });
   };
+  checkAndSetInput = inputamount => {
+    const {
+      walletInfo: {balance},
+    } = this.props.route.params;
+    // TODO this to proper SATS vs BTC unit parse
+    if (isNaN(inputamount)) {
+      return this.setState({validAmount: false});
+    }
+    // Check amounts
+    if (inputamount > balance) {
+      return this.setState({validAmount: false});
+    }
+    return this.setState({
+      amount: inputamount,
+      // Do > 0 check here to allow temporary 0 while deleting / editing amounts
+      validAmount: inputamount > 0 ? true : false,
+    });
+  };
+
   render() {
-    const {amount} = this.state;
+    const {amount, validAmount} = this.state;
     const {
       txnInfo: {address},
       walletInfo: {balance},
@@ -38,22 +57,27 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
             <Text style={styles.recLblTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
             <Text style={styles.recTxt}>{address}</Text>
             <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
+            <TouchableOpacity onPress={() => this.checkAndSetInput(balance)}>
+              <Text style={styles.smallWhiteText}>{`${
+                C.STR_Wallet_balance
+              }: ${balance}`}</Text>
+            </TouchableOpacity>
           </View>
           <View style={{marginTop: 15}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <TextInput
-                placeholder={`Wallet Balance: ${balance}`}
+                value={amount.toString()}
                 style={styles.inputStyle}
                 keyboardType="decimal-pad"
                 autoCorrect={false}
                 autoFocus={true}
-                onChangeText={amount => this.setState({amount: amount})}
+                onChangeText={this.checkAndSetInput}
               />
               <Text style={styles.btcTxt}>{C.STR_BTC}</Text>
             </View>
             <View style={styles.lineStyle} />
           </View>
-          {amount > 0 && (
+          {validAmount && (
             <TouchableOpacity
               style={{
                 marginTop: C.SCREEN_HEIGHT - 520,
@@ -67,7 +91,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               </View>
             </TouchableOpacity>
           )}
-          {(amount <= 0 || parseInt(amount, 10) === 0) && (
+          {!validAmount && (
             <View
               style={[
                 styles.btnStyle,
@@ -127,6 +151,14 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
     fontSize: 23,
+  },
+  smallWhiteText: {
+    color: 'white',
+    fontFamily: AppStyle.mainFont,
+    fontSize: 12,
+    marginTop: 10,
+    marginHorizontal: 50,
+    textAlign: 'center',
   },
   recTxt: {
     color: 'white',

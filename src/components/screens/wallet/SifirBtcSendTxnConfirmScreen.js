@@ -16,7 +16,6 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     modalVisible: false,
   };
   sendBtc = () => {
-    console.log('in send');
     const {txnInfo, walletInfo} = this.props.route.params;
     const {address, amount} = txnInfo;
     this.props.sendBitcoin({address, amount});

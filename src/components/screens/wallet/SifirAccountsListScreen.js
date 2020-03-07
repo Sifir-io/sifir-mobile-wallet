@@ -11,7 +11,7 @@ import SifirWalletButton from '@elements/SifirWalletButton';
 import {getBtcWalletList} from '@actions/btcwallet';
 import {getLnNodeInfo, createInvoice} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
-import {Alert} from 'react-native';
+import {ErrorScreen} from '@screens/error';
 
 class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
@@ -20,7 +20,6 @@ class SifirAccountsListScreen extends React.Component {
 
   componentDidMount() {
     // FIXME combine to one init function
-
     this.props.getBtcWalletList();
     this.props.getLnNodeInfo();
     // TODO remove createInvoice method from this component,it was added for testing purpose.
@@ -32,18 +31,21 @@ class SifirAccountsListScreen extends React.Component {
     //   callback_url: 'CallBackUrl',
     // };
     // this.props.createInvoice(inv);
+    const {
+      props: {getBtcWalletList: getWallets},
+    } = this;
+    this.stopLoading = this.props.navigation.addListener('focus', getWallets);
+    // getWallets();
+  }
+  componentWillUnmount() {
+    this.stopLoading();
   }
 
   render() {
     const CARD_SIZE = C.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
     const {
-      btcWallet: {
-        btcWalletList,
-        loaded: btcLoaded,
-        loading: btcLoading,
-        error: btcError,
-      },
+      btcWallet: {btcWalletList, loaded, loading, error},
       lnWallet: {
         nodeInfo,
         loaded: lnLoaded,
@@ -51,30 +53,21 @@ class SifirAccountsListScreen extends React.Component {
         error: lnError,
       },
     } = this.props;
-    if (btcError) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_list_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this.props.getBtcWalletList(),
-          },
-        ],
-        {cancelable: false},
-      );
-    }
-    if (lnError) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_list_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this.props.getLnNodeInfo(),
-          },
-        ],
-        {cancelable: false},
+    if (error || lnError) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_account_list_screen}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () =>
+                error
+                  ? this.props.getBtcWalletList()
+                  : this.props.getLnNodeInfo(),
+            },
+          ]}
+        />
       );
     }
     return (
@@ -84,14 +77,14 @@ class SifirAccountsListScreen extends React.Component {
             <Image source={Images.icon_setting} style={styles.settingImage} />
           </TouchableOpacity>
         </View>
-        {btcLoading === true && (
+        {loading === true && (
           <View style={styles.loading}>
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
         )}
-        <View style={styles.girdView}>
-          {btcLoaded === true &&
-            btcLoading === false &&
+        <View style={styles.gridView}>
+          {loaded === true &&
+            loading === false &&
             btcWalletList.map((wallet, i) => (
               <SifirWalletButton
                 key={wallet.label}
@@ -139,7 +132,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: AppStyle.backgroundColor,
   },
-  girdView: {
+  gridView: {
     flex: 1,
     width: '100%',
     display: 'flex',

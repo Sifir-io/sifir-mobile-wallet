@@ -37,6 +37,11 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
+        // rudder mod 
+        maven {
+  	   url  "https://dl.bintray.com/rudderstack/rudderstack"
+        }
+
 
         google()
         jcenter()

@@ -11,6 +11,7 @@ import {
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {payBolt} from '@actions/lnWallet';
+import {ErrorScreen} from '@screens/error';
 
 class SifirBtcTxnConfirmedScreen extends Component {
   constructor(props, context) {
@@ -28,61 +29,71 @@ class SifirBtcTxnConfirmedScreen extends Component {
     console.warn('payBolt() response----------', info);
   };
 
-  done = () => {
+  backToAccount = () => {
     const {walletInfo} = this.props.route.params;
     this.props.navigation.navigate('Account', {walletInfo});
   };
 
   render() {
-    // const {
-    //   txnInfo: {amount, address, isSendTxn},
-    // } = this.props.route.params;
-    // TODO remove from here
-    // const {loaded, loading, btcSendResult} = this.props.btcWallet;
-    // const addrTxtFontSize = (C.vw * 250) / address.length;
-
-    // FIXME uncomment and fix the below code once done with payBolt() action.
-
+    const {
+      txnInfo: {amount, address, isSendTxn},
+    } = this.props.route.params;
+    const {loaded, loading, btcSendResult, error} = this.props.btcWallet;
+    if (error) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_txn_error}
+          error={error}
+          actions={[
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => this.backToAccount(),
+            },
+          ]}
+        />
+      );
+    }
+    const addrTxtFontSize = (C.vw * 250) / address.length;
     return (
-      <View />
-      // <View style={styles.mainView}>
-      //   {loading === true && (
-      //     <View style={styles.loading}>
-      //       <ActivityIndicator size="large" color={AppStyle.mainColor} />
-      //     </View>
-      //   )}
-      //   {loaded === true && btcSendResult !== null && (
-      //     <>
-      //       <View style={{alignItems: 'center', flex: 3}}>
-      //         <Image source={Images.icon_done} style={styles.checkImg} />
-      //         <Text style={styles.paymentTxt}>{C.STR_PAYMENT}</Text>
-      //         <Text style={styles.addressLblTxt}>
-      //           {isSendTxn ? C.STR_SENT : C.STR_RECEIVED}
-      //         </Text>
-      //         <Text style={styles.payAddrTxt}>
-      //           {C.STR_PAYMENT +
-      //             ' ' +
-      //             (isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER)}
-      //         </Text>
-      //         <Text style={[styles.addrTxt, {fontSize: addrTxtFontSize}]}>
-      //           {address}
-      //         </Text>
-      //         <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
-      //         <Text style={styles.amountTxt}>{amount + ' ' + C.STR_BTC}</Text>
-      //       </View>
-      //       <TouchableOpacity
-      //         style={styles.doneTouch}
-      //         onPressOut={() => this.done()}>
-      //         <View
-      //           shadowColor="black"
-      //           shadowOffset="30"
-      //           style={styles.doneView}>
-      //           <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
-      //         </View>
-      //       </TouchableOpacity>
-      //     </>
-      //   )}
-      // </View>
+      <View style={styles.mainView}>
+        {loading === true && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" color={AppStyle.mainColor} />
+          </View>
+        )}
+        {loaded === true && btcSendResult !== null && (
+          <>
+            <View style={styles.container}>
+              <Image source={Images.icon_done} style={styles.checkImg} />
+              <Text style={styles.paymentTxt}>{C.STR_PAYMENT}</Text>
+              <Text style={styles.addressLblTxt}>
+                {isSendTxn ? C.STR_SENT : C.STR_RECEIVED}
+              </Text>
+              <Text style={styles.payAddrTxt}>
+                {C.STR_PAYMENT +
+                  ' ' +
+                  (isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER)}
+              </Text>
+              <Text style={[styles.addrTxt, {fontSize: addrTxtFontSize}]}>
+                {address}
+              </Text>
+              <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
+              <Text style={styles.amountTxt}>{amount + ' ' + C.STR_BTC}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.doneTouch}
+              onPressOut={() => this.backToAccount()}>
+              <View
+                shadowColor="black"
+                shadowOffset="30"
+                style={styles.doneView}>
+                <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     );
   }
 }
@@ -101,6 +112,10 @@ export default connect(
 )(SifirBtcTxnConfirmedScreen);
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flex: 3,
+  },
   mainView: {
     flex: 1,
     height: '100%',

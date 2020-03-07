@@ -1,22 +1,13 @@
 import React from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import {getLnWalletDetails} from '@actions/lnWallet';
-import SifirTxnList from '@elements/SifirTxnList';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
-import {Alert} from 'react-native';
+import {ErrorScreen} from '@screens/error';
 
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
@@ -28,6 +19,8 @@ class SifirAccountScreen extends React.Component {
     invoices: null,
     btcUnit: C.STR_BTC,
   };
+  stopLoading = null;
+
   async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
     if (type === C.STR_LN_WALLET_TYPE) {
@@ -50,7 +43,14 @@ class SifirAccountScreen extends React.Component {
     }
   }
   componentDidMount() {
-    this._loadWalletFromProps();
+    const {_loadWalletFromProps} = this;
+    this.stopLoading = this.props.navigation.addListener(
+      'focus',
+      _loadWalletFromProps.bind(this),
+    );
+  }
+  componentWillUnmount() {
+    this.stopLoading();
   }
 
   render() {
@@ -61,21 +61,26 @@ class SifirAccountScreen extends React.Component {
     const {loading: loadingLN} = this.props.lnWallet;
     const {walletInfo} = this.props.route.params;
     if (error) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this._loadWalletFromProps(),
-          },
-        ],
-        {cancelable: false},
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_account_screen}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () => this._loadWalletFromProps(),
+            },
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => navigate('AccountList'),
+            },
+          ]}
+        />
       );
     }
     return (
       <View style={styles.mainView}>
-        <View style={{flex: 0.7}}>
+        <View style={styles.navBtn}>
           <TouchableOpacity>
             <View
               style={styles.backNavView}
@@ -123,14 +128,15 @@ const mapDispatchToProps = {
   getLnWalletDetails,
 };
 
+// eslint-disable-next-line prettier/prettier
 export default connect(mapStateToProps, mapDispatchToProps)(SifirAccountScreen);
 
 const styles = StyleSheet.create({
+  navBtn: {flex: 0.7},
   mainView: {
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
   },
-
   backNavView: {
     display: 'flex',
     flexDirection: 'row',
