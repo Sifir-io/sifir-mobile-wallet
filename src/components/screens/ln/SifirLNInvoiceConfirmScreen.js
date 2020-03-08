@@ -22,34 +22,44 @@ const SifirLNInvoiceConfirmScreen = props => {
   useEffect(() => {
     (async () => {
       const {invoice} = props.route.params;
-      // FIXME no routes found against my node, so using node provided by Gus as ex.
-      // replace below params with invoice.payee,invoice.msatoshi.
       const allroutes = await props.getRoute(invoice.payee, invoice.msatoshi);
       setRoutes(allroutes);
-      const allPeers = await props.getPeers();
+      const allPeers = await props.getPeers(allroutes[0].id);
       setPeers(allPeers);
     })();
   }, []);
 
   const handleSendButton = () => {
-    const {bolt11} = props.route.params;
+    const {bolt11, walletInfo} = props.route.params;
     props.navigation.navigate('LnInvoicePaymentConfirmed', {
       bolt11,
-      route: routes[0].id,
+      walletInfo,
     });
   };
 
   useEffect(() => {
     const {loading} = props.lnWallet;
+    // TODO replace it with Animated API.
     if (loading) {
       setTimeout(() => {
         progress === 100 ? setProgress(10) : setProgress(progress + 1);
       }, 100);
     }
   }, [props.lnWallet, progress]);
+
   const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
   const {loading, loaded} = props.lnWallet;
+  const isLoaded = loaded && routes.length === 0;
+  let openChannelLabel;
+  if (peers.length) {
+    const channel = peers[0].channels[0];
+    openChannelLabel = `${channel.channel_id.slice(
+      0,
+      4,
+    )}-${channel.channel_id.slice(-4)} - ${channel.spendable_msatoshi}`;
+  }
+
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -79,6 +89,7 @@ const SifirLNInvoiceConfirmScreen = props => {
         </View>
         <View style={styles.justify_center}>
           <TouchableOpacity
+            disabled={!loaded || loading || routes.length === 0}
             style={styles.send_button}
             onLongPress={() => handleSendButton()}>
             <Text
@@ -103,15 +114,21 @@ const SifirLNInvoiceConfirmScreen = props => {
             props.navigation.navigate('LNChannelRoute');
           }}
           headerLayout={() => (
-            <View style={styles.headerLayoutStyle}>
-              <View style={styles.up_triangle} />
+            <View style={isLoaded ? styles.orange : styles.transparent}>
+              {!loading && (
+                <View
+                  style={
+                    isLoaded ? styles.inactiveTriangle : styles.activeTriangle
+                  }
+                />
+              )}
               <Text
                 style={[
                   styles.commonTextStyle,
-                  styles.textBrightLight,
+                  isLoaded ? styles.darkColor : styles.orangeColor,
                   styles.text_large,
                 ]}>
-                OPEN CHANNEL
+                {isLoaded ? 'OPEN CHANNEL' : openChannelLabel}
               </Text>
             </View>
           )}
@@ -158,9 +175,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   send_icon: {width: 15, height: 15, marginLeft: 10},
-  up_triangle: {
+  inactiveTriangle: {
     position: 'absolute',
-    top: -15,
+    top: -10,
     left: '45%',
     borderLeftWidth: 15,
     borderLeftColor: 'transparent',
@@ -170,11 +187,23 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderBottomColor: '#ffa500',
   },
+  activeTriangle: {
+    position: 'absolute',
+    top: -10,
+    left: '45%',
+    borderLeftWidth: 15,
+    borderLeftColor: 'transparent',
+    borderRightWidth: 15,
+    borderRightColor: 'transparent',
+    borderBottomWidth: 15,
+    borderStyle: 'solid',
+    borderBottomColor: 'orange',
+  },
   send_button: {
     backgroundColor: AppStyle.mainColor,
     padding: 30,
     borderRadius: 10,
-    marginTop: 80,
+    marginTop: 40,
     width: '85%',
     flexDirection: 'row',
     alignItems: 'center',
@@ -197,12 +226,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  headerLayoutStyle: {
+  orange: {
     width,
     height: 80,
     backgroundColor: 'orange',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  transparent: {
+    width,
+    height: 80,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  orangeColor: {
+    color: 'orange',
   },
   slidingPanelLayoutStyle: {
     width,
@@ -247,8 +286,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontFamily: AppStyle.mainFont,
   },
-  textBrightLight: {
-    color: 'rgb(30, 73, 95)',
+  darkColor: {
+    color: AppStyle.backgroundColor,
     fontFamily: AppStyle.mainFont,
   },
   align_center: {alignItems: 'center'},
@@ -276,7 +315,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   text_x_large: {
-    fontSize: 60,
+    fontSize: 40,
   },
   outline_button: {
     padding: 10,
