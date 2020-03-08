@@ -18,15 +18,14 @@ class SifirBtcTxnConfirmedScreen extends Component {
     super(props, context);
   }
   componentDidMount() {
-    if (this.props.route.params.type === 'lnInvoice') {
+    if (this.props.route.params.type === C.STR_LN_WALLET_TYPE) {
       this.payBolt();
     }
   }
 
   payBolt = async () => {
     const {bolt11} = this.props.route.params;
-    const info = await this.props.payBolt(bolt11);
-    console.warn('payBolt() response----------', info);
+    await this.props.payBolt(bolt11);
   };
 
   backToAccount = () => {
@@ -35,10 +34,28 @@ class SifirBtcTxnConfirmedScreen extends Component {
   };
 
   render() {
-    const {
-      txnInfo: {amount, address, isSendTxn},
-    } = this.props.route.params;
-    const {loaded, loading, btcSendResult, error} = this.props.btcWallet;
+    console.log('this.props.lnWallet', this.props.lnWallet);
+    const {type} = this.props.route.params;
+    let amount, address, isSendTxn, btcSendResult, error;
+    let loading = this.props.lnWallet.loading || this.props.btcWallet.loading;
+    let loaded = this.props.lnWallet.loaded || this.props.btcWallet.loaded;
+    if (type === C.STR_LN_WALLET_TYPE && this.props.lnWallet.txnDetails) {
+      isSendTxn = true;
+      ({
+        loaded,
+        loading,
+        txnDetails: {
+          amount_msat: amount,
+          bolt11: address,
+          status: btcSendResult,
+        },
+      } = this.props.lnWallet);
+    } else if (this.props.route.params.txnInfo) {
+      ({
+        txnInfo: {amount, address, isSendTxn},
+      } = this.props.route.params);
+      ({loaded, loading, btcSendResult, error} = this.props.btcWallet);
+    }
     if (error) {
       return (
         <ErrorScreen
@@ -54,7 +71,8 @@ class SifirBtcTxnConfirmedScreen extends Component {
         />
       );
     }
-    const addrTxtFontSize = (C.vw * 250) / address.length;
+    const addrTxtFontSize =
+      (C.vw * (type === C.STR_LN_WALLET_TYPE ? 800 : 250)) / address?.length;
     return (
       <View style={styles.mainView}>
         {loading === true && (
@@ -101,6 +119,7 @@ class SifirBtcTxnConfirmedScreen extends Component {
 const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
   };
 };
 
