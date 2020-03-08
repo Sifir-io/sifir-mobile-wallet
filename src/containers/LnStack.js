@@ -31,7 +31,7 @@ const LNPayInvoiceRoute = () => {
       <LNPayInvoiceStack.Screen
         name="LnInvoicePaymentConfirmed"
         component={SifirBtcTxnConfirmedScreen}
-        initialParams={{type: 'lnInvoice'}}
+        initialParams={{type: C.STR_LN_WALLET_TYPE}}
       />
     </LNPayInvoiceStack.Navigator>
   );
