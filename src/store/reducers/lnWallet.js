@@ -112,14 +112,32 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_PAY_BOLT + FULFILLED]: (state, {payload: {payBolt}}) => ({
+  [types.LN_WALLET_PAY_BOLT + FULFILLED]: (state, {payload: {txnDetails}}) => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    payBolt,
+    txnDetails,
   }),
   [types.LN_WALLET_PAY_BOLT + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
+  [types.LN_WALLET_GET_PEERS + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_GET_PEERS + FULFILLED]: state => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+  }),
+  [types.LN_WALLET_GET_PEERS + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
     error,
     loading: false,
