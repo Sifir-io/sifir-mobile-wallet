@@ -3,7 +3,8 @@ import {View, StyleSheet} from 'react-native';
 import {AppStyle} from '@common/index';
 
 export const SifirChannelProgress = props => {
-  let {loaded, isGoldenColor} = props;
+  let {loaded, routes} = props;
+  const isGoldenColor = routes.length ? true : false;
   let completed = loaded;
   let remaining = 100 - loaded;
   let startDotColor = loaded === 0 ? 'rgb(30, 73, 95)' : AppStyle.mainColor;

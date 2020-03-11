@@ -89,7 +89,7 @@ const SifirLNInvoiceConfirmScreen = props => {
         <View style={[styles.margin_15, styles.margin_top_50]}>
           <View style={[styles.flex1, styles.justify_center]}>
             <SifirChannelProgress
-              isGoldenColor={routes.length ? true : false}
+              routes={routes}
               loaded={loading ? progress : loaded ? 100 : 0}
             />
           </View>
