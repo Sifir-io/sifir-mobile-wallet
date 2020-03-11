@@ -18,14 +18,20 @@ const {width, height} = Dimensions.get('window');
 const SifirLNInvoiceConfirmScreen = props => {
   const [routes, setRoutes] = useState([]);
   const [peers, setPeers] = useState([]);
+  const [routeFound, setRouteFound] = useState([]);
   const [progress, setProgress] = useState(10);
   useEffect(() => {
     (async () => {
       const {invoice} = props.route.params;
-      const allroutes = await props.getRoute(invoice.payee, invoice.msatoshi);
+      const [allroutes, allPeers] = await Promise.all([
+        props.getRoute(invoice.payee, invoice.msatoshi),
+        props.getPeers(),
+      ]);
+      const isRouteFound =
+        allroutes[0]?.id === allPeers[allPeers.length - 1]?.id;
       setRoutes(allroutes);
-      const allPeers = await props.getPeers(allroutes[0].id);
       setPeers(allPeers);
+      setRouteFound(isRouteFound);
     })();
   }, []);
 
@@ -40,26 +46,27 @@ const SifirLNInvoiceConfirmScreen = props => {
   useEffect(() => {
     const {loading} = props.lnWallet;
     // TODO replace it with Animated API.
+    let progressBar;
     if (loading) {
-      setTimeout(() => {
-        progress === 100 ? setProgress(10) : setProgress(progress + 1);
+      progressBar = setTimeout(() => {
+        progress === 100 ? setProgress(10) : setProgress(progress + 2);
       }, 100);
+    } else {
+      clearTimeout(progressBar);
     }
   }, [props.lnWallet, progress]);
 
   const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
   const {loading, loaded} = props.lnWallet;
-  const isLoaded = loaded && routes.length === 0;
   let openChannelLabel;
-  if (peers.length) {
+  if (routeFound === true) {
     const channel = peers[0].channels[0];
     openChannelLabel = `${channel.channel_id.slice(
       0,
       4,
     )}-${channel.channel_id.slice(-4)} - ${channel.spendable_msatoshi}`;
   }
-
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -114,21 +121,21 @@ const SifirLNInvoiceConfirmScreen = props => {
             props.navigation.navigate('LNChannelRoute');
           }}
           headerLayout={() => (
-            <View style={isLoaded ? styles.orange : styles.transparent}>
-              {!loading && (
+            <View style={routeFound ? styles.transparent : styles.orange}>
+              {routes.length > 0 && (
                 <View
                   style={
-                    isLoaded ? styles.inactiveTriangle : styles.activeTriangle
+                    routeFound ? styles.activeTriangle : styles.inactiveTriangle
                   }
                 />
               )}
               <Text
                 style={[
                   styles.commonTextStyle,
-                  isLoaded ? styles.darkColor : styles.orangeColor,
+                  routeFound ? styles.orangeColor : styles.darkColor,
                   styles.text_large,
                 ]}>
-                {isLoaded ? 'OPEN CHANNEL' : openChannelLabel}
+                {!routeFound ? 'OPEN CHANNEL' : openChannelLabel}
               </Text>
             </View>
           )}
