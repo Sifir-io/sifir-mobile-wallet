@@ -12,6 +12,7 @@ import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {payBolt} from '@actions/lnWallet';
 import {ErrorScreen} from '@screens/error';
+import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 class SifirBtcTxnConfirmedScreen extends Component {
   constructor(props, context) {
@@ -44,9 +45,10 @@ class SifirBtcTxnConfirmedScreen extends Component {
       ({
         loaded,
         loading,
+        error,
         txnDetails: {
-          amount_msat: amount,
-          bolt11: address,
+          msatoshi: amount,
+          payment_preimage: address,
           status: btcSendResult,
         },
       } = this.props.lnWallet);
@@ -71,8 +73,7 @@ class SifirBtcTxnConfirmedScreen extends Component {
         />
       );
     }
-    const addrTxtFontSize =
-      (C.vw * (type === C.STR_LN_WALLET_TYPE ? 800 : 250)) / address?.length;
+    const addrTxtFontSize = (C.vw * 250) / address?.length || 25;
     return (
       <View style={styles.mainView}>
         {loading === true && (
@@ -97,7 +98,9 @@ class SifirBtcTxnConfirmedScreen extends Component {
                 {address}
               </Text>
               <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
-              <Text style={styles.amountTxt}>{amount + ' ' + C.STR_BTC}</Text>
+              <Text style={styles.amountTxt}>
+                <SifirBTCAmount amount={amount} unit="msat" />
+              </Text>
             </View>
             <TouchableOpacity
               style={styles.doneTouch}
