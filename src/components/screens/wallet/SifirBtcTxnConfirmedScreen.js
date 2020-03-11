@@ -10,38 +10,27 @@ import {
 } from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
-import {payBolt} from '@actions/lnWallet';
 import {ErrorScreen} from '@screens/error';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 class SifirBtcTxnConfirmedScreen extends Component {
-  constructor(props, context) {
-    super(props, context);
-  }
-  componentDidMount() {
-    if (this.props.route.params.type === C.STR_LN_WALLET_TYPE) {
-      this.payBolt();
-    }
-  }
-
-  payBolt = async () => {
-    const {bolt11} = this.props.route.params;
-    await this.props.payBolt(bolt11);
-  };
-
   backToAccount = () => {
     const {walletInfo} = this.props.route.params;
     this.props.navigation.navigate('Account', {walletInfo});
   };
 
   render() {
-    console.log('this.props.lnWallet', this.props.lnWallet);
-    const {type} = this.props.route.params;
-    let amount, address, isSendTxn, btcSendResult, error;
-    let loading = this.props.lnWallet.loading || this.props.btcWallet.loading;
-    let loaded = this.props.lnWallet.loaded || this.props.btcWallet.loaded;
+    const {type, displayUnit} = this.props.route.params;
+    const addrTxtFontSize = (C.vw * 250) / address?.length || 25;
+
+    let amount,
+      address,
+      isSendTxn,
+      btcSendResult,
+      error,
+      loading = true,
+      loaded = false;
     if (type === C.STR_LN_WALLET_TYPE && this.props.lnWallet.txnDetails) {
-      isSendTxn = true;
       ({
         loaded,
         loading,
@@ -73,7 +62,6 @@ class SifirBtcTxnConfirmedScreen extends Component {
         />
       );
     }
-    const addrTxtFontSize = (C.vw * 250) / address?.length || 25;
     return (
       <View style={styles.mainView}>
         {loading === true && (
@@ -99,7 +87,7 @@ class SifirBtcTxnConfirmedScreen extends Component {
               </Text>
               <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
               <Text style={styles.amountTxt}>
-                <SifirBTCAmount amount={amount} unit="msat" />
+                <SifirBTCAmount amount={amount} unit={displayUnit} />
               </Text>
             </View>
             <TouchableOpacity
@@ -126,7 +114,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {payBolt};
+const mapDispatchToProps = {};
 
 export default connect(
   mapStateToProps,

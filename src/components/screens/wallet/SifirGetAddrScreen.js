@@ -8,95 +8,101 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 import {decodeBolt} from '@actions/lnWallet';
 import {connect} from 'react-redux';
+import {ErrorScreen} from '@screens/error';
 
 class SifirGetAddrScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
   state = {
-    btnStatus: 0,
     showModal: false,
     torchOn: false,
-    address: null,
-    addrFontSize: 22,
+    scannedQRdata: null,
   };
   closeModal = data => {
     if (data === null) {
-      this.setState({showModal: false});
-      return;
+      return this.setState({showModal: false});
     }
-    const {walletInfo} = this.props.route.params;
-    const {type} = walletInfo;
-    // TODO Refactor this to minimize if statement.
-    if (type === C.STR_LN_WALLET_TYPE) {
-      this.setState({address: data, showModal: false}, this.handleBoltScanned);
-    } else {
-      this.setState({
-        address: data,
+    const {
+      walletInfo: {type},
+    } = this.props.route.params;
+    this.setState(
+      {
+        scannedQRdata: data,
         showModal: false,
-        addrFontSize: (1.2 * C.SCREEN_WIDTH) / data.length,
-      });
-    }
+      },
+      () => {
+        type === C.STR_LN_WALLET_TYPE && this.handleBoltScanned();
+      },
+    );
   };
 
   handleBoltScanned = async () => {
-    const invoice = await this.props.decodeBolt(this.state.address);
     const {walletInfo} = this.props.route.params;
-    const {address} = this.state;
-    if (invoice.amount_msat) {
+    const {scannedQRdata} = this.state;
+    const invoice = await this.props.decodeBolt(scannedQRdata);
+    // TODO change validation condition if required
+    if (invoice?.amount_msat) {
       this.props.navigation.navigate('LnInvoiceConfirm', {
         invoice,
         walletInfo,
-        bolt11: address,
+        bolt11: scannedQRdata,
       });
     }
   };
 
   handleContinueBtn = async () => {
-    const {walletInfo} = this.props.route.params;
-    const {type} = walletInfo;
-    const {address} = this.state;
+    const {
+      walletInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    const {scannedQRdata} = this.state;
     if (type === C.STR_LN_WALLET_TYPE) {
-      const invoice = await this.props.decodeBolt(this.state.address);
-      if (invoice.amount_msat) {
+      const invoice = await this.props.decodeBolt(scannedQRdata);
+      if (invoice?.amount_msat) {
         this.props.navigation.navigate('LnInvoiceConfirm', {
           invoice,
           walletInfo,
-          bolt11: address,
+          bolt11: scannedQRdata,
         });
-      } else {
-        Alert.alert('Oops', "Entered address isn't a a valid bolt11");
       }
     } else {
       this.props.navigation.navigate('BtcSendTxnInputAmount', {
-        txnInfo: {address},
+        txnInfo: {scannedQRdata},
         walletInfo,
       });
     }
   };
 
   inputAddr = address => {
-    if (address.length * 22 < C.SCREEN_WIDTH) {
-      this.setState({address, addrFontSize: 22});
-    } else {
-      this.setState({
-        address,
-        addrFontSize: (1.2 * C.SCREEN_WIDTH) / address.length,
-      });
-    }
+    this.setState({scannedQRdata: address});
   };
 
   render() {
     const {navigate} = this.props.navigation;
-    const {showModal, address, addrFontSize} = this.state;
-    const {loading} = this.props.lnWallet;
+    const {showModal, scannedQRdata} = this.state;
+    const {loading, error} = this.props.lnWallet;
+    if (error && scannedQRdata) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_txn_error}
+          error={error}
+          actions={[
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ]}
+        />
+      );
+    }
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
@@ -119,8 +125,8 @@ class SifirGetAddrScreen extends Component {
             <TextInput
               placeholder={C.STR_Enter_Addr}
               placeholderTextColor="white"
-              style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
-              value={address}
+              style={styles.inputTxtStyle}
+              value={scannedQRdata}
               onChangeText={add => this.inputAddr(add)}
             />
           </View>
@@ -136,11 +142,11 @@ class SifirGetAddrScreen extends Component {
           {loading && <ActivityIndicator size="large" style={styles.spinner} />}
           <TouchableOpacity
             onPress={() => this.handleContinueBtn()}
-            disabled={address && !loading ? false : true}>
+            disabled={scannedQRdata && !loading ? false : true}>
             <View
               style={[
                 styles.continueBtnView,
-                {opacity: address && !loading ? 1 : 0.5},
+                {opacity: scannedQRdata && !loading ? 1 : 0.5},
               ]}>
               <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
               <Image
@@ -171,6 +177,7 @@ const mapDispatchToProps = {
   decodeBolt,
 };
 
+// eslint-disable-next-line prettier/prettier
 export default connect(mapStateToProps, mapDispatchToProps)(SifirGetAddrScreen);
 
 const styles = StyleSheet.create({

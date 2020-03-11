@@ -8,10 +8,11 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import {AppStyle, Images} from '@common/index';
+import {AppStyle, Images, C} from '@common/index';
 import {SifirChannelProgress} from '@elements/SifirChannelProgress';
 import SlidingPanel from 'react-native-sliding-up-down-panels';
-import {getRoute, getPeers} from '@actions/lnWallet';
+import {getRoute, getPeers, payBolt} from '@actions/lnWallet';
+import {ErrorScreen} from '@screens/error';
 import {connect} from 'react-redux';
 // FIXME this comes from styles vh not window
 const {width, height} = Dimensions.get('window');
@@ -35,11 +36,14 @@ const SifirLNInvoiceConfirmScreen = props => {
     })();
   }, []);
 
-  const handleSendButton = () => {
+  const handleSendButton = async () => {
     const {bolt11, walletInfo} = props.route.params;
+    props.payBolt(bolt11);
     props.navigation.navigate('LnInvoicePaymentConfirmed', {
       bolt11,
       walletInfo,
+      displayUnit: 'MSAT',
+      isSendTxn: true,
     });
   };
 
@@ -58,7 +62,7 @@ const SifirLNInvoiceConfirmScreen = props => {
 
   const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
-  const {loading, loaded} = props.lnWallet;
+  const {loading, loaded, error} = props.lnWallet;
   let openChannelLabel;
   if (routeFound === true) {
     const channel = peers[0].channels[0];
@@ -66,6 +70,21 @@ const SifirLNInvoiceConfirmScreen = props => {
       0,
       4,
     )}-${channel.channel_id.slice(-4)} - ${channel.spendable_msatoshi}`;
+  }
+  if (error) {
+    return (
+      <ErrorScreen
+        title={C.STR_ERROR_btc_action}
+        desc={C.STR_ERROR_txn_error}
+        error={error}
+        actions={[
+          {
+            text: C.STR_GO_BACK,
+            onPress: () => this.backToAccount(),
+          },
+        ]}
+      />
+    );
   }
   return (
     <View style={styles.container}>
@@ -157,6 +176,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   getRoute,
   getPeers,
+  payBolt,
 };
 
 export default connect(

@@ -107,7 +107,6 @@ const decodeBolt = bolt11 => async dispatch => {
     });
     return invoice;
   } catch (err) {
-    error(err);
     dispatch({
       type: types.LN_WALLET_DECODE_BOLT + REJECTED,
       payload: {error: err},
