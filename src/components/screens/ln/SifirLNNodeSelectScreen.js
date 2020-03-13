@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,9 +10,19 @@ import {
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
-
-export default function SifirLNNodeSelectScreen() {
+import {getPeers} from '@actions/lnWallet';
+import {connect} from 'react-redux';
+function SifirLNNodeSelectScreen(props) {
   const [selected, setSelected] = useState(undefined);
+  const [peers, setPeers] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const nodeId = props.lnWallet.nodeInfo[0].id;
+      const allPeers = await props.getPeers(nodeId);
+      setPeers(allPeers);
+    })();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -38,7 +48,11 @@ export default function SifirLNNodeSelectScreen() {
           ]}>
           Browse Nodes
         </Text>
-        <SifirNodesTable selected={selected} onSelect={setSelected} />
+        <SifirNodesTable
+          nodes={peers}
+          selected={selected}
+          onSelect={setSelected}
+        />
 
         <TouchableOpacity
           disabled={selected ? !selected.id : true}
@@ -58,6 +72,20 @@ export default function SifirLNNodeSelectScreen() {
     </View>
   );
 }
+const mapStateToProps = state => {
+  return {
+    lnWallet: state.lnWallet,
+  };
+};
+
+const mapDispatchToProps = {
+  getPeers,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirLNNodeSelectScreen);
 
 SifirLNNodeSelectScreen.navigationOptions = {
   header: null,
