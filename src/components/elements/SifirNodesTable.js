@@ -26,17 +26,24 @@ const Columns = props => {
       </View>
 
       <View style={styles.columnBox}>
-        <Text style={styles.columnText}># of Connections</Text>
+        <Text style={styles.columnText}>Status</Text>
       </View>
 
       <View style={styles.rowBox}>
-        <Text style={styles.columnText}>Hops Needed</Text>
+        <Text style={styles.columnText}>Capacity</Text>
       </View>
     </View>
   );
 };
 const Row = props => {
-  const {connections, hops, alias, bgIndicator, selected, onSelect} = props;
+  const {
+    channelStatus,
+    capacity,
+    alias,
+    bgIndicator,
+    selected,
+    onSelect,
+  } = props;
   let backgroundColor = selected
     ? '#ffa500'
     : bgIndicator % 2 === 0
@@ -50,11 +57,11 @@ const Row = props => {
         </View>
 
         <View style={styles.rowBox}>
-          <Text style={styles.columnTextRow}>{connections}</Text>
+          <Text style={styles.columnTextRow}>{channelStatus}</Text>
         </View>
 
         <View style={styles.rowBox}>
-          <Text style={styles.columnTextRow}>{hops}</Text>
+          <Text style={styles.columnTextRow}>{capacity}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -62,23 +69,30 @@ const Row = props => {
 };
 
 const SifirNodesTable = props => {
-  const {selected, onSelect} = props;
+  const {nodes} = props;
+
+  const renderRow = (item, i) => {
+    const {selected, onSelect} = props;
+    const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
+    const channelStatus = item.channels[0].state;
+    const capacity = 'capacity';
+    return (
+      <Row
+        key={item.alias}
+        alias={alias}
+        channelStatus={channelStatus}
+        capacity={capacity}
+        bgIndicator={i}
+        selected={selected && item.id === selected.id}
+        onSelect={() => onSelect(item)}
+      />
+    );
+  };
+
   return (
     <View style={[styles.table, props.style]}>
       <Columns />
-      <ScrollView>
-        {data.map((item, i) => (
-          <Row
-            key={item.alias}
-            alias={item.alias}
-            connections={item.connections}
-            hops={item.hops}
-            bgIndicator={i}
-            selected={selected && item.id === selected.id}
-            onSelect={() => onSelect(item)}
-          />
-        ))}
-      </ScrollView>
+      <ScrollView>{nodes.map((item, i) => renderRow(item, i))}</ScrollView>
     </View>
   );
 };
