@@ -158,6 +158,7 @@ const getPeers = nodeId => async dispatch => {
     const peers = await lnClient.listPeers(nodeId);
     dispatch({
       type: types.LN_WALLET_GET_PEERS + FULFILLED,
+      payload: {peers},
     });
     return peers;
   } catch (err) {

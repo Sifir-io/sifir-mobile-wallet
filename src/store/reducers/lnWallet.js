@@ -131,11 +131,12 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_GET_PEERS + FULFILLED]: state => ({
+  [types.LN_WALLET_GET_PEERS + FULFILLED]: (state, {payload: {peers}}) => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
+    peers,
   }),
   [types.LN_WALLET_GET_PEERS + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
