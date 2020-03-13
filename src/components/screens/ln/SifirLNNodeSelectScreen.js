@@ -19,13 +19,10 @@ function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [QRdataORuserInput, setQRorUserInput] = useState(undefined);
   const [selected, setSelected] = useState(undefined);
-  const [peers, setPeers] = useState([]);
-
   useEffect(() => {
     (async () => {
       const nodeId = props.lnWallet.nodeInfo[0].id;
-      const allPeers = await props.getPeers(nodeId);
-      setPeers(allPeers);
+      props.getPeers(nodeId);
     })();
   }, []);
 
@@ -70,9 +67,11 @@ function SifirLNNodeSelectScreen(props) {
           Browse Nodes
         </Text>
         <SifirNodesTable
-          nodes={peers}
+          nodes={props.lnWallet.peers}
           selected={selected}
           onSelect={setSelected}
+          loading={props.lnWallet.loading}
+          loaded={props.lnWallet.loaded}
         />
 
         <TouchableOpacity
