@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {AppStyle} from '@common/index';
 
@@ -59,7 +60,7 @@ const Row = props => {
 };
 
 const SifirNodesTable = props => {
-  const {nodes} = props;
+  const {nodes, loading, loaded} = props;
 
   const renderRow = (item, i) => {
     const {selected, onSelect} = props;
@@ -83,6 +84,9 @@ const SifirNodesTable = props => {
   return (
     <View style={[styles.table, props.style]}>
       <Columns />
+      {loading && !loaded && (
+        <ActivityIndicator size="large" style={styles.spinner} />
+      )}
       <ScrollView>{nodes.map((item, i) => renderRow(item, i))}</ScrollView>
     </View>
   );
@@ -114,5 +118,8 @@ const styles = StyleSheet.create({
     color: AppStyle.mainColor,
     textAlign: 'center',
     width: '70%',
+  },
+  spinner: {
+    marginTop: '18%',
   },
 });
