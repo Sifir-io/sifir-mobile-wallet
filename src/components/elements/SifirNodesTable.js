@@ -8,16 +8,6 @@ import {
 } from 'react-native';
 import {AppStyle} from '@common/index';
 
-const data = [
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 1},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 2},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 3},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 4},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 6},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 9},
-  {alias: 'EMEA#1', connections: 610, hops: 5, id: 80},
-];
-
 const Columns = props => {
   return (
     <View style={styles.columnWrapper}>
@@ -75,6 +65,7 @@ const SifirNodesTable = props => {
     const {selected, onSelect} = props;
     const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
     const channelStatus = item.channels[0].state;
+    // TODO replace with real data
     const capacity = 'capacity';
     return (
       <Row
