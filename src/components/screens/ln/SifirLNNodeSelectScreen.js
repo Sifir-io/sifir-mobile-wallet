@@ -7,12 +7,17 @@ import {
   Image,
   TextInput,
   Platform,
+  Modal,
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
 import {getPeers} from '@actions/lnWallet';
 import {connect} from 'react-redux';
+import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
+
 function SifirLNNodeSelectScreen(props) {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [QRdataORuserInput, setQRorUserInput] = useState(undefined);
   const [selected, setSelected] = useState(undefined);
   const [peers, setPeers] = useState([]);
 
@@ -23,6 +28,18 @@ function SifirLNNodeSelectScreen(props) {
       setPeers(allPeers);
     })();
   }, []);
+
+  const closeModal = data => {
+    if (data === null) {
+      return this.setState({showModal: false});
+    }
+    setQRorUserInput(data);
+    setModalVisible(false);
+  };
+
+  useEffect(() => {
+    QRdataORuserInput;
+  }, [QRdataORuserInput]);
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -32,9 +49,13 @@ function SifirLNNodeSelectScreen(props) {
             placeholderTextColor="white"
             style={[styles.input]}
             selectionColor="white"
+            value={QRdataORuserInput}
+            onChangeText={txt => setQRorUserInput(txt)}
           />
           <View style={[styles.space_around]}>
-            <Image source={Images.camera_blue} style={styles.camera_icon} />
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Image source={Images.camera_blue} style={styles.camera_icon} />
+            </TouchableOpacity>
             <Image source={Images.icon_setting} style={styles.burger_icon} />
           </View>
         </View>
@@ -69,6 +90,12 @@ function SifirLNNodeSelectScreen(props) {
           </Text>
         </TouchableOpacity>
       </View>
+      <Modal
+        visible={isModalVisible}
+        animationType="fade"
+        presentationStyle="fullScreen">
+        <SifirQrCodeCamera closeHandler={closeModal} />
+      </Modal>
     </View>
   );
 }
