@@ -1,90 +1,123 @@
-import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {Slider} from 'react-native-elements';
-import SifirBTCAmount from '@elements/SifirBTCAmount';
-const SifirLNChannelFundingScreen = ({navigation, props}) => {
-  // FIXME these
-  const {fundingAmount, nodeDetails} = props.route.params;
-  const {nodeAlias, nodeId, nodeAddress} = nodeDetails;
+import {TextInput} from 'react-native-gesture-handler';
+const SifirLNChannelFundingScreen = ({navigation, route}) => {
+  const [ln_enable_set_fees, setFeesEnabled] = useState(false);
+  const {selectedNode, peers, nodeAddress} = route.params;
+  // FIXME where to get nodeAlias? I didn't find it in above peers or selectedNode object.
+  const {id: nodeId, nodeAlias} = selectedNode;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.margin_30}>
-        <View style={styles.textRow}>
-          <Image source={Images.icon_indicator} style={styles.back} />
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Links');
-            }}>
-            <Text
-              style={[styles.text_white, styles.text_normal, styles.text_bold]}>
-              Open Channel{' '}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={[styles.fuding_wrapper]}>
-          <Text
-            style={[styles.textBright, styles.text_normal, styles.text_bold]}>
-            FUNDING AMOUNT
-          </Text>
-          <Text style={[styles.text_white, styles.text_x_large]}>
-            <SifirBTCAmount amount={fundingAmount} unit="SATS" />
-          </Text>
-        </View>
-
-        <View style={[styles.margin_15, styles.margin_top_30]}>
-          <Text style={[styles.textBright]}>Alias</Text>
-          <Text style={[styles.text_white, styles.text_large]}>
-            {nodeAlias}
-          </Text>
-          <Text style={[styles.textBright, styles.margin_top_15]}>Node Id</Text>
-          <Text style={[styles.text_white, styles.text_large]}>{nodeId}</Text>
-
-          <Text style={[styles.textBright, styles.margin_top_15]}>
-            Node Address
-          </Text>
-          <Text style={[styles.text_white, styles.text_large]}>
-            {nodeAddress}
-          </Text>
-
-          <Text style={[styles.textBright, styles.margin_top_15]}>Port</Text>
-          <Text style={[styles.text_white, styles.text_large]}>124</Text>
-
-          <Text style={[styles.textBright, styles.margin_top_15]}>Fees</Text>
-          <View style={[styles.space_between, styles.mt7]}>
-            <View style={styles.outline_button}>
-              <Text style={[styles.text_white, styles.text_large]}>
-                0.015 BTC
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.margin_30}>
+          <View style={styles.textRow}>
+            <Image source={Images.icon_indicator} style={styles.back} />
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Links');
+              }}>
+              <Text
+                style={[
+                  styles.text_white,
+                  styles.text_normal,
+                  styles.text_bold,
+                ]}>
+                Open Channel{' '}
               </Text>
-            </View>
-            <View style={styles.slider_wrapper}>
-              <Slider
-                value={30}
-                onValueChange={value => {}}
-                style={styles.width_60}
-                thumbTintColor="white"
-                maximumTrackTintColor="rgb(45, 171, 226)"
-                minimumTrackTintColor="rgb(45, 171, 226)"
-              />
-              <View style={styles.row}>
-                <Text style={styles.textBright}>Approximate wait</Text>
-                <Text style={[styles.text_white, {marginLeft: 40}]}>
-                  4 hours
+            </TouchableOpacity>
+          </View>
+
+          <View style={[styles.fuding_wrapper]}>
+            <Text
+              style={[styles.textBright, styles.text_normal, styles.text_bold]}>
+              FUNDING AMOUNT
+            </Text>
+            <TextInput
+              keyboardType="number-pad"
+              style={styles.fundInputField}
+            />
+          </View>
+
+          <View style={[styles.margin_15, styles.margin_top_30]}>
+            {nodeAlias && (
+              <>
+                <Text style={[styles.textBright]}>Alias</Text>
+                <Text style={[styles.text_white, styles.text_large]}>
+                  {nodeAlias}
                 </Text>
+              </>
+            )}
+            <Text style={[styles.textBright, styles.margin_top_15]}>
+              Node Id
+            </Text>
+            <Text style={[styles.text_white, styles.text_large]}>{nodeId}</Text>
+
+            <Text style={[styles.textBright, styles.margin_top_15]}>
+              Node Address
+            </Text>
+            <Text style={[styles.text_white, styles.text_large]}>
+              {nodeAddress}
+            </Text>
+
+            <Text style={[styles.textBright, styles.margin_top_15]}>Port</Text>
+            <Text style={[styles.text_white, styles.text_large]}>Public</Text>
+
+            <Text style={[styles.textBright, styles.margin_top_15]}>Fees</Text>
+            <View style={[styles.space_between, styles.mt7]}>
+              {ln_enable_set_fees && (
+                <View style={styles.outline_button}>
+                  <Text style={[styles.text_white, styles.text_large]}>
+                    0.015 BTC
+                  </Text>
+                </View>
+              )}
+              <View
+                style={[
+                  styles.slider_wrapper,
+                  {marginLeft: ln_enable_set_fees ? 20 : 0},
+                ]}>
+                <Slider
+                  disabled={!ln_enable_set_fees}
+                  value={0.4}
+                  onValueChange={value => {}}
+                  style={
+                    ln_enable_set_fees ? styles.width_60 : styles.width_100
+                  }
+                  thumbTintColor="white"
+                  maximumTrackTintColor="rgba(45, 171, 226,0.2)"
+                  minimumTrackTintColor="rgb(45, 171, 226)"
+                />
+                {ln_enable_set_fees && (
+                  <View style={styles.row}>
+                    <Text style={styles.textBright}>Approximate wait</Text>
+                    <Text style={[styles.text_white, {marginLeft: 40}]}>
+                      4 hours
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
-        </View>
 
-        <TouchableOpacity style={styles.yellow_button}>
-          <Text style={[styles.text_26, styles.text_center, styles.text_bold]}>
-            OPEN CHANNEL
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.yellow_button}>
+            <Text
+              style={[styles.text_26, styles.text_center, styles.text_bold]}>
+              OPEN CHANNEL
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -113,6 +146,9 @@ const styles = StyleSheet.create({
   },
   width_60: {
     width: '60%',
+  },
+  width_100: {
+    width: '100%',
   },
   text_bold: {
     fontWeight: 'bold',
@@ -168,6 +204,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppStyle.mainColor,
     justifyContent: 'center',
+  },
+  fundInputField: {
+    width: '90%',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: AppStyle.mainColor,
+    borderRadius: 4,
+    color: 'white',
+    fontSize: 18,
+    padding: 10,
+    fontFamily: AppStyle.mainFont,
   },
 });
 
