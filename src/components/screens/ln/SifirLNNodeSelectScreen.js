@@ -8,6 +8,7 @@ import {
   TextInput,
   Platform,
   Modal,
+  Alert,
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
@@ -15,10 +16,13 @@ import {getPeers} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 
+const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
+
 function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
-  const [QRdataORuserInput, setQRorUserInput] = useState(undefined);
-  const [selected, setSelected] = useState(undefined);
+  // TODO set this null
+  const [QRdataORuserInput, setQRorUserInput] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(undefined);
   useEffect(() => {
     (async () => {
       const nodeId = props.lnWallet.nodeInfo[0].id;
@@ -34,9 +38,19 @@ function SifirLNNodeSelectScreen(props) {
     setModalVisible(false);
   };
 
-  useEffect(() => {
-    QRdataORuserInput;
-  }, [QRdataORuserInput]);
+  const handleContinueBtn = () => {
+    const nodeId = QRdataORuserInput.split('@')[0];
+    if (nodeRegx.test(nodeId)) {
+      props.navigation.navigate('LnChannelFunding', {
+        selectedNode,
+        peers: props.lnWallet.peers,
+        nodeAddress: QRdataORuserInput,
+      });
+    } else {
+      Alert.alert('Oops!', 'Entered node ID is invalid.');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -68,17 +82,19 @@ function SifirLNNodeSelectScreen(props) {
         </Text>
         <SifirNodesTable
           nodes={props.lnWallet.peers}
-          selected={selected}
-          onSelect={setSelected}
+          selected={selectedNode}
+          onSelect={setSelectedNode}
           loading={props.lnWallet.loading}
           loaded={props.lnWallet.loaded}
         />
 
         <TouchableOpacity
-          disabled={selected ? !selected.id : true}
+          disabled={selectedNode ? !selectedNode.id : true}
+          onPress={() => handleContinueBtn()}
           // Adding inline style as condition is needed to be evaluated
           style={{
-            backgroundColor: selected && selected.id ? '#ffa500' : 'lightgrey',
+            backgroundColor:
+              selectedNode && selectedNode.id ? '#ffa500' : 'lightgrey',
             padding: 20,
             borderRadius: 10,
             marginTop: 50,
