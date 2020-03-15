@@ -4,6 +4,7 @@ import {
   SifirLNChannelFundingScreen,
   SifirLNNodeSelectScreen,
   SifirLNInvoiceConfirmScreen,
+  SifirLNChannelConfirmedScreen,
 } from '@screens/ln/';
 import {SifirBtcTxnConfirmedScreen, SifirGetAddrScreen} from '@screens/wallet/';
 import {C} from '@common/index';
@@ -55,8 +56,7 @@ const LNChannelRoute = () => {
       />
       <LNChannelStack.Screen
         name="LnChannelConfirmed"
-        component={SifirBtcTxnConfirmedScreen}
-        initialParams={{type: 'lnChannel'}}
+        component={SifirLNChannelConfirmedScreen}
       />
     </LNChannelStack.Navigator>
   );
