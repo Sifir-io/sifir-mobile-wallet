@@ -35,6 +35,8 @@ export const C = {
   STR_PAYMENT_RECEIPIENT: 'PAYMENT RECIPIENT',
   STR_PAYMENT_AMOUNT: 'PAYMENT AMOUNT',
   STR_BTC: 'BTC',
+  STR_OPEN_CHANNEL: 'OPEN CHANNEL',
+  STR_REQUEST_SENT: 'REQUEST SENT',
   STR_CONFIRM: 'CONFIRM',
   STR_DONE: 'DONE',
   STR_PLEASE: 'PLEASE',
@@ -90,11 +92,12 @@ export const C = {
   STR_ERROR_app_unhandled:
     'An undetermined error has occured, this will be logged',
   STR_ERROR_btc_action: 'BTC Wallet Error',
+  STR_ERROR_channel_action: 'Channel Error',
   STR_ERROR_account_screen:
     'An error occured while trying to load your Wallet details',
   STR_ERROR_account_list_screen:
     'An error occured while trying to load your wallet list',
   STR_ERROR_generating_address:
     'An error occured while trying to generate an address.',
-  STR_ERROR_txn_error: 'A transaction error occured',
+  STR_ERROR_txn_error: 'An error occured while opening a channel',
 };
