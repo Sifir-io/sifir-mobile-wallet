@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Image,
   StyleSheet,
@@ -6,16 +6,54 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {Slider} from 'react-native-elements';
 import {TextInput} from 'react-native-gesture-handler';
-const SifirLNChannelFundingScreen = ({navigation, route}) => {
+import {openAndFundPeerChannel} from '@actions/lnWallet';
+import {connect} from 'react-redux';
+import {ErrorScreen} from '@screens/error';
+
+const SifirLNChannelFundingScreen = ({
+  navigation,
+  route,
+  openAndFundPeerChannel,
+  lnWallet,
+}) => {
   const [ln_enable_set_fees, setFeesEnabled] = useState(false);
-  const {selectedNode, peers, nodeAddress} = route.params;
+  const [fundingAmount, setFundingAmount] = useState(0);
+  const {selectedNode, peers, nodeAddress, walletInfo} = route.params;
+  console.log('peers---------', peers);
   // FIXME where to get nodeAlias? I didn't find it in above peers or selectedNode object.
   const {id: nodeId, nodeAlias} = selectedNode;
+  const {loading, loaded, error} = lnWallet;
+  const handleOpenChannelBtn = async () => {
+    const fundingResponse = await openAndFundPeerChannel({
+      peer: nodeId,
+      msatoshi: fundingAmount,
+    });
+    // checking !== failed to handle timedout exception too
+    if (fundingResponse.result !== 'failed') {
+      navigation.navigate('LnChannelConfirmed', {fundingResponse, walletInfo});
+    }
+  };
 
+  if (error) {
+    return (
+      <ErrorScreen
+        title={C.STR_ERROR_channel_action}
+        desc={C.STR_ERROR_txn_error}
+        error={error}
+        actions={[
+          {
+            text: C.STR_GO_BACK,
+            onPress: () => navigation.navigate('Account', {walletInfo}),
+          },
+        ]}
+      />
+    );
+  }
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -32,7 +70,7 @@ const SifirLNChannelFundingScreen = ({navigation, route}) => {
                   styles.text_normal,
                   styles.text_bold,
                 ]}>
-                Open Channel{' '}
+                Open Channel
               </Text>
             </TouchableOpacity>
           </View>
@@ -45,6 +83,7 @@ const SifirLNChannelFundingScreen = ({navigation, route}) => {
             <TextInput
               keyboardType="number-pad"
               style={styles.fundInputField}
+              onChangeText={amount => setFundingAmount(amount)}
             />
           </View>
 
@@ -88,7 +127,7 @@ const SifirLNChannelFundingScreen = ({navigation, route}) => {
                 ]}>
                 <Slider
                   disabled={!ln_enable_set_fees}
-                  value={0.4}
+                  value={0.6}
                   onValueChange={value => {}}
                   style={
                     ln_enable_set_fees ? styles.width_60 : styles.width_100
@@ -108,8 +147,10 @@ const SifirLNChannelFundingScreen = ({navigation, route}) => {
               </View>
             </View>
           </View>
-
-          <TouchableOpacity style={styles.yellow_button}>
+          {loading && !loaded && <ActivityIndicator />}
+          <TouchableOpacity
+            style={styles.yellow_button}
+            onPress={() => handleOpenChannelBtn()}>
             <Text
               style={[styles.text_26, styles.text_center, styles.text_bold]}>
               OPEN CHANNEL
@@ -124,6 +165,21 @@ const SifirLNChannelFundingScreen = ({navigation, route}) => {
 SifirLNChannelFundingScreen.navigationOptions = {
   header: null,
 };
+
+const mapStateToProps = state => {
+  return {
+    lnWallet: state.lnWallet,
+  };
+};
+
+const mapDispatchToProps = {
+  openAndFundPeerChannel,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirLNChannelFundingScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -217,5 +273,3 @@ const styles = StyleSheet.create({
     fontFamily: AppStyle.mainFont,
   },
 });
-
-export default SifirLNChannelFundingScreen;
