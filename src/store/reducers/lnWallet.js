@@ -144,6 +144,31 @@ const lnWallet = createReducer(initialState)({
     loading: false,
     loaded: false,
   }),
+  [types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + FULFILLED]: (
+    state,
+    {payload: {fundingResponse}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    fundingResponse,
+  }),
+  [types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + REJECTED]: (
+    state,
+    {payload: {error}},
+  ) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
 });
 
 export default lnWallet;

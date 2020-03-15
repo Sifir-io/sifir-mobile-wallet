@@ -188,6 +188,27 @@ const createInvoice = invoice => async dispatch => {
     });
   }
 };
+
+const openAndFundPeerChannel = payload => async dispatch => {
+  dispatch({type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + PENDING});
+  try {
+    await dispatch(initLnClient());
+    console.log('payload', payload);
+    const fundingResponse = await lnClient.openAndFundPeerChannel(payload);
+    dispatch({
+      type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + FULFILLED,
+      payload: {fundingResponse},
+    });
+    // return fundingResponse;
+  } catch (err) {
+    dispatch({
+      type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + REJECTED,
+      payload: {error: err},
+    });
+    error(err);
+  }
+};
+
 export {
   getFunds,
   getLnNodeInfo,
@@ -197,4 +218,5 @@ export {
   payBolt,
   getPeers,
   createInvoice,
+  openAndFundPeerChannel,
 };
