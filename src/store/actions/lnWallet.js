@@ -193,19 +193,24 @@ const openAndFundPeerChannel = payload => async dispatch => {
   dispatch({type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + PENDING});
   try {
     await dispatch(initLnClient());
-    console.log('payload', payload);
     const fundingResponse = await lnClient.openAndFundPeerChannel(payload);
     dispatch({
       type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + FULFILLED,
-      payload: {fundingResponse},
     });
-    // return fundingResponse;
+    return fundingResponse;
   } catch (err) {
-    dispatch({
-      type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + REJECTED,
-      payload: {error: err},
-    });
-    error(err);
+    // if timedout; consider it as success.
+    if (typeof err?.err === 'string' && err.err.includes('timedout')) {
+      const fundingResponse = {
+        message: 'Please check peer list',
+      };
+      return fundingResponse;
+    } else {
+      dispatch({
+        type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + REJECTED,
+        payload: {error: err.err.err}, //nested err obj received :|
+      });
+    }
   }
 };
 
