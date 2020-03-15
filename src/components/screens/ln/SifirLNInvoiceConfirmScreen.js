@@ -47,6 +47,14 @@ const SifirLNInvoiceConfirmScreen = props => {
     });
   };
 
+  const handleOpenChannelDrag = () => {
+    childRef.current?.onRequestClose();
+    props.navigation.navigate('LNChannelRoute', {
+      screen: 'LnNodeSelect',
+      params: {walletInfo},
+    });
+  };
+
   useEffect(() => {
     const {loading} = props.lnWallet;
     // TODO replace it with Animated API.
@@ -63,6 +71,7 @@ const SifirLNInvoiceConfirmScreen = props => {
   const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
   const {loading, loaded, error} = props.lnWallet;
+  const {walletInfo} = props.route.params;
   let openChannelLabel;
   if (routeFound === true) {
     const channel = peers[0].channels[0];
@@ -131,14 +140,8 @@ const SifirLNInvoiceConfirmScreen = props => {
           ref={childRef}
           headerLayoutHeight={80}
           AnimationSpeed={50}
-          onAnimationStop={() => {
-            childRef.current && childRef.current.onRequestClose();
-            props.navigation.navigate('LNChannelRoute');
-          }}
-          onDragStop={() => {
-            childRef.current && childRef.current.onRequestClose();
-            props.navigation.navigate('LNChannelRoute');
-          }}
+          onAnimationStop={() => handleOpenChannelDrag()}
+          onDragStop={() => handleOpenChannelDrag()}
           headerLayout={() => (
             <View style={routeFound ? styles.transparent : styles.orange}>
               {routes.length > 0 && (
