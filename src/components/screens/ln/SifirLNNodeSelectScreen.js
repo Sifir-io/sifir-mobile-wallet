@@ -40,11 +40,13 @@ function SifirLNNodeSelectScreen(props) {
 
   const handleContinueBtn = () => {
     const nodeId = QRdataORuserInput.split('@')[0];
+    const {walletInfo} = props.route.params;
     if (nodeRegx.test(nodeId)) {
       props.navigation.navigate('LnChannelFunding', {
         selectedNode,
         peers: props.lnWallet.peers,
         nodeAddress: QRdataORuserInput,
+        walletInfo,
       });
     } else {
       Alert.alert('Oops!', 'Entered node ID is invalid.');
