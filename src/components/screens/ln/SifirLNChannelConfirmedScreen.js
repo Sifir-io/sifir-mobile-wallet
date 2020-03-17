@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+} from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 class SifirLNChannelConfirmedScreen extends Component {
@@ -7,23 +14,37 @@ class SifirLNChannelConfirmedScreen extends Component {
     const {fundingResponse, walletInfo} = this.props.route.params;
     console.log('fundingResponse', fundingResponse);
     return (
-      <View style={styles.mainView}>
-        <View style={styles.container}>
-          <Image source={Images.icon_done} style={styles.checkImg} />
-          <Text style={styles.paymentTxt}>{C.STR_OPEN_CHANNEL}</Text>
-          <Text style={styles.payAddrTxt}>{C.STR_REQUEST_SENT}</Text>
-          <Text style={styles.addrTxt}>{fundingResponse.message}</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.doneTouch}
-          onPressOut={() =>
-            this.props.navigation.navigate('AccountList', {walletInfo})
-          }>
-          <View shadowColor="black" shadowOffset="30" style={styles.doneView}>
-            <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
+      <ScrollView>
+        <View style={styles.mainView}>
+          <View style={styles.container}>
+            <Image source={Images.icon_done} style={styles.checkImg} />
+            <Text style={styles.paymentTxt}>{C.STR_OPEN_CHANNEL}</Text>
+            {!fundingResponse.result && (
+              <Text style={styles.payAddrTxt}>{C.STR_REQUEST_SENT}</Text>
+            )}
+            <Text style={styles.addrTxt}>{fundingResponse.message}</Text>
+            {fundingResponse.result && (
+              <>
+                <Text style={styles.addrTxt}>TxID</Text>
+                <Text style={styles.payAddrTxt}>{fundingResponse.txid}</Text>
+                <Text style={styles.addrTxt}>Channel ID</Text>
+                <Text style={styles.payAddrTxt}>
+                  {fundingResponse.channel_id}
+                </Text>
+              </>
+            )}
           </View>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.doneTouch}
+            onPressOut={() =>
+              this.props.navigation.navigate('LnNodeSelect', {walletInfo})
+            }>
+            <View shadowColor="black" shadowOffset="30" style={styles.doneView}>
+              <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -79,6 +100,7 @@ const styles = StyleSheet.create({
     color: AppStyle.mainColor,
     marginTop: 20,
     fontFamily: AppStyle.mainFontBold,
+    textAlign: 'center',
   },
   addrTxt: {
     color: 'white',
