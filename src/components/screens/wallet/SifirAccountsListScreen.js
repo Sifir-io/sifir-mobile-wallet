@@ -9,7 +9,7 @@ import {
 import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
 import {getBtcWalletList} from '@actions/btcwallet';
-import {getLnNodeInfo, createInvoice} from '@actions/lnWallet';
+import {getLnNodeInfo} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
 import {ErrorScreen} from '@screens/error';
 
@@ -22,15 +22,6 @@ class SifirAccountsListScreen extends React.Component {
     // FIXME combine to one init function
     this.props.getBtcWalletList();
     this.props.getLnNodeInfo();
-    // TODO remove createInvoice method from this component,it was added for testing purpose.
-    // const inv = {
-    //   msatoshi: 123,
-    //   label: 'another invoice ' + new Date().getSeconds(),
-    //   description: 'desc here',
-    //   expiry: 100000000,
-    //   callback_url: 'CallBackUrl',
-    // };
-    // this.props.createInvoice(inv);
     const {
       props: {getBtcWalletList: getWallets},
     } = this;
@@ -156,7 +147,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {getBtcWalletList, getLnNodeInfo, createInvoice};
+const mapDispatchToProps = {getBtcWalletList, getLnNodeInfo};
 
 export default connect(
   mapStateToProps,
