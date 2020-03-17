@@ -88,6 +88,12 @@ class SifirGetAddrScreen extends Component {
     const {navigate} = this.props.navigation;
     const {showModal, scannedQRdata} = this.state;
     const {loading, error} = this.props.lnWallet;
+    const {
+      walletInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    const placeHolder =
+      type === C.STR_LN_WALLET_TYPE ? C.STR_Enter_bolt : C.STR_Enter_addr;
     if (error && scannedQRdata) {
       return (
         <ErrorScreen
@@ -117,13 +123,13 @@ class SifirGetAddrScreen extends Component {
           </TouchableOpacity>
 
           <View style={styles.titleStyle}>
-            <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
+            <Text style={styles.commentTxt}>{placeHolder}</Text>
             <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
           </View>
 
           <View style={styles.inputView}>
             <TextInput
-              placeholder={C.STR_Enter_Addr}
+              placeholder={placeHolder}
               placeholderTextColor="white"
               style={styles.inputTxtStyle}
               value={scannedQRdata}
