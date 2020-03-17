@@ -124,11 +124,18 @@ const getRoute = (nodeId, msatoshi) => async dispatch => {
     });
     return routes;
   } catch (err) {
-    error(err);
-    dispatch({
-      type: types.LN_WALLET_GET_ROUTE + REJECTED,
-      payload: {error: err},
-    });
+    // if throws no found exception
+    if (err.err.err.code === 205) {
+      dispatch({
+        type: types.LN_WALLET_GET_ROUTE + FULFILLED,
+      });
+      return [];
+    } else {
+      error(err);
+      dispatch({
+        type: types.LN_WALLET_GET_ROUTE + REJECTED,
+      });
+    }
   }
 };
 
@@ -190,6 +197,7 @@ const createInvoice = invoice => async dispatch => {
 };
 
 const openAndFundPeerChannel = payload => async dispatch => {
+  console.log('payload', payload);
   dispatch({type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + PENDING});
   try {
     await dispatch(initLnClient());
