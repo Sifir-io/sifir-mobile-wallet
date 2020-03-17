@@ -16,6 +16,7 @@ const SifirAccountHistory = ({
   loaded,
   txnData,
   invoices,
+  btcUnit,
 }) => {
   const BTN_WIDTH = C.SCREEN_WIDTH / 2;
 
@@ -40,7 +41,7 @@ const SifirAccountHistory = ({
             <SifirTxnList
               txnData={txnData}
               invoices={invoices}
-              unit={C.STR_BTC}
+              unit={btcUnit}
               width={BTN_WIDTH * 2 - 50}
               height={200}
             />
