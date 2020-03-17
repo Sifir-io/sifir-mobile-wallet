@@ -23,14 +23,13 @@ const SifirLNChannelFundingScreen = ({
 }) => {
   const [ln_enable_set_fees, setFeesEnabled] = useState(false);
   const [fundingAmount, setFundingAmount] = useState(0);
-  const {selectedNode, peers, nodeAddress, walletInfo} = route.params;
-  console.log('peers---------', peers);
+  const {selectedNode, peers, nodeAddress, walletInfo, nodeId} = route.params;
   // FIXME where to get nodeAlias? I didn't find it in above peers or selectedNode object.
-  const {id: nodeId, nodeAlias} = selectedNode;
+  const {id, nodeAlias} = selectedNode;
   const {loading, loaded, error} = lnWallet;
   const handleOpenChannelBtn = async () => {
     const fundingResponse = await openAndFundPeerChannel({
-      peer: nodeId,
+      peer: nodeAddress,
       msatoshi: fundingAmount,
     });
     // checking !== failed to handle timedout exception too
@@ -99,7 +98,7 @@ const SifirLNChannelFundingScreen = ({
             <Text style={[styles.textBright, styles.margin_top_15]}>
               Node Id
             </Text>
-            <Text style={[styles.text_white, styles.text_large]}>{nodeId}</Text>
+            <Text style={[styles.text_white, styles.text_large]}>{id}</Text>
 
             <Text style={[styles.textBright, styles.margin_top_15]}>
               Node Address
