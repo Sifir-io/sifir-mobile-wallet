@@ -19,7 +19,7 @@ const {width, height} = Dimensions.get('window');
 const SifirLNInvoiceConfirmScreen = props => {
   const [routes, setRoutes] = useState([]);
   const [peers, setPeers] = useState([]);
-  const [routeFound, setRouteFound] = useState([]);
+  const [routeFound, setRouteFound] = useState({});
   const [progress, setProgress] = useState(10);
   useEffect(() => {
     (async () => {
@@ -28,11 +28,10 @@ const SifirLNInvoiceConfirmScreen = props => {
         props.getRoute(invoice.payee, invoice.msatoshi),
         props.getPeers(),
       ]);
-      const isRouteFound =
-        allroutes[0]?.id === allPeers[allPeers.length - 1]?.id;
+      const foundRoute = allPeers.find(peer => peer.id === allroutes[0]?.id);
       setRoutes(allroutes);
       setPeers(allPeers);
-      setRouteFound(isRouteFound);
+      setRouteFound(foundRoute);
     })();
   }, []);
 
@@ -73,8 +72,8 @@ const SifirLNInvoiceConfirmScreen = props => {
   const {loading, loaded, error} = props.lnWallet;
   const {walletInfo} = props.route.params;
   let openChannelLabel;
-  if (routeFound === true) {
-    const channel = peers[0].channels[0];
+  if (routeFound.id) {
+    const channel = routeFound.channels[0];
     openChannelLabel = `${channel.channel_id.slice(
       0,
       4,
@@ -106,7 +105,6 @@ const SifirLNInvoiceConfirmScreen = props => {
             <Text style={[styles.text_white, styles.text_x_large]}>
               {amount_msat}
             </Text>
-            <Text style={[styles.text_29, styles.text_white]}> BTC</Text>
           </View>
           <Text style={[styles.text_white, styles.text_18]}>{description}</Text>
           <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
@@ -135,37 +133,39 @@ const SifirLNInvoiceConfirmScreen = props => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={styles.justify_end}>
-        <SlidingPanel
-          ref={childRef}
-          headerLayoutHeight={80}
-          AnimationSpeed={50}
-          onAnimationStop={() => handleOpenChannelDrag()}
-          onDragStop={() => handleOpenChannelDrag()}
-          headerLayout={() => (
-            <View style={routeFound ? styles.transparent : styles.orange}>
-              {routes.length > 0 && (
+      {loaded && peers.length > 0 && (
+        <View style={styles.justify_end}>
+          <SlidingPanel
+            ref={childRef}
+            headerLayoutHeight={80}
+            AnimationSpeed={50}
+            onAnimationStop={() => handleOpenChannelDrag()}
+            onDragStop={() => handleOpenChannelDrag()}
+            headerLayout={() => (
+              <View style={routeFound.id ? styles.transparent : styles.orange}>
                 <View
                   style={
-                    routeFound ? styles.activeTriangle : styles.inactiveTriangle
+                    routeFound.id
+                      ? styles.activeTriangle
+                      : styles.inactiveTriangle
                   }
                 />
-              )}
-              <Text
-                style={[
-                  styles.commonTextStyle,
-                  routeFound ? styles.orangeColor : styles.darkColor,
-                  styles.text_large,
-                ]}>
-                {!routeFound ? 'OPEN CHANNEL' : openChannelLabel}
-              </Text>
-            </View>
-          )}
-          slidingPanelLayout={() => (
-            <View style={styles.slidingPanelLayoutStyle} />
-          )}
-        />
-      </View>
+                <Text
+                  style={[
+                    styles.commonTextStyle,
+                    routeFound.id ? styles.orangeColor : styles.darkColor,
+                    styles.text_large,
+                  ]}>
+                  {!routeFound.id ? 'OPEN CHANNEL' : openChannelLabel}
+                </Text>
+              </View>
+            )}
+            slidingPanelLayout={() => (
+              <View style={styles.slidingPanelLayoutStyle} />
+            )}
+          />
+        </View>
+      )}
     </View>
   );
 };
