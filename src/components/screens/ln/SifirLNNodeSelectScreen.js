@@ -21,7 +21,7 @@ const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
 function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   // TODO set this null
-  const [QRdataORuserInput, setQRorUserInput] = useState(null);
+  const [QRdataORuserInput, setQRorUserInput] = useState('');
   const [selectedNode, setSelectedNode] = useState(undefined);
   useEffect(() => {
     (async () => {
@@ -32,7 +32,7 @@ function SifirLNNodeSelectScreen(props) {
 
   const closeModal = data => {
     if (data === null) {
-      return this.setState({showModal: false});
+      return setModalVisible(false);
     }
     setQRorUserInput(data);
     setModalVisible(false);
