@@ -61,13 +61,11 @@ const Row = props => {
 
 const SifirNodesTable = props => {
   const {nodes, loading, loaded} = props;
-
   const renderRow = (item, i) => {
     const {selected, onSelect} = props;
     const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
-    const channelStatus = item.channels[0].state;
-    // TODO replace with real data
-    const capacity = 'capacity';
+    const channelStatus = item.channels[0]?.state;
+    const capacity = item.channels[0]?.spendable_msat;
     return (
       <Row
         key={item.alias}
