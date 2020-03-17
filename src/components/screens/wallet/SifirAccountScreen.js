@@ -17,7 +17,6 @@ class SifirAccountScreen extends React.Component {
     balance: 0,
     txnData: null,
     invoices: null,
-    btcUnit: C.STR_BTC,
   };
   stopLoading = null;
 
@@ -54,12 +53,13 @@ class SifirAccountScreen extends React.Component {
   }
 
   render() {
-    const {balance, invoices, btcUnit, txnData} = this.state;
+    const {balance, invoices, txnData} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, error} = this.props.btcWallet;
     const {loading: loadingLN} = this.props.lnWallet;
     const {walletInfo} = this.props.route.params;
+    const btcUnit = type === C.STR_LN_WALLET_TYPE ? C.STR_MSAT : C.STR_BTC;
     if (error) {
       return (
         <ErrorScreen
@@ -110,6 +110,7 @@ class SifirAccountScreen extends React.Component {
           loaded={loaded}
           invoices={invoices}
           txnData={txnData}
+          btcUnit={btcUnit}
         />
       </View>
     );
