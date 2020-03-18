@@ -14,6 +14,7 @@ import SlidingPanel from 'react-native-sliding-up-down-panels';
 import {getRoute, getPeers, payBolt} from '@actions/lnWallet';
 import {ErrorScreen} from '@screens/error';
 import {connect} from 'react-redux';
+import moment from 'moment';
 // FIXME this comes from styles vh not window
 const {width, height} = Dimensions.get('window');
 const SifirLNInvoiceConfirmScreen = props => {
@@ -72,7 +73,7 @@ const SifirLNInvoiceConfirmScreen = props => {
   const {loading, loaded, error} = props.lnWallet;
   const {walletInfo} = props.route.params;
   let openChannelLabel;
-  if (routeFound.id) {
+  if (routeFound?.id) {
     const channel = routeFound.channels[0];
     openChannelLabel = `${channel.channel_id.slice(
       0,
@@ -109,7 +110,12 @@ const SifirLNInvoiceConfirmScreen = props => {
           <Text style={[styles.text_white, styles.text_18]}>{description}</Text>
           <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
             EXPIRES IN{'  '}
-            <Text style={[styles.text_white, styles.text_18]}>{expiry}</Text>
+            <Text style={[styles.text_white, styles.text_18]}>
+              {moment(Date.now() + expiry)
+                .fromNow()
+                .substr(3)}{' '}
+              from now
+            </Text>
           </Text>
         </View>
         <View style={[styles.margin_15, styles.margin_top_50]}>
@@ -142,10 +148,10 @@ const SifirLNInvoiceConfirmScreen = props => {
             onAnimationStop={() => handleOpenChannelDrag()}
             onDragStop={() => handleOpenChannelDrag()}
             headerLayout={() => (
-              <View style={routeFound.id ? styles.transparent : styles.orange}>
+              <View style={routeFound?.id ? styles.transparent : styles.orange}>
                 <View
                   style={
-                    routeFound.id
+                    routeFound?.id
                       ? styles.activeTriangle
                       : styles.inactiveTriangle
                   }
@@ -153,10 +159,10 @@ const SifirLNInvoiceConfirmScreen = props => {
                 <Text
                   style={[
                     styles.commonTextStyle,
-                    routeFound.id ? styles.orangeColor : styles.darkColor,
+                    routeFound?.id ? styles.orangeColor : styles.darkColor,
                     styles.text_large,
                   ]}>
-                  {!routeFound.id ? 'OPEN CHANNEL' : openChannelLabel}
+                  {!routeFound?.id ? 'OPEN CHANNEL' : openChannelLabel}
                 </Text>
               </View>
             )}
@@ -219,15 +225,16 @@ const styles = StyleSheet.create({
   },
   activeTriangle: {
     position: 'absolute',
-    top: -10,
+    top: -4,
     left: '45%',
-    borderLeftWidth: 15,
-    borderLeftColor: 'transparent',
-    borderRightWidth: 15,
-    borderRightColor: 'transparent',
-    borderBottomWidth: 15,
+    height: 20,
+    width: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: 'orange',
+    borderTopWidth: 4,
+    borderTopColor: 'orange',
     borderStyle: 'solid',
-    borderBottomColor: 'orange',
+    transform: [{rotate: '45deg'}],
   },
   send_button: {
     backgroundColor: AppStyle.mainColor,
