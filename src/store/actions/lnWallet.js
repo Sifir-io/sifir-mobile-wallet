@@ -153,7 +153,7 @@ const payBolt = bolt11 => async dispatch => {
     error(err);
     dispatch({
       type: types.LN_WALLET_PAY_BOLT + REJECTED,
-      payload: {error: err},
+      payload: {error: err.err.err},
     });
   }
 };
