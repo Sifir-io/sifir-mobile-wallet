@@ -31,17 +31,17 @@ class SifirBtcTxnConfirmedScreen extends Component {
       error,
       loading = true,
       loaded = false;
-    if (type === C.STR_LN_WALLET_TYPE && this.props.lnWallet.txnDetails) {
-      ({
-        loaded,
-        loading,
-        error,
-        txnDetails: {
-          msatoshi: amount,
-          payment_preimage: address,
-          status: btcSendResult,
-        },
-      } = this.props.lnWallet);
+    if (type === C.STR_LN_WALLET_TYPE) {
+      ({loaded, loading, error} = this.props.lnWallet);
+      if (this.props.lnWallet.txnDetails) {
+        ({
+          txnDetails: {
+            msatoshi: amount,
+            payment_preimage: address,
+            status: btcSendResult,
+          },
+        } = this.props.lnWallet);
+      }
     } else if (this.props.route.params.txnInfo) {
       ({
         txnInfo: {amount, address, isSendTxn},
@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: AppStyle.backgroundColor,
     width: '100%',
+    paddingVertical: 15,
   },
   doneView: {
     width: C.SCREEN_WIDTH * 0.5,
