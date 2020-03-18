@@ -112,6 +112,8 @@ class SifirBtcSendTxnConfirmScreen extends Component {
             <SifirSettingModal
               hideModal={hideModal}
               feeEnabled={feeSettingEnabled}
+              showSettings={true}
+              showManageFunds={true}
             />
           )}
         </Overlay>
