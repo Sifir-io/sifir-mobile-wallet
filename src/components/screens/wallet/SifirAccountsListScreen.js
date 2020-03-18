@@ -12,11 +12,16 @@ import {getBtcWalletList} from '@actions/btcwallet';
 import {getLnNodeInfo} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
 import {ErrorScreen} from '@screens/error';
+import Overlay from 'react-native-modal-overlay';
+import SifirSettingModal from '@elements/SifirSettingModal';
 
 class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
   }
+  state = {
+    modalVisible: false,
+  };
 
   componentDidMount() {
     // FIXME combine to one init function
@@ -31,6 +36,12 @@ class SifirAccountsListScreen extends React.Component {
   componentWillUnmount() {
     this.stopLoading();
   }
+
+  handleMenuBtn() {
+    this.setState({modalVisible: true});
+  }
+
+  onClose = () => this.setState({modalVisible: false});
 
   render() {
     const CARD_SIZE = C.SCREEN_WIDTH / 2 - 40;
@@ -64,7 +75,7 @@ class SifirAccountsListScreen extends React.Component {
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => this.handleMenuBtn()}>
             <Image source={Images.icon_setting} style={styles.settingImage} />
           </TouchableOpacity>
         </View>
@@ -99,6 +110,23 @@ class SifirAccountsListScreen extends React.Component {
               );
             })}
         </View>
+        <Overlay
+          visible={this.state.modalVisible}
+          onClose={this.onClose}
+          closeOnTouchOutside
+          animationType="zoomIn"
+          containerStyle={styles.overlayContainer}
+          childrenWrapperStyle={styles.dlgChild}
+          animationDuration={500}>
+          {hideModal => (
+            <SifirSettingModal
+              hideModal={hideModal}
+              showOpenChannel={true}
+              showTopUp={true}
+              showWithdraw={true}
+            />
+          )}
+        </Overlay>
       </View>
     );
   }
@@ -137,6 +165,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  overlayContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
   },
 });
 
