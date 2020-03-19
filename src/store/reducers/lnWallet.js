@@ -165,6 +165,31 @@ const lnWallet = createReducer(initialState)({
     loading: false,
     loaded: false,
   }),
+  [types.LN_WALLET_GET_NEW_ADDRESS + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_GET_NEW_ADDRESS + FULFILLED]: (
+    state,
+    {payload: {address}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    address,
+  }),
+  [types.LN_WALLET_GET_NEW_ADDRESS + REJECTED]: (
+    state,
+    {payload: {address}},
+  ) => ({
+    ...state,
+    address,
+    loading: false,
+    loaded: false,
+  }),
 });
 
 export default lnWallet;

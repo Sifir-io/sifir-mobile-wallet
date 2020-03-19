@@ -222,6 +222,25 @@ const openAndFundPeerChannel = payload => async dispatch => {
   }
 };
 
+const getNewAddress = nodeId => async dispatch => {
+  dispatch({type: types.LN_WALLET_GET_NEW_ADDRESS + PENDING});
+  try {
+    await dispatch(initLnClient());
+    const address = await lnClient.getNewAddress(nodeId);
+    dispatch({
+      type: types.LN_WALLET_GET_NEW_ADDRESS + FULFILLED,
+      payload: {address},
+    });
+    return address;
+  } catch (err) {
+    dispatch({
+      type: types.LN_WALLET_GET_NEW_ADDRESS + REJECTED,
+      payload: {error: err},
+    });
+    error(err);
+  }
+};
+
 export {
   getFunds,
   getLnNodeInfo,
@@ -232,4 +251,5 @@ export {
   getPeers,
   createInvoice,
   openAndFundPeerChannel,
+  getNewAddress,
 };
