@@ -29,25 +29,31 @@ class SifirGetAddrScreen extends Component {
     if (data === null) {
       return this.setState({showModal: false});
     }
-    const {
-      walletInfo: {type},
-    } = this.props.route.params;
+    const {txnType} = this.props.route.params;
     this.setState(
       {
         scannedQRdata: data,
         showModal: false,
       },
       () => {
-        type === C.STR_LN_WALLET_TYPE && this.handleBoltScanned();
+        if (txnType === C.STR_LN_WITHDRAW) {
+          this.handleAddressScanned();
+        } else {
+          this.handleBoltScanned();
+        }
       },
     );
   };
 
   handleBoltScanned = async () => {
-    const {walletInfo} = this.props.route.params;
     const {scannedQRdata} = this.state;
     const invoice = await this.props.decodeBolt(scannedQRdata);
-    // TODO change validation condition if required
+    const {
+      walletInfo,
+      txnType,
+      walletInfo: {type},
+    } = this.props.route.params;
+
     if (invoice?.amount_msat) {
       this.props.navigation.navigate('LnInvoiceConfirm', {
         invoice,
@@ -57,13 +63,27 @@ class SifirGetAddrScreen extends Component {
     }
   };
 
+  handleAddressScanned = () => {
+    const {
+      walletInfo,
+      txnType,
+      walletInfo: {type},
+    } = this.props.route.params;
+
+    const {scannedQRdata} = this.state;
+    this.props.navigation.navigate('BtcSendTxnInputAmount', {
+      txnInfo: {address: scannedQRdata},
+      walletInfo,
+    });
+  };
   handleContinueBtn = async () => {
     const {
       walletInfo,
+      txnType,
       walletInfo: {type},
     } = this.props.route.params;
     const {scannedQRdata} = this.state;
-    if (type === C.STR_LN_WALLET_TYPE) {
+    if (type === C.STR_LN_WALLET_TYPE && txnType !== C.STR_LN_WITHDRAW) {
       const invoice = await this.props.decodeBolt(scannedQRdata);
       if (invoice?.amount_msat) {
         this.props.navigation.navigate('LnInvoiceConfirm', {
@@ -74,7 +94,7 @@ class SifirGetAddrScreen extends Component {
       }
     } else {
       this.props.navigation.navigate('BtcSendTxnInputAmount', {
-        txnInfo: {scannedQRdata},
+        txnInfo: {address: scannedQRdata},
         walletInfo,
       });
     }
@@ -90,10 +110,13 @@ class SifirGetAddrScreen extends Component {
     const {loading, error} = this.props.lnWallet;
     const {
       walletInfo,
+      txnType,
       walletInfo: {type},
     } = this.props.route.params;
     const placeHolder =
-      type === C.STR_LN_WALLET_TYPE ? C.STR_Enter_bolt : C.STR_Enter_addr;
+      type === C.STR_LN_WALLET_TYPE && txnType !== C.STR_LN_WITHDRAW
+        ? C.STR_Enter_bolt
+        : C.STR_Enter_addr;
     if (error && scannedQRdata) {
       return (
         <ErrorScreen
@@ -115,7 +138,7 @@ class SifirGetAddrScreen extends Component {
           <TouchableOpacity>
             <View
               style={styles.backNavView}
-              onTouchEnd={() => navigate('Account')}>
+              onTouchEnd={() => navigate('Account', {walletInfo})}>
               <Image source={Images.icon_back} style={styles.backImg} />
               <Image source={Images.icon_btc_cir} style={styles.btcImg} />
               <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
