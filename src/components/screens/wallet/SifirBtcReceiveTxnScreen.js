@@ -14,6 +14,7 @@ import SifirQRCode from '@elements/SifirQRCode';
 import Share from 'react-native-share';
 
 import {getWalletAddress} from '@actions/btcwallet';
+import {getNewAddress} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
 import {log} from '@io/events/';
 import {ErrorScreen} from '@screens/error';
@@ -38,6 +39,9 @@ class SifirBtcReceiveTxnScreen extends Component {
     const {label, type} = this.props.route.params.walletInfo;
     if (type === C.STR_WATCH_WALLET_TYPE) {
       await this.props.getWalletAddress({label, type});
+      await this.setState({showQRCode: true});
+    } else if (type === C.STR_LN_WALLET_TYPE) {
+      await this.props.getNewAddress();
       await this.setState({showQRCode: true});
     }
   }
@@ -72,11 +76,28 @@ class SifirBtcReceiveTxnScreen extends Component {
     await this.props.getWalletAddress({label, type, addrType});
     this.setState({showQRCode: true});
   };
+
+  handleBackBtn = () => {
+    const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
+    const {navigation} = this.props;
+    // if (type === C.STR_WATCH_WALLET_TYPE) {
+    //   navigation.navigate('Account', {walletInfo});
+    // } else {
+    navigation.goBack();
+    // }
+  };
+
   render() {
-    const {navigate} = this.props.navigation;
-    const {label, type} = this.props.route.params.walletInfo;
+    const {walletInfo} = this.props.route.params;
+    const {label, type} = walletInfo;
     const {showQRCode, enableWatchSelection} = this.state;
-    const {loaded, loading, address, error} = this.props.btcWallet;
+    let loaded, loading, address, error;
+    if (type === C.STR_LN_WALLET_TYPE) {
+      ({loaded, loading, address, error} = this.props.lnWallet);
+    } else {
+      ({loaded, loading, address, error} = this.props.btcWallet);
+    }
     if (error) {
       return (
         <ErrorScreen
@@ -98,10 +119,8 @@ class SifirBtcReceiveTxnScreen extends Component {
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
-          <TouchableOpacity>
-            <View
-              style={styles.backNavStyle}
-              onTouchEnd={() => navigate('Account')}>
+          <TouchableOpacity onPress={() => this.handleBackBtn()}>
+            <View style={styles.backNavStyle}>
               <Image source={Images.icon_back} style={styles.backImg} />
               <Image source={Images.icon_btc_cir} style={styles.btcImg} />
               <Text style={styles.backTxt}>{label} Wallet</Text>
@@ -316,10 +335,11 @@ class SifirBtcReceiveTxnScreen extends Component {
 const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
   };
 };
 
-const mapDispatchToProps = {getWalletAddress};
+const mapDispatchToProps = {getWalletAddress, getNewAddress};
 
 export default connect(
   mapStateToProps,
@@ -334,6 +354,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 15,
   },
   loadingView: {justifyContent: 'center', position: 'absolute', top: 40 * C.vh},
   settingView: {
