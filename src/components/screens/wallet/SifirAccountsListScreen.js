@@ -72,6 +72,7 @@ class SifirAccountsListScreen extends React.Component {
         />
       );
     }
+    let lnWalletInfo;
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
@@ -99,6 +100,7 @@ class SifirAccountsListScreen extends React.Component {
           {lnLoaded === true &&
             lnLoading === false &&
             nodeInfo.map((info, i) => {
+              lnWalletInfo = info;
               return (
                 <SifirWalletButton
                   key={info.alias}
@@ -124,6 +126,7 @@ class SifirAccountsListScreen extends React.Component {
               showOpenChannel={true}
               showTopUp={true}
               showWithdraw={true}
+              walletInfo={lnWalletInfo}
             />
           )}
         </Overlay>
