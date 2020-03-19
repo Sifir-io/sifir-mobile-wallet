@@ -15,6 +15,8 @@ import {getRoute, getPeers, payBolt} from '@actions/lnWallet';
 import {ErrorScreen} from '@screens/error';
 import {connect} from 'react-redux';
 import moment from 'moment';
+import SifirBTCAmount from '@elements/SifirBTCAmount';
+
 // FIXME this comes from styles vh not window
 const {width, height} = Dimensions.get('window');
 const SifirLNInvoiceConfirmScreen = props => {
@@ -73,12 +75,13 @@ const SifirLNInvoiceConfirmScreen = props => {
   const {loading, loaded, error} = props.lnWallet;
   const {walletInfo} = props.route.params;
   let openChannelLabel;
+  let channel;
   if (routeFound?.id) {
-    const channel = routeFound.channels[0];
+    channel = routeFound.channels[0];
     openChannelLabel = `${channel.channel_id.slice(
       0,
       4,
-    )}-${channel.channel_id.slice(-4)} - ${channel.spendable_msatoshi}`;
+    )}-${channel.channel_id.slice(-4)} - `;
   }
   if (error) {
     return (
@@ -163,6 +166,12 @@ const SifirLNInvoiceConfirmScreen = props => {
                     styles.text_large,
                   ]}>
                   {!routeFound?.id ? 'OPEN CHANNEL' : openChannelLabel}
+                  {routeFound?.id && (
+                    <SifirBTCAmount
+                      amount={channel.spendable_msatoshi}
+                      unit="MSAT"
+                    />
+                  )}
                 </Text>
               </View>
             )}
