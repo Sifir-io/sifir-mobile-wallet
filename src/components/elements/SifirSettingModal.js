@@ -9,7 +9,7 @@ class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
 
   render() {
-    const {navigation} = this.props;
+    const {navigation, walletInfo} = this.props;
     return (
       <>
         <View>
@@ -97,7 +97,14 @@ class SifirSettingModal extends Component {
                   </TouchableOpacity>
                 )}
                 {this.props.showTopUp && (
-                  <TouchableOpacity style={{flex: 1}}>
+                  <TouchableOpacity
+                    style={{flex: 1}}
+                    onPress={() => {
+                      this.props.hideModal();
+                      this.props.navigation.navigate('BtcReceiveTxn', {
+                        walletInfo,
+                      });
+                    }}>
                     <View
                       style={{
                         flex: 1,
@@ -116,7 +123,15 @@ class SifirSettingModal extends Component {
                   </TouchableOpacity>
                 )}
                 {this.props.showWithdraw && (
-                  <TouchableOpacity style={{flex: 1}}>
+                  <TouchableOpacity
+                    style={{flex: 1}}
+                    onPress={() => {
+                      this.props.hideModal();
+                      this.props.navigation.navigate('GetAddress', {
+                        walletInfo,
+                        txnType: C.STR_LN_WITHDRAW,
+                      });
+                    }}>
                     <View
                       style={{
                         flex: 1,
