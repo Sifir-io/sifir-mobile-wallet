@@ -8,7 +8,10 @@ import {
 } from 'react-native';
 
 import {AppStyle, C} from '@common/index';
-export default class SifirBtcSendTxnInputAmountScreen extends Component {
+import {connect} from 'react-redux';
+import {getFunds} from '@actions/lnWallet';
+
+class SifirBtcSendTxnInputAmountScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
@@ -17,9 +20,15 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
     amount: 0,
     validAmount: false,
   };
+
+  componentDidMount() {
+    this.props.getFunds();
+  }
+
   goToConfirm = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
     const {amount} = this.state;
+    console.log('txnInfo----------', txnInfo);
     this.props.navigation.navigate('BtcSendTxnConfirm', {
       txnInfo: {...txnInfo, amount},
       walletInfo,
@@ -58,9 +67,12 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
             <Text style={styles.recTxt}>{address}</Text>
             <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
             <TouchableOpacity onPress={() => this.checkAndSetInput(balance)}>
-              <Text style={styles.smallWhiteText}>{`${
-                C.STR_Wallet_balance
-              }: ${balance}`}</Text>
+              <Text style={styles.smallWhiteText}>
+                {`${C.STR_Wallet_balance}: ${balance ||
+                  this.props.lnWallet?.balance ||
+                  '.....  '} `}
+                MSAT
+              </Text>
             </TouchableOpacity>
           </View>
           <View style={{marginTop: 15}}>
@@ -107,6 +119,20 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
+  };
+};
+
+const mapDispatchToProps = {getFunds};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirBtcSendTxnInputAmountScreen);
 
 const styles = StyleSheet.create({
   mainView: {
