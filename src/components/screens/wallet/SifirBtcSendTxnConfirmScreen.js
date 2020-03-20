@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {sendBitcoin} from '@actions/btcwallet';
+import {withdrawFunds} from '@actions/lnWallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
@@ -17,12 +18,20 @@ class SifirBtcSendTxnConfirmScreen extends Component {
   };
   sendBtc = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
-    const {address, amount} = txnInfo;
-    this.props.sendBitcoin({address, amount});
-    this.props.navigation.navigate('BtcTxnConfirmed', {
-      txnInfo: {...txnInfo, isSendTxn: true},
-      walletInfo,
-    });
+    const {address, amount, txnType} = txnInfo;
+    if (txnType === C.STR_LN_WITHDRAW) {
+      this.props.withdrawFunds(address, amount);
+      this.props.navigation.navigate('BtcTxnConfirmed', {
+        txnInfo: {...txnInfo, isSendTxn: true},
+        walletInfo,
+      });
+    } else {
+      this.props.sendBitcoin({address, amount});
+      this.props.navigation.navigate('BtcTxnConfirmed', {
+        txnInfo: {...txnInfo, isSendTxn: true},
+        walletInfo,
+      });
+    }
   };
 
   render() {
@@ -124,10 +133,11 @@ class SifirBtcSendTxnConfirmScreen extends Component {
 const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
   };
 };
 
-const mapDispatchToProps = {sendBitcoin};
+const mapDispatchToProps = {sendBitcoin, withdrawFunds};
 
 export default connect(
   mapStateToProps,
