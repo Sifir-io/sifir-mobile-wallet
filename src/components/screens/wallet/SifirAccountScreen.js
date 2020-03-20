@@ -27,10 +27,7 @@ class SifirAccountScreen extends React.Component {
         inChannelBalance,
         outputBalance,
         invoices,
-      } = await this.props.getLnWalletDetails({
-        label,
-        type,
-      });
+      } = await this.props.getLnWalletDetails();
       const balance = inChannelBalance + outputBalance;
       this.setState({balance, invoices});
     } else {
