@@ -83,10 +83,19 @@ const getFunds = () => async dispatch => {
   dispatch({type: types.LN_WALLET_GET_FUNDS + PENDING});
   try {
     await dispatch(initLnClient());
-    const {channels, outputs} = lnClient.listFunds();
+    const {channels, outputs} = await lnClient.listFunds();
+    const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
+      balance += channel_sat;
+      return balance;
+    }, 0);
+    const outputBalance = outputs.reduce((balance, {value}) => {
+      balance += value;
+      return balance;
+    }, 0);
+    const balance = inChannelBalance + outputBalance;
     dispatch({
       type: types.LN_WALLET_GET_FUNDS + FULFILLED,
-      payload: {channels, outputs},
+      payload: {balance},
     });
   } catch (err) {
     error(err);
@@ -241,6 +250,25 @@ const getNewAddress = nodeId => async dispatch => {
   }
 };
 
+const withdrawFunds = (destination, amount) => async dispatch => {
+  dispatch({type: types.LN_WALLET_WITHDRAW_FUNDS + PENDING});
+  try {
+    await dispatch(initLnClient());
+    const txnDetails = await lnClient.withdrawFunds(destination, amount);
+    dispatch({
+      type: types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED,
+      payload: {txnDetails},
+    });
+    return txnDetails;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.LN_WALLET_WITHDRAW_FUNDS + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
+
 export {
   getFunds,
   getLnNodeInfo,
@@ -252,4 +280,5 @@ export {
   createInvoice,
   openAndFundPeerChannel,
   getNewAddress,
+  withdrawFunds,
 };
