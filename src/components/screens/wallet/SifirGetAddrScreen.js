@@ -64,15 +64,10 @@ class SifirGetAddrScreen extends Component {
   };
 
   handleAddressScanned = () => {
-    const {
-      walletInfo,
-      txnType,
-      walletInfo: {type},
-    } = this.props.route.params;
-
+    const {walletInfo, txnType} = this.props.route.params;
     const {scannedQRdata} = this.state;
     this.props.navigation.navigate('BtcSendTxnInputAmount', {
-      txnInfo: {address: scannedQRdata},
+      txnInfo: {address: scannedQRdata, txnType},
       walletInfo,
     });
   };
@@ -94,7 +89,7 @@ class SifirGetAddrScreen extends Component {
       }
     } else {
       this.props.navigation.navigate('BtcSendTxnInputAmount', {
-        txnInfo: {address: scannedQRdata},
+        txnInfo: {address: scannedQRdata, txnType},
         walletInfo,
       });
     }
