@@ -37,12 +37,12 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_GET_FUNDS + FULFILLED]: (state, {payload: {funds}}) => ({
+  [types.LN_WALLET_GET_FUNDS + FULFILLED]: (state, {payload: {balance}}) => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    funds,
+    balance,
   }),
   [types.LN_WALLET_GET_FUNDS + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
@@ -187,6 +187,28 @@ const lnWallet = createReducer(initialState)({
   ) => ({
     ...state,
     address,
+    loading: false,
+    loaded: false,
+  }),
+  [types.LN_WALLET_WITHDRAW_FUNDS + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED]: (
+    state,
+    {payload: {txnDetails}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    txnDetails,
+  }),
+  [types.LN_WALLET_WITHDRAW_FUNDS + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
     loading: false,
     loaded: false,
   }),
