@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import {AppStyle, Images, C} from '@common/index';
 import {SifirChannelProgress} from '@elements/SifirChannelProgress';
@@ -100,48 +101,60 @@ const SifirLNInvoiceConfirmScreen = props => {
   }
   return (
     <View style={styles.container}>
-      <View style={[styles.margin_30, styles.flex1]}>
-        <View style={[styles.funding_wrapper]}>
-          <Text style={[styles.textBright, styles.text_11, styles.text_bold]}>
-            INVOICE AMOUNT
-          </Text>
-          <View style={[styles.textRow]}>
-            <Text style={[styles.text_white, styles.text_x_large]}>
-              {amount_msat}
+      <ScrollView
+        style={styles.sv}
+        contentContainerStyle={styles.contentContainer}>
+        <View style={[styles.margin_30, styles.flex1]}>
+          <View style={[styles.funding_wrapper]}>
+            <Text style={[styles.textBright, styles.text_11, styles.text_bold]}>
+              INVOICE AMOUNT
             </Text>
-          </View>
-          <Text style={[styles.text_white, styles.text_18]}>{description}</Text>
-          <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
-            EXPIRES IN{'  '}
+            <View style={[styles.textRow]}>
+              <Text style={[styles.text_white, styles.text_x_large]}>
+                {amount_msat}
+              </Text>
+            </View>
             <Text style={[styles.text_white, styles.text_18]}>
-              {moment(Date.now() + expiry)
-                .fromNow()
-                .substr(3)}{' '}
-              from now
+              {description}
             </Text>
-          </Text>
-        </View>
-        <View style={[styles.margin_15, styles.margin_top_50]}>
-          <View style={[styles.flex1, styles.justify_center]}>
-            <SifirChannelProgress
-              routes={routes}
-              loaded={loading ? progress : loaded ? 100 : 0}
-            />
+            <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
+              EXPIRES IN{'  '}
+              <Text style={[styles.text_white, styles.text_18]}>
+                {/* convert seconds to MS by * with 1000 */}
+                {moment(Date.now() + expiry * 1000)
+                  .fromNow()
+                  .substr(3)}{' '}
+                from now
+              </Text>
+            </Text>
+          </View>
+          <View style={[styles.margin_15, styles.margin_top_50]}>
+            <View style={[styles.flex1, styles.justify_center]}>
+              <SifirChannelProgress
+                routes={routes}
+                loaded={loading ? progress : loaded ? 100 : 0}
+              />
+            </View>
+          </View>
+          <View style={styles.justify_center}>
+            <TouchableOpacity
+              disabled={!loaded || loading || routes.length === 0}
+              style={styles.send_button}
+              onLongPress={() => handleSendButton()}>
+              <Text
+                style={[
+                  styles.text_large,
+                  styles.text_center,
+                  styles.text_bold,
+                ]}>
+                SEND
+              </Text>
+              <Image source={Images.icon_up_dark} style={styles.send_icon} />
+            </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.justify_center}>
-          <TouchableOpacity
-            disabled={!loaded || loading || routes.length === 0}
-            style={styles.send_button}
-            onLongPress={() => handleSendButton()}>
-            <Text
-              style={[styles.text_large, styles.text_center, styles.text_bold]}>
-              SEND
-            </Text>
-            <Image source={Images.icon_up_dark} style={styles.send_icon} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      </ScrollView>
+
       {loaded && peers.length > 0 && (
         <View style={styles.justify_end}>
           <SlidingPanel
@@ -368,5 +381,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: AppStyle.mainColor,
+  },
+  sv: {
+    marginBottom: 60,
+  },
+  contentContainer: {
+    paddingBottom: 30,
   },
 });
