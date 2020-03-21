@@ -44,7 +44,7 @@ const getLnNodeInfo = () => async dispatch => {
     error(err);
     dispatch({
       type: types.LN_WALLET_NODEINFO + REJECTED,
-      payload: {error: err},
+      payload: {nodeError: err},
     });
   }
 };
@@ -118,7 +118,7 @@ const decodeBolt = bolt11 => async dispatch => {
   } catch (err) {
     dispatch({
       type: types.LN_WALLET_DECODE_BOLT + REJECTED,
-      payload: {error: err},
+      payload: {error: err.err.err},
     });
   }
 };

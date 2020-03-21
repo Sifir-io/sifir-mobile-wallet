@@ -52,7 +52,7 @@ class SifirAccountsListScreen extends React.Component {
         nodeInfo,
         loaded: lnLoaded,
         loading: lnLoading,
-        error: lnError,
+        nodeError: lnError,
       },
     } = this.props;
     if (error || lnError) {
@@ -76,11 +76,13 @@ class SifirAccountsListScreen extends React.Component {
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
-          <TouchableOpacity onPress={() => this.handleMenuBtn()}>
+          <TouchableOpacity
+            disabled={loading || lnLoading}
+            onPress={() => this.handleMenuBtn()}>
             <Image source={Images.icon_setting} style={styles.settingImage} />
           </TouchableOpacity>
         </View>
-        {loading === true && (
+        {loading && (
           <View style={styles.loading}>
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
@@ -97,6 +99,11 @@ class SifirAccountsListScreen extends React.Component {
                 navigate={navigate}
               />
             ))}
+          {loaded && lnLoading && (
+            <View style={styles.LnSpinner}>
+              <ActivityIndicator size="large" color={AppStyle.mainColor} />
+            </View>
+          )}
           {lnLoaded === true &&
             lnLoading === false &&
             nodeInfo.map((info, i) => {
@@ -173,6 +180,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 15,
   },
+  LnSpinner: {flex: 1, justifyContent: 'center', alignItems: 'center'},
 });
 
 const mapStateToProps = state => {

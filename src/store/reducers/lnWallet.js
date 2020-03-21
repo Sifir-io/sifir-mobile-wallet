@@ -25,9 +25,9 @@ const lnWallet = createReducer(initialState)({
     loaded: true,
     error: null,
   }),
-  [types.LN_WALLET_NODEINFO + REJECTED]: (state, {payload: {error}}) => ({
+  [types.LN_WALLET_NODEINFO + REJECTED]: (state, {payload: {nodeError}}) => ({
     ...state,
-    error,
+    nodeError,
     loading: false,
     loaded: false,
   }),
