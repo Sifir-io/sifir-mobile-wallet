@@ -18,26 +18,23 @@ class SifirBtcSendTxnConfirmScreen extends Component {
   };
   sendBtc = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
+    console.log('txnInfo----------', txnInfo);
     const {address, amount, txnType} = txnInfo;
     if (txnType === C.STR_LN_WITHDRAW) {
       this.props.withdrawFunds(address, amount);
-      this.props.navigation.navigate('BtcTxnConfirmed', {
-        txnInfo: {...txnInfo, isSendTxn: true},
-        walletInfo,
-      });
     } else {
       this.props.sendBitcoin({address, amount});
-      this.props.navigation.navigate('BtcTxnConfirmed', {
-        txnInfo: {...txnInfo, isSendTxn: true},
-        walletInfo,
-      });
     }
+    this.props.navigation.navigate('BtcTxnConfirmed', {
+      txnInfo: {...txnInfo, isSendTxn: true},
+      walletInfo,
+    });
   };
 
   render() {
     const {
       walletInfo: {feeSettingEnabled},
-      txnInfo: {address, amount},
+      txnInfo: {address, amount, txnType},
     } = this.props.route.params;
     const amountFontSize = (C.vw * 80) / amount.length;
     const btcUnitFontSize = amountFontSize * 0.6;
@@ -80,7 +77,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
                 fontSize: btcUnitFontSize,
                 marginBottom: 5,
               }}>
-              {C.STR_BTC}
+              {txnType === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
             </Text>
           </View>
           <View style={styles.lineView} />
