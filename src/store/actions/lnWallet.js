@@ -231,11 +231,11 @@ const openAndFundPeerChannel = payload => async dispatch => {
   }
 };
 
-const getNewAddress = nodeId => async dispatch => {
+const getNewAddress = () => async dispatch => {
   dispatch({type: types.LN_WALLET_GET_NEW_ADDRESS + PENDING});
   try {
     await dispatch(initLnClient());
-    const address = await lnClient.getNewAddress(nodeId);
+    const address = await lnClient.getNewAddress();
     dispatch({
       type: types.LN_WALLET_GET_NEW_ADDRESS + FULFILLED,
       payload: {address},
@@ -250,21 +250,21 @@ const getNewAddress = nodeId => async dispatch => {
   }
 };
 
-const withdrawFunds = (destination, amount) => async dispatch => {
+const withdrawFunds = (address, amount) => async dispatch => {
   dispatch({type: types.LN_WALLET_WITHDRAW_FUNDS + PENDING});
   try {
     await dispatch(initLnClient());
-    const txnDetails = await lnClient.withdrawFunds(destination, amount);
+    const btcSendResult = await lnClient.withdrawFunds(address, amount);
     dispatch({
       type: types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED,
-      payload: {txnDetails},
+      payload: {btcSendResult},
     });
-    return txnDetails;
+    return btcSendResult;
   } catch (err) {
     error(err);
     dispatch({
       type: types.LN_WALLET_WITHDRAW_FUNDS + REJECTED,
-      payload: {error: err},
+      payload: {error: err.err.err},
     });
   }
 };

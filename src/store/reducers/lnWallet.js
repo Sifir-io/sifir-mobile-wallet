@@ -198,13 +198,13 @@ const lnWallet = createReducer(initialState)({
   }),
   [types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED]: (
     state,
-    {payload: {txnDetails}},
+    {payload: {btcSendResult}},
   ) => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    txnDetails,
+    btcSendResult,
   }),
   [types.LN_WALLET_WITHDRAW_FUNDS + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
