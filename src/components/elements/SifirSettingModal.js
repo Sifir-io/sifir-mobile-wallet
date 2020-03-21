@@ -5,6 +5,30 @@ import Slider from 'react-native-slider';
 
 import {Images, AppStyle, C} from '@common/index';
 import {useNavigation} from '@react-navigation/native';
+const MenuListItem = ({label, icon, onPress}) => {
+  return (
+    <TouchableOpacity style={{flex: 1}} onPress={onPress}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <Image
+          // TODO replace icon for Open Channels
+          resizeMode="contain"
+          source={icon}
+          style={{
+            width: 37,
+            height: 37,
+          }}
+        />
+        <Text style={styles.textStyle}>{label}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
 
@@ -54,126 +78,66 @@ class SifirSettingModal extends Component {
             {this.state.curMenu === 0 && (
               <View style={{flex: 1}}>
                 {this.props.showManageFunds && (
-                  <TouchableOpacity style={{flex: 1}}>
-                    <View style={styles.rowStyle}>
-                      <Image
-                        source={Images.icon_funds}
-                        style={{width: 33, height: 30}}
-                      />
-                      <Text style={styles.textStyle}>{C.STR_Manage_Fund}</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <MenuListItem
+                    icon={Images.icon_funds}
+                    label={C.STR_Manage_Fund}
+                    onPress={() => {
+                      this.setState({curMenu: 1});
+                    }}
+                  />
                 )}
                 {this.props.feeSettingEnabled && (
-                  <TouchableOpacity style={{flex: 1}}>
-                    <View
-                      style={styles.rowStyle}
-                      onTouchEnd={() => this.setState({curMenu: 1})}>
-                      <Image
-                        source={Images.icon_clock}
-                        style={{width: 30, height: 30}}
-                      />
-                      <Text style={styles.textStyle}>{C.STR_SET_FEES}</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <MenuListItem
+                    icon={Images.icon_clock}
+                    label={C.STR_SET_FEES}
+                    onPress={() => {
+                      this.setState({curMenu: 1});
+                    }}
+                  />
                 )}
                 {this.props.showSettings && (
-                  <TouchableOpacity style={{flex: 1}}>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Image
-                        source={Images.icon_dollar}
-                        style={{
-                          width: 30,
-                          height: 37,
-                        }}
-                      />
-                      <Text style={styles.textStyle}>{C.STR_SETTINGS}</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <MenuListItem
+                    icon={Images.icon_dollar}
+                    label={C.STR_SETTINGS}
+                    onPress={() => {
+                      this.props.hideModal();
+                    }}
+                  />
                 )}
                 {this.props.showTopUp && (
-                  <TouchableOpacity
-                    style={{flex: 1}}
+                  <MenuListItem
+                    icon={Images.icon_funds}
+                    label={C.TOP_UP}
                     onPress={() => {
                       this.props.hideModal();
                       this.props.navigation.navigate('BtcReceiveTxn', {
                         walletInfo,
                       });
-                    }}>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Image
-                        source={Images.icon_funds}
-                        style={{
-                          width: 40,
-                          height: 37,
-                        }}
-                      />
-                      <Text style={styles.textStyle}>{C.TOP_UP}</Text>
-                    </View>
-                  </TouchableOpacity>
+                    }}
+                  />
                 )}
                 {this.props.showWithdraw && (
-                  <TouchableOpacity
-                    style={{flex: 1}}
+                  <MenuListItem
+                    icon={Images.icon_dollar}
+                    label={C.WITHDRAW}
                     onPress={() => {
                       this.props.hideModal();
                       this.props.navigation.navigate('GetAddress', {
                         walletInfo,
                         txnType: C.STR_LN_WITHDRAW,
                       });
-                    }}>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Image
-                        // TODO replace icon
-                        source={Images.icon_dollar}
-                        style={{
-                          width: 30,
-                          height: 37,
-                        }}
-                      />
-                      <Text style={styles.textStyle}>{C.WITHDRAW}</Text>
-                    </View>
-                  </TouchableOpacity>
+                    }}
+                  />
                 )}
                 {this.props.showOpenChannel && (
-                  <TouchableOpacity
-                    style={{flex: 1}}
+                  <MenuListItem
+                    icon={Images.icon_dollar}
+                    label={C.Open_Channels}
                     onPress={() => {
                       this.props.hideModal();
                       navigation.navigate('LNChannelRoute');
-                    }}>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Image
-                        // TODO replace icon
-                        source={Images.icon_dollar}
-                        style={{
-                          width: 30,
-                          height: 37,
-                        }}
-                      />
-                      <Text style={styles.textStyle}>{C.Open_Channels}</Text>
-                    </View>
-                  </TouchableOpacity>
+                    }}
+                  />
                 )}
               </View>
             )}
