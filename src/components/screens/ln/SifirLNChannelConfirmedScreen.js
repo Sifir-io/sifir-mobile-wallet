@@ -14,7 +14,7 @@ class SifirLNChannelConfirmedScreen extends Component {
     const {fundingResponse, walletInfo} = this.props.route.params;
     console.log('fundingResponse', fundingResponse);
     return (
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.sv}>
         <View style={styles.mainView}>
           <View style={styles.container}>
             <Image source={Images.icon_done} style={styles.checkImg} />
@@ -63,6 +63,9 @@ export default connect(
 )(SifirLNChannelConfirmedScreen);
 
 const styles = StyleSheet.create({
+  sv: {
+    flex: 1,
+  },
   container: {
     alignItems: 'center',
     flex: 3,
@@ -72,6 +75,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: AppStyle.backgroundColor,
     width: '100%',
+    paddingVertical: 15,
   },
   doneView: {
     width: C.SCREEN_WIDTH * 0.5,
