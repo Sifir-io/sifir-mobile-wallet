@@ -16,8 +16,12 @@ import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 class SifirBtcTxnConfirmedScreen extends Component {
   backToAccount = () => {
-    const {walletInfo} = this.props.route.params;
-    this.props.navigation.navigate('Account', {walletInfo});
+    const {type, walletInfo} = this.props.route.params;
+    if (type === C.STR_LN_WALLET_TYPE) {
+      this.props.navigation.navigate('Account', {walletInfo});
+    } else {
+      this.props.navigation.navigate('AccountList');
+    }
   };
 
   render() {
@@ -32,6 +36,7 @@ class SifirBtcTxnConfirmedScreen extends Component {
       loading = true,
       loaded = false;
     if (type === C.STR_LN_WALLET_TYPE) {
+      // LN Transaction
       ({loaded, loading, error} = this.props.lnWallet);
       if (this.props.lnWallet.txnDetails) {
         ({
@@ -42,7 +47,14 @@ class SifirBtcTxnConfirmedScreen extends Component {
           },
         } = this.props.lnWallet);
       }
+    } else if (this.props.route.params.txnInfo?.txnType === C.STR_LN_WITHDRAW) {
+      // LN_Withdraw
+      ({
+        txnInfo: {amount, address, isSendTxn},
+      } = this.props.route.params);
+      ({loaded, loading, btcSendResult, error} = this.props.lnWallet);
     } else if (this.props.route.params.txnInfo) {
+      //  BTC Transaction
       ({
         txnInfo: {amount, address, isSendTxn},
       } = this.props.route.params);
@@ -52,7 +64,11 @@ class SifirBtcTxnConfirmedScreen extends Component {
       return (
         <ErrorScreen
           title={C.STR_ERROR_btc_action}
-          desc={C.STR_ERROR_txn_error}
+          desc={
+            type === C.STR_LN_WALLET_TYPE
+              ? C.STR_ERROR_txn_error
+              : C.STR_ERROR_btc_txn_error
+          }
           error={error}
           actions={[
             {
