@@ -28,7 +28,6 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
   goToConfirm = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
     const {amount} = this.state;
-    console.log('txnInfo----------', txnInfo);
     this.props.navigation.navigate('BtcSendTxnConfirm', {
       txnInfo: {...txnInfo, amount},
       walletInfo,
@@ -56,7 +55,7 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
   render() {
     const {amount, validAmount} = this.state;
     const {
-      txnInfo: {address},
+      txnInfo: {address, txnType},
       walletInfo: {balance},
     } = this.props.route.params;
     return (
@@ -71,7 +70,7 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
                 {`${C.STR_Wallet_balance}: ${balance ||
                   this.props.lnWallet?.balance ||
                   '.....  '} `}
-                MSAT
+                {txnType === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
               </Text>
             </TouchableOpacity>
           </View>
@@ -85,7 +84,9 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
                 autoFocus={true}
                 onChangeText={this.checkAndSetInput}
               />
-              <Text style={styles.btcTxt}>{C.STR_BTC}</Text>
+              <Text style={styles.btcTxt}>
+                {txnType === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
+              </Text>
             </View>
             <View style={styles.lineStyle} />
           </View>
