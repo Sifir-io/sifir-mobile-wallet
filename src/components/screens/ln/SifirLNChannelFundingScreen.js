@@ -7,10 +7,11 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  TextInput,
+  Alert,
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {Slider} from 'react-native-elements';
-import {TextInput} from 'react-native-gesture-handler';
 import {openAndFundPeerChannel} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 import {ErrorScreen} from '@screens/error';
@@ -28,13 +29,20 @@ const SifirLNChannelFundingScreen = ({
   const {id, nodeAlias} = selectedNode;
   const {loading, loaded, error} = lnWallet;
   const handleOpenChannelBtn = async () => {
-    const fundingResponse = await openAndFundPeerChannel({
-      peer: nodeAddress,
-      msatoshi: fundingAmount,
-    });
-    // checking !== failed to handle timedout exception too
-    if (fundingResponse.result !== 'failed') {
-      navigation.navigate('LnChannelConfirmed', {fundingResponse, walletInfo});
+    if (!isNaN(fundingAmount) && fundingAmount > 0) {
+      const fundingResponse = await openAndFundPeerChannel({
+        peer: nodeAddress,
+        msatoshi: fundingAmount,
+      });
+      // checking !== failed to handle timedout exception too
+      if (fundingResponse.result !== 'failed') {
+        navigation.navigate('LnChannelConfirmed', {
+          fundingResponse,
+          walletInfo,
+        });
+      }
+    } else {
+      Alert.alert('Error', 'Please enter a valid funding amount.');
     }
   };
 
@@ -79,11 +87,16 @@ const SifirLNChannelFundingScreen = ({
               style={[styles.textBright, styles.text_normal, styles.text_bold]}>
               FUNDING AMOUNT
             </Text>
-            <TextInput
-              keyboardType="number-pad"
-              style={styles.fundInputField}
-              onChangeText={amount => setFundingAmount(amount)}
-            />
+            <View style={styles.fundingAmountInputContainer}>
+              <TextInput
+                keyboardType="number-pad"
+                style={styles.fundInputField}
+                autoFocus={true}
+                value={fundingAmount.toString()}
+                onChangeText={amount => setFundingAmount(amount)}
+              />
+              <Text style={styles.fundingAmountUnit}>{C.STR_BTC}</Text>
+            </View>
           </View>
 
           <View style={[styles.margin_15, styles.margin_top_30]}>
@@ -110,7 +123,11 @@ const SifirLNChannelFundingScreen = ({
             <Text style={[styles.textBright, styles.margin_top_15]}>Port</Text>
             <Text style={[styles.text_white, styles.text_large]}>Public</Text>
 
-            <Text style={[styles.textBright, styles.margin_top_15]}>Fees</Text>
+            {ln_enable_set_fees && (
+              <Text style={[styles.textBright, styles.margin_top_15]}>
+                Fees
+              </Text>
+            )}
             <View style={[styles.space_between, styles.mt7]}>
               {ln_enable_set_fees && (
                 <View style={styles.outline_button}>
@@ -124,17 +141,19 @@ const SifirLNChannelFundingScreen = ({
                   styles.slider_wrapper,
                   {marginLeft: ln_enable_set_fees ? 20 : 0},
                 ]}>
-                <Slider
-                  disabled={!ln_enable_set_fees}
-                  value={0.6}
-                  onValueChange={value => {}}
-                  style={
-                    ln_enable_set_fees ? styles.width_60 : styles.width_100
-                  }
-                  thumbTintColor="white"
-                  maximumTrackTintColor="rgba(45, 171, 226,0.2)"
-                  minimumTrackTintColor="rgb(45, 171, 226)"
-                />
+                {ln_enable_set_fees && (
+                  <Slider
+                    disabled={!ln_enable_set_fees}
+                    value={0.6}
+                    onValueChange={value => {}}
+                    style={
+                      ln_enable_set_fees ? styles.width_60 : styles.width_100
+                    }
+                    thumbTintColor="white"
+                    maximumTrackTintColor="rgba(45, 171, 226,0.2)"
+                    minimumTrackTintColor="rgb(45, 171, 226)"
+                  />
+                )}
                 {ln_enable_set_fees && (
                   <View style={styles.row}>
                     <Text style={styles.textBright}>Approximate wait</Text>
@@ -261,14 +280,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   fundInputField: {
-    width: '90%',
     marginTop: 10,
-    borderWidth: 1,
-    borderColor: AppStyle.mainColor,
     borderRadius: 4,
     color: 'white',
-    fontSize: 18,
-    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: AppStyle.mainColor,
+    fontSize: 60,
+    paddingHorizontal: 10,
     fontFamily: AppStyle.mainFont,
+    paddingBottom: 0,
+  },
+  fundingAmountInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'center',
+  },
+
+  fundingAmountUnit: {
+    color: 'white',
+    fontSize: 30,
+    fontFamily: AppStyle.mainFont,
+    paddingBottom: 10,
   },
 });
