@@ -108,4 +108,6 @@ export const C = {
   STR_ERROR_generating_address:
     'An error occured while trying to generate an address.',
   STR_ERROR_txn_error: 'An error occured while opening a channel',
+  STR_ERROR_btc_txn_error:
+    'An error occured while completing this transaction.',
 };
