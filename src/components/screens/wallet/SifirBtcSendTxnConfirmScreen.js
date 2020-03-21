@@ -18,7 +18,6 @@ class SifirBtcSendTxnConfirmScreen extends Component {
   };
   sendBtc = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
-    console.log('txnInfo----------', txnInfo);
     const {address, amount, txnType} = txnInfo;
     if (txnType === C.STR_LN_WITHDRAW) {
       this.props.withdrawFunds(address, amount);
@@ -28,6 +27,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     this.props.navigation.navigate('BtcTxnConfirmed', {
       txnInfo: {...txnInfo, isSendTxn: true},
       walletInfo,
+      displayUnit: C.STR_MSAT,
     });
   };
 
@@ -38,7 +38,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     } = this.props.route.params;
     const amountFontSize = (C.vw * 80) / amount.length;
     const btcUnitFontSize = amountFontSize * 0.6;
-    const recTxtFontSize = (C.vw * 70) / address.length;
+    const recTxtFontSize = (C.vw * 120) / address.length;
 
     return (
       <View style={styles.mainView}>
@@ -51,11 +51,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
             <Image source={Images.icon_setting} style={styles.settingImg} />
           </TouchableOpacity>
         </View>
-        <View
-          style={{
-            alignItems: 'center',
-            marginTop: 15,
-          }}>
+        <View style={styles.addressContainer}>
           <Text style={styles.recTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
           <Text style={[styles.addrTxt, {fontSize: recTxtFontSize}]}>
             {address}
@@ -63,20 +59,11 @@ class SifirBtcSendTxnConfirmScreen extends Component {
           <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
         </View>
         <View style={styles.valueTxt}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-            }}>
+          <View style={styles.amountContainer}>
             <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
               {amount}
             </Text>
-            <Text
-              style={{
-                color: 'white',
-                fontSize: btcUnitFontSize,
-                marginBottom: 5,
-              }}>
+            <Text style={[styles.amountUniLabel, {fontSize: btcUnitFontSize}]}>
               {txnType === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
             </Text>
           </View>
@@ -91,16 +78,10 @@ class SifirBtcSendTxnConfirmScreen extends Component {
         )}
         <TouchableOpacity
           onLongPress={this.sendBtc}
-          style={{
-            marginTop: 50,
-            alignItems: 'center',
-          }}>
+          style={styles.sendBtnTouchable}>
           <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
             <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
-            <Image
-              source={Images.icon_up_dark}
-              style={{width: 20, height: 20}}
-            />
+            <Image source={Images.icon_up_dark} style={styles.sendImg} />
           </View>
         </TouchableOpacity>
         <Overlay
@@ -108,10 +89,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
           onClose={this.onClose}
           closeOnTouchOutside
           animationType="zoomIn"
-          containerStyle={{
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: 15,
-          }}
+          containerStyle={styles.overlayContainer}
           childrenWrapperStyle={styles.dlgChild}
           animationDuration={500}>
           {hideModal => (
@@ -236,4 +214,25 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
+  addressContainer: {
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  amountUniLabel: {
+    color: 'white',
+    marginBottom: 5,
+  },
+  sendBtnTouchable: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  overlayContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
+  },
+  sendImg: {width: 20, height: 20},
 });
