@@ -80,13 +80,15 @@ class SifirBtcTxnConfirmedScreen extends Component {
       );
     }
     return (
-      <ScrollView>
-        <View style={styles.mainView}>
-          {loading === true && (
-            <View style={styles.loading}>
-              <ActivityIndicator size="large" color={AppStyle.mainColor} />
-            </View>
-          )}
+      <View style={styles.mainView}>
+        {loading === true && (
+          <ActivityIndicator
+            size="large"
+            style={styles.loading}
+            color={AppStyle.mainColor}
+          />
+        )}
+        <ScrollView style={styles.sv}>
           {loaded === true && btcSendResult !== null && (
             <>
               <View style={styles.container}>
@@ -128,8 +130,8 @@ class SifirBtcTxnConfirmedScreen extends Component {
               </TouchableOpacity>
             </>
           )}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -220,8 +222,10 @@ const styles = StyleSheet.create({
   },
   checkImg: {width: 8 * C.vh, height: 8 * C.vh, marginTop: 2 * C.vh},
   loading: {
+    alignSelf: 'center',
+    marginTop: C.SCREEN_HEIGHT / 4,
+  },
+  sv: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
