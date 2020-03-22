@@ -269,25 +269,6 @@ const withdrawFunds = (address, amount) => async dispatch => {
   }
 };
 
-const listPays = () => async dispatch => {
-  dispatch({type: types.LN_WALLET_LIST_PAYS + PENDING});
-  try {
-    await dispatch(initLnClient());
-    const listPaysArr = await lnClient.listPays();
-    dispatch({
-      type: types.LN_WALLET_LIST_PAYS + FULFILLED,
-      payload: {listPaysArr},
-    });
-    return listPaysArr;
-  } catch (err) {
-    error(err);
-    dispatch({
-      type: types.LN_WALLET_LIST_PAYS + REJECTED,
-      payload: {error: err.err.err},
-    });
-  }
-};
-
 export {
   getFunds,
   getLnNodeInfo,
@@ -300,5 +281,4 @@ export {
   openAndFundPeerChannel,
   getNewAddress,
   withdrawFunds,
-  listPays,
 };
