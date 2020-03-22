@@ -79,6 +79,7 @@ class SifirGetAddrScreen extends Component {
     } = this.props.route.params;
     const {scannedQRdata} = this.state;
     if (type === C.STR_LN_WALLET_TYPE && txnType !== C.STR_LN_WITHDRAW) {
+      // Bolt scanned
       const invoice = await this.props.decodeBolt(scannedQRdata);
       if (invoice?.amount_msat) {
         this.props.navigation.navigate('LnInvoiceConfirm', {
@@ -88,10 +89,20 @@ class SifirGetAddrScreen extends Component {
         });
       }
     } else {
+      // Normal btc Txn
       this.props.navigation.navigate('BtcSendTxnInputAmount', {
         txnInfo: {address: scannedQRdata, txnType},
         walletInfo,
       });
+    }
+  };
+
+  handleBackButton = () => {
+    const {walletInfo, txnType} = this.props.route.params;
+    if (txnType === C.STR_LN_WITHDRAW) {
+      this.props.navigation.goBack();
+    } else {
+      this.props.navigation.navigate('Account', {walletInfo});
     }
   };
 
@@ -100,11 +111,9 @@ class SifirGetAddrScreen extends Component {
   };
 
   render() {
-    const {navigate} = this.props.navigation;
     const {showModal, scannedQRdata} = this.state;
     const {loading, error} = this.props.lnWallet;
     const {
-      walletInfo,
       txnType,
       walletInfo: {type},
     } = this.props.route.params;
@@ -130,14 +139,19 @@ class SifirGetAddrScreen extends Component {
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
-          <TouchableOpacity>
-            <View
-              style={styles.backNavView}
-              onTouchEnd={() => navigate('Account', {walletInfo})}>
-              <Image source={Images.icon_back} style={styles.backImg} />
-              <Image source={Images.icon_btc_cir} style={styles.btcImg} />
-              <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
-            </View>
+          <TouchableOpacity
+            style={styles.backNavView}
+            onPress={() => this.handleBackButton()}>
+            <Image source={Images.icon_back} style={styles.backImg} />
+            <Image
+              source={
+                type === C.STR_LN_WALLET_TYPE
+                  ? Images.icon_bolt_cir
+                  : Images.icon_btc_cir
+              }
+              style={styles.btcImg}
+            />
+            <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
           </TouchableOpacity>
 
           <View style={styles.titleStyle}>
@@ -183,6 +197,7 @@ class SifirGetAddrScreen extends Component {
         <Modal
           visible={showModal}
           animationType="fade"
+          onRequestClose={() => this.setState({showModal: false})}
           presentationStyle="fullScreen">
           <SifirQrCodeCamera closeHandler={this.closeModal} />
         </Modal>
