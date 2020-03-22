@@ -41,7 +41,7 @@ const Row = props => {
     ? '#102c3a'
     : '#1f4c5f';
   return (
-    <TouchableOpacity style={{backgroundColor}} onPress={onSelect}>
+    <TouchableOpacity style={{backgroundColor}} onPress={onSelect} key={alias}>
       <View style={styles.rowWrapper}>
         <View style={styles.rowBox}>
           <Text style={styles.columnTextRow}>{alias}</Text>
@@ -68,7 +68,7 @@ const SifirNodesTable = props => {
     const capacity = item.channels[0]?.spendable_msat;
     return (
       <Row
-        key={item.alias}
+        key={item.id}
         alias={alias}
         channelStatus={channelStatus}
         capacity={capacity}
