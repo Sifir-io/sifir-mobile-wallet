@@ -17,6 +17,7 @@ export default {
   icon_up_blue: require('./../assets/images/uparrow_blue.png'),
   icon_down_arrow: require('./../assets/images/down_arrow.png'),
   icon_btc_cir: require('./../assets/images/bitcoin_blue.png'),
+  icon_bolt_cir: require('./../assets/images/bolt_blue.png'),
   img_camera: require('./../assets/images/camera.png'),
   icon_up_dark: require('./../assets/images/uparrow_dark.png'),
   icon_done: require('./../assets/images/check.png'),
