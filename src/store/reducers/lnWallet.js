@@ -212,6 +212,28 @@ const lnWallet = createReducer(initialState)({
     loading: false,
     loaded: false,
   }),
+  [types.LN_WALLET_LIST_PAYS + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.LN_WALLET_LIST_PAYS + FULFILLED]: (
+    state,
+    {payload: {listPaysArr}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    listPaysArr,
+  }),
+  [types.LN_WALLET_LIST_PAYS + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
 });
 
 export default lnWallet;
