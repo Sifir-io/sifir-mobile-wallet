@@ -37,12 +37,14 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
     const {
       walletInfo: {balance},
     } = this.props.route.params;
+    const totalBalance = balance || this.props.lnWallet?.balance;
+
     // TODO this to proper SATS vs BTC unit parse
     if (isNaN(inputamount)) {
       return this.setState({validAmount: false});
     }
     // Check amounts
-    if (inputamount > balance) {
+    if (inputamount > totalBalance) {
       return this.setState({validAmount: false});
     }
     return this.setState({
@@ -77,7 +79,6 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
           <View style={{marginTop: 15}}>
             <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
               <TextInput
-                value={amount.toString()}
                 style={styles.inputStyle}
                 keyboardType="decimal-pad"
                 autoCorrect={false}
@@ -90,31 +91,18 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
             </View>
             <View style={styles.lineStyle} />
           </View>
-          {validAmount && (
-            <TouchableOpacity
-              style={{
-                marginTop: C.SCREEN_HEIGHT - 520,
-              }}
-              shadowColor="black"
-              shadowOffset="30">
-              <View
-                style={styles.btnStyle}
-                onTouchEnd={() => this.goToConfirm()}>
-                <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          {!validAmount && (
-            <View
-              style={[
-                styles.btnStyle,
-                {marginTop: C.SCREEN_HEIGHT - 520, opacity: 0.5},
-              ]}
-              shadowColor="black"
-              shadowOffset="30">
+          <TouchableOpacity
+            style={{
+              marginTop: C.SCREEN_HEIGHT - 520,
+            }}
+            disabled={!validAmount}
+            shadowColor="black"
+            onPress={() => this.goToConfirm()}
+            shadowOffset="30">
+            <View style={styles.btnStyle}>
               <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
             </View>
-          )}
+          </TouchableOpacity>
         </View>
       </View>
     );
