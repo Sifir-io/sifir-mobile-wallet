@@ -18,6 +18,7 @@ import SifirSettingModal from '@elements/SifirSettingModal';
 class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
+    this.lnWalletInfo = null;
   }
   state = {
     modalVisible: false,
@@ -38,7 +39,7 @@ class SifirAccountsListScreen extends React.Component {
   }
 
   handleMenuBtn() {
-    this.setState({modalVisible: true});
+    this.setState({modalVisible: !this.state.modalVisible});
   }
 
   onClose = () => this.setState({modalVisible: false});
@@ -72,7 +73,6 @@ class SifirAccountsListScreen extends React.Component {
         />
       );
     }
-    let lnWalletInfo;
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
@@ -82,6 +82,19 @@ class SifirAccountsListScreen extends React.Component {
             <Image source={Images.icon_setting} style={styles.settingImage} />
           </TouchableOpacity>
         </View>
+        {this.state.modalVisible && (
+          <View
+            style={styles.settingMenuContainer}
+            onTouchEnd={() => this.handleMenuBtn()}>
+            <SifirSettingModal
+              hideModal={() => this.handleMenuBtn()}
+              showOpenChannel={true}
+              showTopUp={true}
+              showWithdraw={true}
+              walletInfo={this.lnWalletInfo}
+            />
+          </View>
+        )}
         {loading && (
           <View style={styles.loading}>
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
@@ -107,7 +120,7 @@ class SifirAccountsListScreen extends React.Component {
           {lnLoaded === true &&
             lnLoading === false &&
             nodeInfo.map((info, i) => {
-              lnWalletInfo = info;
+              this.lnWalletInfo = info;
               return (
                 <SifirWalletButton
                   key={info.alias}
@@ -119,24 +132,6 @@ class SifirAccountsListScreen extends React.Component {
               );
             })}
         </View>
-        <Overlay
-          visible={this.state.modalVisible}
-          onClose={this.onClose}
-          closeOnTouchOutside
-          animationType="zoomIn"
-          containerStyle={styles.overlayContainer}
-          childrenWrapperStyle={styles.dlgChild}
-          animationDuration={500}>
-          {hideModal => (
-            <SifirSettingModal
-              hideModal={hideModal}
-              showOpenChannel={true}
-              showTopUp={true}
-              showWithdraw={true}
-              walletInfo={lnWalletInfo}
-            />
-          )}
-        </Overlay>
       </View>
     );
   }
@@ -181,6 +176,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   LnSpinner: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  settingMenuContainer: {
+    position: 'absolute',
+    paddingTop: 80,
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    height: '100%',
+    elevation: 10,
+    zIndex: 10,
+  },
 });
 
 const mapStateToProps = state => {
