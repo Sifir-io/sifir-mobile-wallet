@@ -95,7 +95,7 @@ const SifirLNChannelFundingScreen = ({
                 value={fundingAmount.toString()}
                 onChangeText={amount => setFundingAmount(amount)}
               />
-              <Text style={styles.fundingAmountUnit}>{C.STR_BTC}</Text>
+              <Text style={styles.fundingAmountUnit}>{C.STR_MSAT}</Text>
             </View>
           </View>
 
