@@ -77,6 +77,7 @@ class SifirAccountsListScreen extends React.Component {
       <View style={styles.mainView}>
         <View style={styles.settingView}>
           <TouchableOpacity
+            activeOpacity={1}
             disabled={loading || lnLoading}
             onPress={() => this.handleMenuBtn()}>
             <Image source={Images.icon_setting} style={styles.settingImage} />
@@ -91,7 +92,8 @@ class SifirAccountsListScreen extends React.Component {
               showOpenChannel={true}
               showTopUp={true}
               showWithdraw={true}
-              walletInfo={this.lnWalletInfo}
+              // FIXME using node from 0 index
+              walletInfo={nodeInfo[0]}
             />
           </View>
         )}
@@ -120,7 +122,6 @@ class SifirAccountsListScreen extends React.Component {
           {lnLoaded === true &&
             lnLoading === false &&
             nodeInfo.map((info, i) => {
-              this.lnWalletInfo = info;
               return (
                 <SifirWalletButton
                   key={info.alias}

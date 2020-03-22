@@ -8,10 +8,8 @@ import {
 } from 'react-native';
 
 import {AppStyle, C} from '@common/index';
-import {connect} from 'react-redux';
-import {getFunds} from '@actions/lnWallet';
 
-class SifirBtcSendTxnInputAmountScreen extends Component {
+export default class SifirBtcSendTxnInputAmountScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
@@ -20,10 +18,6 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
     amount: 0,
     validAmount: false,
   };
-
-  componentDidMount() {
-    this.props.getFunds();
-  }
 
   goToConfirm = () => {
     const {txnInfo, walletInfo} = this.props.route.params;
@@ -37,14 +31,12 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
     const {
       walletInfo: {balance},
     } = this.props.route.params;
-    const totalBalance = balance || this.props.lnWallet?.balance;
-
     // TODO this to proper SATS vs BTC unit parse
     if (isNaN(inputamount)) {
       return this.setState({validAmount: false});
     }
     // Check amounts
-    if (inputamount > totalBalance) {
+    if (inputamount > balance) {
       return this.setState({validAmount: false});
     }
     return this.setState({
@@ -55,7 +47,7 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
   };
 
   render() {
-    const {amount, validAmount} = this.state;
+    const {validAmount} = this.state;
     const {
       txnInfo: {address, txnType},
       walletInfo: {balance},
@@ -69,9 +61,7 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
             <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
             <TouchableOpacity onPress={() => this.checkAndSetInput(balance)}>
               <Text style={styles.smallWhiteText}>
-                {`${C.STR_Wallet_balance}: ${balance ||
-                  this.props.lnWallet?.balance ||
-                  '.....  '} `}
+                {`${C.STR_Wallet_balance}: ${balance} `}
                 {txnType === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
               </Text>
             </TouchableOpacity>
@@ -108,20 +98,6 @@ class SifirBtcSendTxnInputAmountScreen extends Component {
     );
   }
 }
-
-const mapStateToProps = state => {
-  return {
-    btcWallet: state.btcWallet,
-    lnWallet: state.lnWallet,
-  };
-};
-
-const mapDispatchToProps = {getFunds};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SifirBtcSendTxnInputAmountScreen);
 
 const styles = StyleSheet.create({
   mainView: {
