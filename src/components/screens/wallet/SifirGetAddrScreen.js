@@ -29,14 +29,17 @@ class SifirGetAddrScreen extends Component {
     if (data === null) {
       return this.setState({showModal: false});
     }
-    const {txnType} = this.props.route.params;
+    const {
+      walletInfo: {type},
+    } = this.props.route.params;
+
     this.setState(
       {
         scannedQRdata: data,
         showModal: false,
       },
       () => {
-        if (txnType === C.STR_LN_WITHDRAW) {
+        if (type === C.STR_LN_WITHDRAW) {
           this.handleAddressScanned();
         } else {
           this.handleBoltScanned();
@@ -48,11 +51,7 @@ class SifirGetAddrScreen extends Component {
   handleBoltScanned = async () => {
     const {scannedQRdata} = this.state;
     const invoice = await this.props.decodeBolt(scannedQRdata);
-    const {
-      walletInfo,
-      txnType,
-      walletInfo: {type},
-    } = this.props.route.params;
+    const {walletInfo} = this.props.route.params;
 
     if (invoice?.amount_msat) {
       this.props.navigation.navigate('LnInvoiceConfirm', {
@@ -64,21 +63,20 @@ class SifirGetAddrScreen extends Component {
   };
 
   handleAddressScanned = () => {
-    const {walletInfo, txnType} = this.props.route.params;
+    const {walletInfo} = this.props.route.params;
     const {scannedQRdata} = this.state;
     this.props.navigation.navigate('BtcSendTxnInputAmount', {
-      txnInfo: {address: scannedQRdata, txnType},
+      txnInfo: {address: scannedQRdata},
       walletInfo,
     });
   };
   handleContinueBtn = async () => {
     const {
       walletInfo,
-      txnType,
       walletInfo: {type},
     } = this.props.route.params;
     const {scannedQRdata} = this.state;
-    if (type === C.STR_LN_WALLET_TYPE && txnType !== C.STR_LN_WITHDRAW) {
+    if (type === C.STR_LN_WALLET_TYPE) {
       // Bolt scanned
       const invoice = await this.props.decodeBolt(scannedQRdata);
       if (invoice?.amount_msat) {
@@ -89,17 +87,20 @@ class SifirGetAddrScreen extends Component {
         });
       }
     } else {
-      // Normal btc Txn
+      // Normal btc Txn or 'Withdraw'
       this.props.navigation.navigate('BtcSendTxnInputAmount', {
-        txnInfo: {address: scannedQRdata, txnType},
+        txnInfo: {address: scannedQRdata},
         walletInfo,
       });
     }
   };
 
   handleBackButton = () => {
-    const {walletInfo, txnType} = this.props.route.params;
-    if (txnType === C.STR_LN_WITHDRAW) {
+    const {
+      walletInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    if (type === C.STR_LN_WITHDRAW) {
       this.props.navigation.goBack();
     } else {
       this.props.navigation.navigate('Account', {walletInfo});
@@ -114,18 +115,15 @@ class SifirGetAddrScreen extends Component {
     const {showModal, scannedQRdata} = this.state;
     const {loading, error} = this.props.lnWallet;
     const {
-      txnType,
       walletInfo: {type},
     } = this.props.route.params;
     const placeHolder =
-      type === C.STR_LN_WALLET_TYPE && txnType !== C.STR_LN_WITHDRAW
-        ? C.STR_Enter_bolt
-        : C.STR_Enter_addr;
+      type === C.STR_LN_WALLET_TYPE ? C.STR_Enter_bolt : C.STR_Enter_addr;
     if (error && scannedQRdata) {
       return (
         <ErrorScreen
-          title={C.STR_ERROR_btc_action}
-          desc={C.STR_ERROR_txn_error}
+          title={C.STR_ERROR_transaction}
+          desc={C.STR_ERROR_btc_txn_error}
           error={error}
           actions={[
             {
