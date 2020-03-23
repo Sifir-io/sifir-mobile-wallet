@@ -137,8 +137,7 @@ class SifirSettingModal extends Component {
                   onPress={() => {
                     this.props.hideModal();
                     this.props.navigation.navigate('GetAddress', {
-                      walletInfo,
-                      txnType: C.STR_LN_WITHDRAW,
+                      walletInfo: {...walletInfo, type: C.STR_LN_WITHDRAW},
                     });
                   }}
                 />
