@@ -30,6 +30,7 @@ class SifirQrCodeCamera extends Component {
       <QRCodeScanner
         showMarker
         onRead={this.onSuccess.bind(this)}
+        topViewStyle={{position: 'absolute'}}
         cameraStyle={{height: C.SCREEN_HEIGHT}}
         flashMode={
           this.state.isFlashOn
