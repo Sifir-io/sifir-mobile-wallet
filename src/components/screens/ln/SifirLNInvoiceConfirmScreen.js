@@ -6,7 +6,6 @@ import {
   View,
   Image,
   Dimensions,
-  ActivityIndicator,
   ScrollView,
 } from 'react-native';
 import {AppStyle, Images, C} from '@common/index';
@@ -17,6 +16,7 @@ import {ErrorScreen} from '@screens/error';
 import {connect} from 'react-redux';
 import moment from 'moment';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
+import {ActivityIndicator} from 'react-native';
 
 // FIXME this comes from styles vh not window
 const {width, height} = Dimensions.get('window');
@@ -41,13 +41,18 @@ const SifirLNInvoiceConfirmScreen = props => {
 
   const handleSendButton = async () => {
     const {bolt11, walletInfo} = props.route.params;
-    props.payBolt(bolt11);
-    props.navigation.navigate('LnInvoicePaymentConfirmed', {
-      bolt11,
-      walletInfo,
-      displayUnit: 'MSAT',
-      isSendTxn: true,
-    });
+    const txnInfo = await props.payBolt(bolt11);
+    if (txnInfo.status === 'complete') {
+      props.navigation.navigate('LnInvoicePaymentConfirmed', {
+        walletInfo,
+        displayUnit: C.STR_MSAT,
+        isSendTxn: true,
+        txnInfo: {
+          amount: txnInfo.msatoshi,
+          address: txnInfo.payment_preimage,
+        },
+      });
+    }
   };
 
   const handleOpenChannelDrag = () => {
@@ -73,7 +78,7 @@ const SifirLNInvoiceConfirmScreen = props => {
 
   const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
-  const {loading, loaded, error} = props.lnWallet;
+  const {loading, loaded, error, isPayingBolt} = props.lnWallet;
   const {walletInfo} = props.route.params;
   let openChannelLabel;
   let channel;
@@ -136,6 +141,7 @@ const SifirLNInvoiceConfirmScreen = props => {
               />
             </View>
           </View>
+          {isPayingBolt && <ActivityIndicator size="large" />}
           <View style={styles.justify_center}>
             <TouchableOpacity
               disabled={!loaded || loading || routes.length === 0}
@@ -155,7 +161,7 @@ const SifirLNInvoiceConfirmScreen = props => {
         </View>
       </ScrollView>
 
-      {loaded && peers.length > 0 && (
+      {loaded && !isPayingBolt && peers.length > 0 && (
         <View style={styles.justify_end}>
           <SlidingPanel
             ref={childRef}
