@@ -100,6 +100,7 @@ export const C = {
   STR_ERROR_app_unhandled:
     'An undetermined error has occured, this will be logged',
   STR_ERROR_btc_action: 'BTC Wallet Error',
+  STR_ERROR_transaction: 'Transaction Error',
   STR_ERROR_channel_action: 'Channel Error',
   STR_ERROR_account_screen:
     'An error occured while trying to load your Wallet details',
