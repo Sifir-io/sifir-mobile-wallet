@@ -12,27 +12,26 @@ import {getBtcWalletList} from '@actions/btcwallet';
 import {getLnNodeInfo} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
 import {ErrorScreen} from '@screens/error';
-import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
 class SifirAccountsListScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.lnWalletInfo = null;
   }
   state = {
     modalVisible: false,
   };
 
-  componentDidMount() {
-    // FIXME combine to one init function
+  _init = () => {
     this.props.getBtcWalletList();
     this.props.getLnNodeInfo();
-    const {
-      props: {getBtcWalletList: getWallets},
-    } = this;
-    this.stopLoading = this.props.navigation.addListener('focus', getWallets);
-    // getWallets();
+  };
+
+  componentDidMount() {
+    this._init();
+    this.stopLoading = this.props.navigation.addListener('focus', () =>
+      this._init(),
+    );
   }
   componentWillUnmount() {
     this.stopLoading();
