@@ -1,11 +1,19 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {sendBitcoin} from '@actions/btcwallet';
 import {withdrawFunds} from '@actions/lnWallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
+import {ErrorScreen} from '@screens/error';
 
 class SifirBtcSendTxnConfirmScreen extends Component {
   constructor(props, context) {
@@ -16,29 +24,78 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     btnStatus: 0,
     modalVisible: false,
   };
-  sendBtc = () => {
-    const {txnInfo, walletInfo} = this.props.route.params;
-    const {address, amount, txnType} = txnInfo;
-    if (txnType === C.STR_LN_WITHDRAW) {
-      this.props.withdrawFunds(address, amount);
-    } else {
-      this.props.sendBitcoin({address, amount});
-    }
-    this.props.navigation.navigate('BtcTxnConfirmed', {
-      txnInfo: {...txnInfo, isSendTxn: true},
+
+  withdrawFunds = async () => {
+    const {
+      txnInfo,
       walletInfo,
-      displayUnit: C.STR_MSAT,
-    });
+      walletInfo: {type},
+    } = this.props.route.params;
+    const {address, amount} = txnInfo;
+    const withdrawDetails = await this.props.withdrawFunds(address, amount);
+    if (withdrawDetails?.tx) {
+      this.props.navigation.navigate('BtcTxnConfirmed', {
+        txnInfo: {
+          ...txnInfo,
+          isSendTxn: true,
+          amount,
+          address,
+        },
+        walletInfo,
+        displayUnit: C.STR_MSAT,
+        type,
+      });
+    }
+  };
+
+  sendBitcoin = async () => {
+    const {
+      txnInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    const {address, amount} = txnInfo;
+    await this.props.sendBitcoin({address, amount});
+    // TODO handle navigation here
+  };
+
+  handleSendBtn = () => {
+    const {
+      walletInfo: {type},
+    } = this.props.route.params;
+    if (type === C.STR_LN_WITHDRAW) {
+      this.withdrawFunds();
+    } else {
+      this.sendBitcoin();
+    }
   };
 
   render() {
     const {
-      walletInfo: {feeSettingEnabled},
-      txnInfo: {address, amount, txnType},
+      walletInfo: {feeSettingEnabled, type},
+      txnInfo: {address, amount},
     } = this.props.route.params;
-    const amountFontSize = (C.vw * 80) / amount.length;
+    const amountFontSize =
+      (C.vw * 80) / (amount.length < 3 ? 5 : amount.length);
     const btcUnitFontSize = amountFontSize * 0.6;
     const recTxtFontSize = (C.vw * 120) / address.length;
+    const {loading: btcLoading, error: btcError} = this.props.lnWallet;
+    const {loading: lnLoading, error: lnError} = this.props.btcWallet;
+
+    if (btcError || lnError) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_transaction}
+          desc={C.STR_ERROR_btc_txn_error}
+          error={btcError || lnError}
+          actions={[
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => this.props.navigation.navigate('AccountList'),
+            },
+          ]}
+        />
+      );
+    }
 
     return (
       <View style={styles.mainView}>
@@ -61,10 +118,10 @@ class SifirBtcSendTxnConfirmScreen extends Component {
         <View style={styles.valueTxt}>
           <View style={styles.amountContainer}>
             <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
-              {amount}
+              {amount}{' '}
             </Text>
             <Text style={[styles.amountUniLabel, {fontSize: btcUnitFontSize}]}>
-              {txnType === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
+              {type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
             </Text>
           </View>
           <View style={styles.lineView} />
@@ -76,8 +133,9 @@ class SifirBtcSendTxnConfirmScreen extends Component {
             <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
           </View>
         )}
+        {(btcLoading || lnLoading) && <ActivityIndicator size="large" />}
         <TouchableOpacity
-          onLongPress={this.sendBtc}
+          onLongPress={this.handleSendBtn}
           style={styles.sendBtnTouchable}>
           <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
             <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
@@ -168,7 +226,6 @@ const styles = StyleSheet.create({
   },
   bigTxt: {
     color: 'white',
-    width: C.SCREEN_WIDTH * 0.55,
     textAlign: 'center',
   },
   recTxt: {
@@ -221,6 +278,7 @@ const styles = StyleSheet.create({
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   amountUniLabel: {
     color: 'white',
