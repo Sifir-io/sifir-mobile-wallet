@@ -6,12 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  ActivityIndicator,
   ScrollView,
 } from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
-import {ErrorScreen} from '@screens/error';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 class SifirBtcTxnConfirmedScreen extends Component {
@@ -28,108 +26,43 @@ class SifirBtcTxnConfirmedScreen extends Component {
     const {type, displayUnit} = this.props.route.params;
     const addrTxtFontSize = (C.vw * 250) / address?.length || 25;
 
-    let amount,
-      address,
-      isSendTxn,
-      btcSendResult,
-      error,
-      loading = true,
-      loaded = false;
-    if (type === C.STR_LN_WALLET_TYPE) {
-      // LN Transaction
-      ({loaded, loading, error} = this.props.lnWallet);
-      if (this.props.lnWallet.txnDetails) {
-        ({
-          txnDetails: {
-            msatoshi: amount,
-            payment_preimage: address,
-            status: btcSendResult,
-          },
-        } = this.props.lnWallet);
-      }
-    } else if (this.props.route.params.txnInfo?.txnType === C.STR_LN_WITHDRAW) {
-      // LN_Withdraw
-      ({
-        txnInfo: {amount, address, isSendTxn},
-      } = this.props.route.params);
-      ({loaded, loading, btcSendResult, error} = this.props.lnWallet);
-    } else if (this.props.route.params.txnInfo) {
-      //  BTC Transaction
-      ({
-        txnInfo: {amount, address, isSendTxn},
-      } = this.props.route.params);
-      ({loaded, loading, btcSendResult, error} = this.props.btcWallet);
-    }
-    if (error) {
-      return (
-        <ErrorScreen
-          title={C.STR_ERROR_btc_action}
-          desc={
-            type === C.STR_LN_WALLET_TYPE
-              ? C.STR_ERROR_txn_error
-              : C.STR_ERROR_btc_txn_error
-          }
-          error={error}
-          actions={[
-            {
-              text: C.STR_GO_BACK,
-              onPress: () => this.backToAccount(),
-            },
-          ]}
-        />
-      );
-    }
+    const {amount, address, isSendTxn} = this.props.route.params.txnInfo;
+
     return (
       <View style={styles.mainView}>
-        {loading === true && (
-          <ActivityIndicator
-            size="large"
-            style={styles.loading}
-            color={AppStyle.mainColor}
-          />
-        )}
         <ScrollView style={styles.sv}>
-          {loaded === true && btcSendResult !== null && (
-            <>
-              <View style={styles.container}>
-                <Image source={Images.icon_done} style={styles.checkImg} />
-                <Text style={styles.paymentTxt}>
-                  {type === C.STR_LN_WALLET_TYPE
-                    ? C.STR_INVOICE
-                    : C.STR_PAYMENT}
-                </Text>
-                <Text style={styles.addressLblTxt}>
-                  {type === C.STR_LN_WALLET_TYPE
-                    ? C.STR_PAID
-                    : isSendTxn
-                    ? C.STR_SENT
-                    : C.STR_RECEIVED}
-                </Text>
-                <Text style={styles.payAddrTxt}>
-                  {C.STR_PAYMENT +
-                    ' ' +
-                    (isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER)}
-                </Text>
-                <Text style={[styles.addrTxt, {fontSize: addrTxtFontSize}]}>
-                  {address}
-                </Text>
-                <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
-                <Text style={styles.amountTxt}>
-                  <SifirBTCAmount amount={amount} unit={displayUnit} />
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.doneTouch}
-                onPressOut={() => this.backToAccount()}>
-                <View
-                  shadowColor="black"
-                  shadowOffset="30"
-                  style={styles.doneView}>
-                  <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
-                </View>
-              </TouchableOpacity>
-            </>
-          )}
+          <View style={styles.container}>
+            <Image source={Images.icon_done} style={styles.checkImg} />
+            <Text style={styles.paymentTxt}>
+              {type === C.STR_LN_WALLET_TYPE ? C.STR_INVOICE : C.STR_PAYMENT}
+            </Text>
+            <Text style={styles.addressLblTxt}>
+              {type === C.STR_LN_WALLET_TYPE
+                ? C.STR_PAID
+                : isSendTxn
+                ? C.STR_SENT
+                : C.STR_RECEIVED}
+            </Text>
+            <Text style={styles.payAddrTxt}>
+              {C.STR_PAYMENT +
+                ' ' +
+                (isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER)}
+            </Text>
+            <Text style={[styles.addrTxt, {fontSize: addrTxtFontSize}]}>
+              {address}
+            </Text>
+            <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
+            <Text style={styles.amountTxt}>
+              <SifirBTCAmount amount={amount} unit={displayUnit} />
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.doneTouch}
+            onPressOut={() => this.backToAccount()}>
+            <View shadowColor="black" shadowOffset="30" style={styles.doneView}>
+              <Text style={styles.doneTxt}>{C.STR_DONE}</Text>
+            </View>
+          </TouchableOpacity>
         </ScrollView>
       </View>
     );
