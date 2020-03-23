@@ -4,6 +4,8 @@ import _ln from '@io/lnClient';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
+import lightningPayReq from '../../../bolt11.min';
+
 let lnClient;
 
 const initLnClient = () => async (dispatch, getState) => {
@@ -30,12 +32,25 @@ const getLnNodeInfo = () => async dispatch => {
   dispatch({type: types.LN_WALLET_NODEINFO + PENDING});
   await dispatch(initLnClient());
   try {
-    const nodeInfo = await lnClient.getNodeInfo();
+    const [{channels, outputs}, nodeInfo] = await Promise.all([
+      lnClient.listFunds(),
+      lnClient.getNodeInfo(),
+    ]);
+    const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
+      balance += channel_sat;
+      return balance;
+    }, 0);
+    const outputBalance = outputs.reduce((balance, {value}) => {
+      balance += value;
+      return balance;
+    }, 0);
+    const balance = inChannelBalance + outputBalance;
     nodeInfo.pageURL = 'Account';
     nodeInfo.type = C.STR_LN_WALLET_TYPE;
     nodeInfo.label = nodeInfo.alias;
     nodeInfo.iconURL = Images.icon_light;
     nodeInfo.iconClickedURL = Images.icon_light_clicked;
+    nodeInfo.balance = balance;
     dispatch({
       type: types.LN_WALLET_NODEINFO + FULFILLED,
       payload: {nodeInfo},
@@ -53,9 +68,10 @@ const getLnWalletDetails = () => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
     await dispatch(initLnClient());
-    const [{channels, outputs}, invoices] = await Promise.all([
+    const [{channels, outputs}, invoices, paidBolts] = await Promise.all([
       lnClient.listFunds(),
       lnClient.getInvoice(),
+      lnClient.listPays(),
     ]);
     const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
       balance += channel_sat;
@@ -69,7 +85,10 @@ const getLnWalletDetails = () => async dispatch => {
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
-    return {inChannelBalance, outputBalance, invoices};
+    console.log('paidBolts-----', paidBolts);
+    const decodedBolt = lightningPayReq.decode(paidBolts[0].bolt11);
+    console.log('decodedBolt', decodedBolt);
+    return {inChannelBalance, outputBalance, invoices, paidBolts};
   } catch (err) {
     error(err);
     dispatch({
@@ -155,7 +174,6 @@ const payBolt = bolt11 => async dispatch => {
     const txnDetails = await lnClient.payBolt11(bolt11);
     dispatch({
       type: types.LN_WALLET_PAY_BOLT + FULFILLED,
-      payload: {txnDetails},
     });
     return txnDetails;
   } catch (err) {
@@ -221,6 +239,9 @@ const openAndFundPeerChannel = payload => async dispatch => {
       const fundingResponse = {
         message: 'Please check peer list',
       };
+      dispatch({
+        type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + FULFILLED,
+      });
       return fundingResponse;
     } else {
       dispatch({
@@ -257,7 +278,6 @@ const withdrawFunds = (address, amount) => async dispatch => {
     const btcSendResult = await lnClient.withdrawFunds(address, amount);
     dispatch({
       type: types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED,
-      payload: {btcSendResult},
     });
     return btcSendResult;
   } catch (err) {
