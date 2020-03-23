@@ -109,21 +109,20 @@ const lnWallet = createReducer(initialState)({
   [types.LN_WALLET_PAY_BOLT + PENDING]: state => ({
     ...state,
     error: null,
-    loading: true,
-    loaded: false,
+    isPayingBolt: true,
+    isBoltPaid: false,
   }),
-  [types.LN_WALLET_PAY_BOLT + FULFILLED]: (state, {payload: {txnDetails}}) => ({
+  [types.LN_WALLET_PAY_BOLT + FULFILLED]: state => ({
     ...state,
-    loading: false,
-    loaded: true,
+    isPayingBolt: false,
+    isBoltPaid: true,
     error: null,
-    txnDetails,
   }),
   [types.LN_WALLET_PAY_BOLT + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
     error,
-    loading: false,
-    loaded: false,
+    isPayingBolt: false,
+    isBoltPaid: false,
   }),
   [types.LN_WALLET_GET_PEERS + PENDING]: state => ({
     ...state,
@@ -196,15 +195,11 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED]: (
-    state,
-    {payload: {btcSendResult}},
-  ) => ({
+  [types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED]: state => ({
     ...state,
     loading: false,
     loaded: true,
     error: null,
-    btcSendResult,
   }),
   [types.LN_WALLET_WITHDRAW_FUNDS + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
