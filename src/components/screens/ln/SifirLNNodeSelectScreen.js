@@ -6,7 +6,6 @@ import {
   View,
   Image,
   TextInput,
-  Platform,
   Modal,
   Alert,
 } from 'react-native';
@@ -94,13 +93,14 @@ function SifirLNNodeSelectScreen(props) {
           disabled={selectedNode ? !selectedNode.id : true}
           onPress={() => handleContinueBtn()}
           // Adding inline style as condition is needed to be evaluated
-          style={{
-            backgroundColor:
-              selectedNode && selectedNode.id ? '#ffa500' : 'lightgrey',
-            padding: 20,
-            borderRadius: 10,
-            marginTop: 50,
-          }}>
+          style={[
+            styles.continueBtn,
+            // eslint-disable-next-line react-native/no-inline-styles
+            {
+              backgroundColor:
+                selectedNode && selectedNode.id ? '#ffa500' : 'lightgrey',
+            },
+          ]}>
           <Text
             style={[styles.text_large, styles.text_center, styles.text_bold]}>
             CONTINUE
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   input: {
     width: '70%',
     color: 'white',
-    height: Platform.OS === 'android' ? 30 : 25,
+    // height: Platform.OS === 'android' ? 30 : 25,
     fontSize: 12,
   },
   text_bold: {
@@ -194,4 +194,9 @@ const styles = StyleSheet.create({
     margin: 30,
   },
   margin_top_30: {marginTop: 30},
+  continueBtn: {
+    padding: 20,
+    borderRadius: 10,
+    marginTop: 50,
+  },
 });
