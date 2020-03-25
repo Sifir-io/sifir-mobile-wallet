@@ -68,11 +68,17 @@ const getLnWalletDetails = () => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
     await dispatch(initLnClient());
-    const [{channels, outputs}, invoices, paidBolts] = await Promise.all([
-      lnClient.listFunds(),
-      lnClient.getInvoice(),
-      lnClient.listPays(),
-    ]);
+    const {channels, outputs} = await lnClient.listFunds();
+    await new Promise((res, resj) => setTimeout(res, 500));
+    const invoices = await lnClient.getInvoice();
+    await new Promise((res, resj) => setTimeout(res, 500));
+    const listPays = await lnClient.listPays();
+
+    // const [{channels, outputs}, invoices, listPays] = await Promise.all([
+    //   lnClient.listFunds(),
+    //   lnClient.getInvoice(),
+    //   lnClient.listPays(),
+    // ]);
     const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
       balance += channel_sat;
       return balance;
@@ -85,10 +91,22 @@ const getLnWalletDetails = () => async dispatch => {
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
-    console.log('paidBolts-----', paidBolts);
-    const decodedBolt = lightningPayReq.decode(paidBolts[0].bolt11);
-    console.log('decodedBolt', decodedBolt);
-    return {inChannelBalance, outputBalance, invoices, paidBolts};
+
+    invoices.forEach(inv => {
+      try {
+        inv.decodedBolt = lightningPayReq.decode(inv.bolt11);
+      } catch {
+        inv.decodedBolt = {valid: false};
+      }
+    });
+    listPays.forEach(pay => {
+      try {
+        pay.decodedBolt = lightningPayReq.decode(pay.bolt11);
+      } catch {
+        pay.decodedBolt = {valid: false};
+      }
+    });
+    return {inChannelBalance, outputBalance, invoices, listPays};
   } catch (err) {
     error(err);
     dispatch({
