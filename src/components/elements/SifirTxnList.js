@@ -79,18 +79,21 @@ const SifirTxnEntry = ({txn, unit}) => {
   );
 };
 
-const SifirInvEntry = ({inv, inv: {type}, unit}) => {
-  const {amount, imgURL, timeStr, description} =
-    type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
-  return (
-    <ListItem
-      title={timeStr}
-      description={description}
-      amount={amount}
-      unit={unit}
-      imgURL={imgURL}
-    />
-  );
+const SifirInvEntry = ({inv, inv: {type, decodedBolt}, unit}) => {
+  if (decodedBolt) {
+    const {amount, imgURL, timeStr, description} =
+      type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
+    return (
+      <ListItem
+        title={timeStr}
+        description={description}
+        amount={amount}
+        unit={unit}
+        imgURL={imgURL}
+      />
+    );
+  }
+  return null;
 };
 
 const ListItem = ({title, description, imgURL, amount, unit}) => {
