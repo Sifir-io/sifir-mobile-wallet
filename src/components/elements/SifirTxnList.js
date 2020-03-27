@@ -9,50 +9,98 @@ import {
 } from 'react-native';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import moment from 'moment';
-import {Images, AppStyle} from '@common/index';
+import {Images, AppStyle, C} from '@common/index';
 
-const sortTxnData = txnData => {
-  return txnData.sort((a, b) => {
-    return moment(b.timereceived * 1000).diff(moment(a.timereceived * 1000));
-  });
+const makeInvoiceRenderData = ({decodedBolt, description: desc, status}) => {
+  let amount, imgURL, description, timeStr;
+  const {millisatoshis, timestamp} = decodedBolt;
+  amount = millisatoshis;
+  description = desc;
+  switch (status) {
+    case 'unpaid':
+      imgURL = Images.icon_yellowTxn;
+      break;
+    case 'paid':
+      imgURL = Images.icon_thickGreenArrowTxn;
+      break;
+  }
+  timeStr = moment(timestamp * 1000).fromNow();
+  return {amount, description, imgURL, timeStr};
+};
+
+const makePaysRenderData = ({decodedBolt, preimage}) => {
+  let amount, imgURL, description, timeStr;
+  const {millisatoshis, complete, timestamp} = decodedBolt;
+  if (complete) {
+    imgURL = Images.icon_send;
+    description = `Paid - ${preimage.slice(0, 3)} .. ${preimage.slice(-3)}`;
+    amount = millisatoshis;
+    timeStr = moment(timestamp * 1000).fromNow();
+  }
+  return {amount, description, imgURL, timeStr};
+};
+
+const makeTxnRenderData = ({category, txid, amount, timereceived}) => {
+  let imgURL, timeStr, txIDStr;
+  txIDStr = `${txid.slice(0, 3)} .. ${txid.slice(-3)}`;
+  if (category) {
+    switch (category) {
+      case 'send':
+        txIDStr = 'Sent - #' + txIDStr;
+        imgURL = Images.icon_send;
+        break;
+      case 'receive':
+        txIDStr = 'Received - #' + txIDStr;
+        imgURL = Images.icon_receive;
+        break;
+      default:
+        txIDStr = 'Unknown - #' + txIDStr;
+        imgURL = Images.icon_receive;
+        break;
+    }
+  } else {
+    txIDStr = 'Received - #' + txIDStr;
+    imgURL = Images.icon_receive;
+  }
+  timeStr = moment(timereceived * 1000).fromNow();
+  return {imgURL, txIDStr, amount, timeStr};
 };
 
 const SifirTxnEntry = ({txn, unit}) => {
-  const makeRenderData = ({category, txid, amount, timereceived}) => {
-    let txIDStr = `${txid.slice(0, 3)} .. ${txid.slice(-3)}`;
-    let imgURL;
-    if (category) {
-      switch (category) {
-        case 'send':
-          txIDStr = 'Sent - #' + txIDStr;
-          imgURL = Images.icon_send;
-          break;
-        case 'receive':
-          txIDStr = 'Received - #' + txIDStr;
-          imgURL = Images.icon_receive;
-          break;
-        default:
-          txIDStr = 'Unknown - #' + txIDStr;
-          imgURL = Images.icon_receive;
-          break;
-      }
-    } else {
-      txIDStr = 'Received - #' + txIDStr;
-      imgURL = Images.icon_receive;
-    }
-    const timeStr = moment(timereceived * 1000).fromNow();
-    return {imgURL, txIDStr, amount, timeStr};
-  };
+  const {imgURL, txIDStr, amount, timeStr} = makeTxnRenderData(txn);
+  return (
+    <ListItem
+      title={timeStr}
+      description={txIDStr}
+      amount={amount}
+      unit={unit}
+      imgURL={imgURL}
+    />
+  );
+};
 
-  const {imgURL, txIDStr, amount, timeStr} = makeRenderData(txn);
+const SifirInvEntry = ({inv, inv: {type}, unit}) => {
+  const {amount, imgURL, timeStr, description} =
+    type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
+  return (
+    <ListItem
+      title={timeStr}
+      description={description}
+      amount={amount}
+      unit={unit}
+      imgURL={imgURL}
+    />
+  );
+};
 
+const ListItem = ({title, description, imgURL, amount, unit}) => {
   return (
     <TouchableOpacity>
       <View style={styles.listItme}>
-        <Image source={imgURL} style={{width: 30, height: 30}} />
-        <View style={{flex: 5, marginLeft: 20}}>
-          <Text style={{color: AppStyle.mainColor}}>{timeStr}</Text>
-          <Text style={styles.txIDstr}>{txIDStr}</Text>
+        <Image source={imgURL} style={styles.arrowIcon} />
+        <View style={styles.timeStrContainer}>
+          <Text style={{color: AppStyle.mainColor}}>{title}</Text>
+          <Text style={styles.txIDstr}>{description}</Text>
         </View>
         <Text style={styles.amount}>
           <SifirBTCAmount amount={amount} unit={unit} />
@@ -62,41 +110,19 @@ const SifirTxnEntry = ({txn, unit}) => {
   );
 };
 
-const SifirInvEntry = ({inv, unit}) => {
-  const {msatoshi, description, payment_hash} = inv;
-  const paymentHashStr = `${payment_hash.slice(0, 9)} .... ${payment_hash.slice(
-    -9,
-  )}`;
-
-  return (
-    <TouchableOpacity>
-      <View style={styles.listItme}>
-        {/* <Image source={imgURL} style={{width: 30, height: 30}} /> */}
-        <View style={{flex: 5}}>
-          <Text style={{color: AppStyle.mainColor}}>{description}</Text>
-          <Text style={styles.txIDstr}>{paymentHashStr}</Text>
-        </View>
-        <Text style={styles.amount}>
-          <SifirBTCAmount amount={msatoshi} unit={unit} />
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-const SifirTxnList = ({width, height, unit, txnData, invoices}) => {
-  txnData = txnData ? sortTxnData(txnData) : null;
+const SifirTxnList = ({width, height, unit, txnData, type}) => {
   return (
     <FlatList
-      data={txnData || invoices}
+      data={txnData}
       style={height}
       width={width}
-      keyExtractor={(item, index) => item.label + item.txid + index}
+      keyExtractor={(item, index) => item.bolt11 + item.txid}
       renderItem={({item}) => {
-        if (txnData) {
+        if (type === C.STR_LN_WALLET_TYPE) {
+          return <SifirInvEntry inv={item} unit={unit} />;
+        } else {
           return <SifirTxnEntry txn={item} unit={unit} />;
         }
-        return <SifirInvEntry inv={item} unit={unit} />;
       }}
     />
   );
@@ -122,4 +148,6 @@ const styles = StyleSheet.create({
     flex: 2,
     color: AppStyle.mainColor,
   },
+  arrowIcon: {width: 30, height: 30},
+  timeStrContainer: {flex: 5, marginLeft: 20},
 });

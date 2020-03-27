@@ -10,42 +10,27 @@ import {
 import {Images, AppStyle, C} from '@common/index';
 import SifirTxnList from '@elements/SifirTxnList';
 
-const SifirAccountHistory = ({
-  loading,
-  loadingLN,
-  loaded,
-  txnData,
-  invoices,
-  btcUnit,
-}) => {
+const SifirAccountHistory = ({loading, loaded, txnData, btcUnit, type}) => {
   const BTN_WIDTH = C.SCREEN_WIDTH / 2;
-
   return (
     <>
       <View style={styles.txnSetView}>
         <Text style={styles.txnLblTxt}>{C.TRANSACTIONS}</Text>
         <TouchableOpacity>
-          <Image
-            source={Images.icon_setting}
-            style={{width: 20, height: 20, marginLeft: 20, marginTop: 7}}
-          />
+          <Image source={Images.icon_setting} style={styles.settingIcon} />
         </TouchableOpacity>
       </View>
       <View style={styles.txnListView}>
-        {(loading || loadingLN) && (
+        {loading && (
           <ActivityIndicator size="large" color={AppStyle.mainColor} />
         )}
-        {loaded === true &&
-          loading === false &&
-          (txnData !== null || invoices !== null) && (
-            <SifirTxnList
-              txnData={txnData}
-              invoices={invoices}
-              unit={btcUnit}
-              width={BTN_WIDTH * 2 - 50}
-              height={200}
-            />
-          )}
+        <SifirTxnList
+          txnData={txnData}
+          type={type}
+          unit={btcUnit}
+          width={BTN_WIDTH * 2 - 50}
+          height={200}
+        />
       </View>
     </>
   );
@@ -69,6 +54,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginLeft: 25,
   },
+  settingIcon: {width: 20, height: 20, marginLeft: 20, marginTop: 7},
 });
 
 export default SifirAccountHistory;
