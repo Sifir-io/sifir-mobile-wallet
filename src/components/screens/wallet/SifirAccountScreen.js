@@ -3,7 +3,7 @@ import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
-import {getLnWalletDetails} from '@actions/lnWallet';
+import {getLnWalletDetails, createInvoice} from '@actions/lnWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
@@ -15,21 +15,15 @@ class SifirAccountScreen extends React.Component {
   }
   state = {
     balance: 0,
-    txnData: null,
-    invoices: null,
+    txnData: [],
   };
   stopLoading = null;
 
   async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
     if (type === C.STR_LN_WALLET_TYPE) {
-      const {
-        inChannelBalance,
-        outputBalance,
-        invoices,
-      } = await this.props.getLnWalletDetails();
-      const balance = inChannelBalance + outputBalance;
-      this.setState({balance, invoices});
+      const {balance, txnData} = await this.props.getLnWalletDetails();
+      this.setState({balance, txnData});
     } else {
       const {balance, txnData} = await this.props.getWalletDetails({
         label,
@@ -38,6 +32,7 @@ class SifirAccountScreen extends React.Component {
       this.setState({balance, txnData});
     }
   }
+
   componentDidMount() {
     const {_loadWalletFromProps} = this;
     this.stopLoading = this.props.navigation.addListener(
@@ -45,16 +40,17 @@ class SifirAccountScreen extends React.Component {
       _loadWalletFromProps.bind(this),
     );
   }
+
   componentWillUnmount() {
     this.stopLoading();
   }
 
   render() {
-    const {balance, invoices, txnData} = this.state;
+    const {balance, txnData} = this.state;
     const {navigate} = this.props.navigation;
     const {label, type} = this.props.route.params.walletInfo;
     const {loading, loaded, error} = this.props.btcWallet;
-    const {loading: loadingLN} = this.props.lnWallet;
+    const {loading: loadingLN, loaded: loadedLN} = this.props.lnWallet;
     const {walletInfo} = this.props.route.params;
     const btcUnit = type === C.STR_LN_WALLET_TYPE ? C.STR_MSAT : C.STR_BTC;
     if (error) {
@@ -102,10 +98,9 @@ class SifirAccountScreen extends React.Component {
           walletInfo={walletInfo}
         />
         <SifirAccountHistory
-          loading={loading}
-          loadingLN={loadingLN}
-          loaded={loaded}
-          invoices={invoices}
+          loading={loading || loadingLN}
+          loaded={loaded || loadedLN}
+          type={type}
           txnData={txnData}
           btcUnit={btcUnit}
         />
@@ -124,6 +119,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   getWalletDetails,
   getLnWalletDetails,
+  createInvoice,
 };
 
 // eslint-disable-next-line prettier/prettier

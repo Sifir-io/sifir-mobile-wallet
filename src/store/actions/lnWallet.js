@@ -5,6 +5,7 @@ import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
 import lightningPayReq from '../../../bolt11.min';
+import moment from 'moment';
 
 let lnClient;
 
@@ -87,26 +88,34 @@ const getLnWalletDetails = () => async dispatch => {
       balance += value;
       return balance;
     }, 0);
-
-    dispatch({
-      type: types.LN_WALLET_DETAILS + FULFILLED,
-    });
+    const balance = inChannelBalance + outputBalance;
 
     invoices.forEach(inv => {
       try {
         inv.decodedBolt = lightningPayReq.decode(inv.bolt11);
-      } catch {
-        inv.decodedBolt = {valid: false};
-      }
+        inv.type = 'invoice';
+      } catch {}
     });
     listPays.forEach(pay => {
       try {
         pay.decodedBolt = lightningPayReq.decode(pay.bolt11);
-      } catch {
-        pay.decodedBolt = {valid: false};
+        pay.type = 'pays';
+      } catch {}
+    });
+
+    const txnData = [...invoices, ...listPays];
+
+    txnData.sort((a, b) => {
+      if (a.decodedBolt) {
+        return moment(b.decodedBolt.timestamp * 1000).diff(
+          moment(a.decodedBolt.timestamp * 1000),
+        );
       }
     });
-    return {inChannelBalance, outputBalance, invoices, listPays};
+    dispatch({
+      type: types.LN_WALLET_DETAILS + FULFILLED,
+    });
+    return {balance, txnData};
   } catch (err) {
     error(err);
     dispatch({
@@ -223,6 +232,13 @@ const getPeers = nodeId => async dispatch => {
 };
 
 const createInvoice = invoice => async dispatch => {
+  invoice = {
+    msatoshi: 9999,
+    label: 'Top-Up 3rd',
+    description: 'By hamza',
+    expiry: 100000,
+    callback_url: 'CallBackUrl',
+  };
   dispatch({type: types.LN_WALLET_CREATE_INVOICE + PENDING});
   try {
     await dispatch(initLnClient());
