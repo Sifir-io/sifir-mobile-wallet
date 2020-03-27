@@ -21,7 +21,7 @@ function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   // TODO set this null
   const [QRdataORuserInput, setQRorUserInput] = useState('');
-  const [selectedNode, setSelectedNode] = useState(undefined);
+  const [selectedNode, setSelectedNode] = useState({});
   useEffect(() => {
     (async () => {
       const nodeId = props.lnWallet.nodeInfo[0].id;
@@ -51,7 +51,9 @@ function SifirLNNodeSelectScreen(props) {
       Alert.alert('Oops!', 'Entered node ID is invalid.');
     }
   };
-
+  const nodeId = QRdataORuserInput.split('@')[0];
+  const isValidNode = nodeRegx.test(nodeId);
+  console.log('selectedNode', selectedNode);
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
@@ -84,21 +86,24 @@ function SifirLNNodeSelectScreen(props) {
         <SifirNodesTable
           nodes={props.lnWallet.peers}
           selected={selectedNode}
-          onSelect={setSelectedNode}
+          onSelect={node =>
+            selectedNode.id === node.id
+              ? setSelectedNode({})
+              : setSelectedNode(node)
+          }
           loading={props.lnWallet.loading}
           loaded={props.lnWallet.loaded}
         />
 
         <TouchableOpacity
-          disabled={selectedNode ? !selectedNode.id : true}
+          disabled={!isValidNode}
           onPress={() => handleContinueBtn()}
           // Adding inline style as condition is needed to be evaluated
           style={[
             styles.continueBtn,
             // eslint-disable-next-line react-native/no-inline-styles
             {
-              backgroundColor:
-                selectedNode && selectedNode.id ? '#ffa500' : 'lightgrey',
+              backgroundColor: isValidNode ? '#ffa500' : 'lightgrey',
             },
           ]}>
           <Text
@@ -109,6 +114,7 @@ function SifirLNNodeSelectScreen(props) {
       </View>
       <Modal
         visible={isModalVisible}
+        onRequestClose={() => setModalVisible(false)}
         animationType="fade"
         presentationStyle="fullScreen">
         <SifirQrCodeCamera closeHandler={closeModal} />

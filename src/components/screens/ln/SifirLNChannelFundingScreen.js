@@ -108,11 +108,14 @@ const SifirLNChannelFundingScreen = ({
                 </Text>
               </>
             )}
-            <Text style={[styles.textBright, styles.margin_top_15]}>
-              Node Id
-            </Text>
-            <Text style={[styles.text_white, styles.text_large]}>{id}</Text>
-
+            {id && (
+              <>
+                <Text style={[styles.textBright, styles.margin_top_15]}>
+                  Node Id
+                </Text>
+                <Text style={[styles.text_white, styles.text_large]}>{id}</Text>
+              </>
+            )}
             <Text style={[styles.textBright, styles.margin_top_15]}>
               Node Address
             </Text>
