@@ -4,6 +4,7 @@ import _btc from '@io/btcClient';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
+import moment from 'moment';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
@@ -41,6 +42,7 @@ const getBtcWalletList = () => async dispatch => {
 
   try {
     await dispatch(initBtcClient());
+    await new Promise((res, resj) => setTimeout(res, 500));
     const watchedPub32 = await btcClient.getWatchedPub32();
     watchedPub32.forEach(({pub32, label}) =>
       btcWalletList.push({
@@ -84,25 +86,35 @@ const getWalletDetails = ({label, type}) => async dispatch => {
     txnData = [];
   try {
     await dispatch(initBtcClient());
+    await new Promise((res, resj) => setTimeout(res, 500));
     switch (type) {
       case C.STR_WATCH_WALLET_TYPE:
-        [balance, txnData] = await Promise.all([
-          btcClient.getBalanceByPub32Label(label),
-          btcClient.getTransactionsByPub32Label(label),
-        ]);
+        balance = await btcClient.getBalanceByPub32Label(label);
+        await new Promise((res, resj) => setTimeout(res, 500));
+        txnData = await btcClient.getTransactionsByPub32Label(label);
+        // [balance, txnData] = await Promise.all([
+        //   btcClient.getBalanceByPub32Label(label),
+        //   btcClient.getTransactionsByPub32Label(label),
+        // ]);
         break;
       case C.STR_SPEND_WALLET_TYPE:
-        [balance, txnData] = await Promise.all([
-          btcClient.getBalance(),
-          btcClient.getTxnsSpending(),
-        ]);
+        balance = await btcClient.getBalance(label);
+        await new Promise((res, resj) => setTimeout(res, 500));
+        txnData = await btcClient.getTxnsSpending(label);
+        // [balance, txnData] = await Promise.all([
+        //   btcClient.getBalance(),
+        //   btcClient.getTxnsSpending(),
+        // ]);
         break;
       default:
         break;
     }
     dispatch({
       type: types.BTC_WALLET_DETAILS + FULFILLED,
-      // payload: {btcWalletDetails: {balance, txnData, btcUnit}},
+    });
+
+    txnData.sort((a, b) => {
+      return moment(b.timereceived * 1000).diff(moment(a.timereceived * 1000));
     });
     return {balance, txnData};
   } catch (err) {
