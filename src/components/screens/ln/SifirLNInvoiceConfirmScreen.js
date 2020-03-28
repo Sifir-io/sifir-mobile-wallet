@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect, createRef, useRef} from 'react';
 import {
   StyleSheet,
@@ -18,8 +19,6 @@ import moment from 'moment';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import {ActivityIndicator} from 'react-native';
 
-// FIXME this comes from styles vh not window
-const {width, height} = Dimensions.get('window');
 const SifirLNInvoiceConfirmScreen = props => {
   const [routes, setRoutes] = useState([]);
   const [peers, setPeers] = useState([]);
@@ -75,14 +74,14 @@ const SifirLNInvoiceConfirmScreen = props => {
       clearTimeout(progressBar);
     }
   }, [props.lnWallet, progress]);
-
+  const isRouteFound = routeFound?.id ? true : false;
   const childRef = useRef();
   const {amount_msat, description, expiry} = props.route.params.invoice;
   const {loading, loaded, error, isPayingBolt} = props.lnWallet;
   const {walletInfo} = props.route.params;
   let openChannelLabel;
   let channel;
-  if (routeFound?.id) {
+  if (isRouteFound) {
     channel = routeFound.channels[0];
     openChannelLabel = `${channel.channel_id.slice(
       0,
@@ -137,7 +136,9 @@ const SifirLNInvoiceConfirmScreen = props => {
             <View style={[styles.flex1, styles.justify_center]}>
               <SifirChannelProgress
                 routes={routes}
+                isRouteFound={isRouteFound}
                 loaded={loading ? progress : loaded ? 100 : 0}
+                loading={loading}
               />
             </View>
           </View>
@@ -145,17 +146,31 @@ const SifirLNInvoiceConfirmScreen = props => {
           <View style={styles.justify_center}>
             <TouchableOpacity
               disabled={!loaded || loading || routes.length === 0}
-              style={styles.send_button}
+              style={
+                isRouteFound ? styles.send_button : styles.send_button_disabled
+              }
               onLongPress={() => handleSendButton()}>
               <Text
                 style={[
-                  styles.text_large,
-                  styles.text_center,
-                  styles.text_bold,
+                  styles.sendLabel,
+                  {
+                    color: isRouteFound ? AppStyle.backgroundColor : '#21827D',
+                    opacity: isRouteFound ? 1 : 0.7,
+                  },
                 ]}>
                 SEND
               </Text>
-              <Image source={Images.icon_up_dark} style={styles.send_icon} />
+              <Image
+                source={
+                  isRouteFound ? Images.icon_up_dark : Images.icon_up_blue
+                }
+                style={[
+                  styles.send_icon,
+                  {
+                    opacity: isRouteFound ? 1 : 0.5,
+                  },
+                ]}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -170,10 +185,10 @@ const SifirLNInvoiceConfirmScreen = props => {
             onAnimationStop={() => handleOpenChannelDrag()}
             onDragStop={() => handleOpenChannelDrag()}
             headerLayout={() => (
-              <View style={routeFound?.id ? styles.transparent : styles.orange}>
+              <View style={isRouteFound ? styles.transparent : styles.orange}>
                 <View
                   style={
-                    routeFound?.id
+                    isRouteFound
                       ? styles.activeTriangle
                       : styles.inactiveTriangle
                   }
@@ -181,11 +196,11 @@ const SifirLNInvoiceConfirmScreen = props => {
                 <Text
                   style={[
                     styles.commonTextStyle,
-                    routeFound?.id ? styles.orangeColor : styles.darkColor,
+                    isRouteFound ? styles.orangeColor : styles.darkColor,
                     styles.text_large,
                   ]}>
-                  {!routeFound?.id ? 'OPEN CHANNEL' : openChannelLabel}
-                  {routeFound?.id && (
+                  {!isRouteFound ? 'OPEN CHANNEL' : openChannelLabel}
+                  {isRouteFound && (
                     <SifirBTCAmount
                       amount={channel.spendable_msatoshi}
                       unit="MSAT"
@@ -276,8 +291,7 @@ const styles = StyleSheet.create({
   },
   send_button_disabled: {
     backgroundColor: 'transparent',
-    paddingVertical: 26,
-    paddingHorizontal: 85,
+    padding: 30,
     borderRadius: 10,
     marginTop: 52,
     width: '85%',
@@ -285,21 +299,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#53cbc8',
+    borderColor: '#21827D',
   },
   space_between: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   orange: {
-    width,
+    width: C.SCREEN_WIDTH,
     height: 80,
     backgroundColor: 'orange',
     justifyContent: 'center',
     alignItems: 'center',
   },
   transparent: {
-    width,
+    width: C.SCREEN_WIDTH,
     height: 80,
     backgroundColor: 'transparent',
     justifyContent: 'center',
@@ -309,8 +323,8 @@ const styles = StyleSheet.create({
     color: 'orange',
   },
   slidingPanelLayoutStyle: {
-    width,
-    height: height - 10,
+    width: C.SCREEN_WIDTH,
+    height: C.SCREEN_HEIGHT - 10,
     backgroundColor: 'orange',
     justifyContent: 'center',
     alignItems: 'center',
@@ -330,6 +344,15 @@ const styles = StyleSheet.create({
   },
   text_center: {
     textAlign: 'center',
+  },
+  text_primary: {
+    color: AppStyle.backgroundColor,
+  },
+  sendLabel: {
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontFamily: AppStyle.mainFont,
   },
   text_small: {
     fontSize: 8,

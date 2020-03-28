@@ -3,13 +3,15 @@ import {View, StyleSheet} from 'react-native';
 import {AppStyle} from '@common/index';
 
 export const SifirChannelProgress = props => {
-  let {loaded, routes} = props;
+  let {loaded, routes, isRouteFound, loading} = props;
+  const primaryColor =
+    !loading && !isRouteFound ? '#21827D' : AppStyle.mainColor;
   const isGoldenColor = routes.length ? true : false;
   let completed = loaded;
   let remaining = 100 - loaded;
-  let startDotColor = loaded === 0 ? 'rgb(30, 73, 95)' : AppStyle.mainColor;
-  let firstViewColor = AppStyle.mainColor;
-  let endDotColor = loaded === 100 ? AppStyle.mainColor : 'rgb(30, 73, 95)';
+  let startDotColor = loaded === 0 ? 'rgb(30, 73, 95)' : primaryColor;
+  let firstViewColor = primaryColor;
+  let endDotColor = loaded === 100 ? primaryColor : 'rgb(30, 73, 95)';
   let secondViewColor = 'rgb(30, 73, 95)';
 
   const styles = StyleSheet.create({
@@ -20,7 +22,7 @@ export const SifirChannelProgress = props => {
       alignItems: 'center',
     },
     completed: {
-      width: `${completed}%`,
+      width: `${completed - 2}%`,
       borderWidth: 1,
       borderStyle: loaded === 100 ? 'solid' : 'dashed',
       borderColor: isGoldenColor ? AppStyle.orange : firstViewColor,
