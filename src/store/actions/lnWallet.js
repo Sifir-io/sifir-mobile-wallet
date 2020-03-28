@@ -246,7 +246,6 @@ const createInvoice = invoice => async dispatch => {
     dispatch({
       type: types.LN_WALLET_CREATE_INVOICE + FULFILLED,
     });
-    console.log('createdInvoice-----------', createdInvoice);
     return createdInvoice;
   } catch (err) {
     error(err);
@@ -258,7 +257,6 @@ const createInvoice = invoice => async dispatch => {
 };
 
 const openAndFundPeerChannel = payload => async dispatch => {
-  console.log('payload', payload);
   dispatch({type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + PENDING});
   try {
     await dispatch(initLnClient());

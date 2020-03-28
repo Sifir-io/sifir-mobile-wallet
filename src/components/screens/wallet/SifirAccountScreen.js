@@ -3,7 +3,7 @@ import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
-import {getLnWalletDetails, createInvoice} from '@actions/lnWallet';
+import {getLnWalletDetails} from '@actions/lnWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
@@ -119,7 +119,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   getWalletDetails,
   getLnWalletDetails,
-  createInvoice,
 };
 
 // eslint-disable-next-line prettier/prettier

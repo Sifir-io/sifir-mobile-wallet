@@ -12,7 +12,6 @@ import {Images, AppStyle, C} from '@common/index';
 class SifirLNChannelConfirmedScreen extends Component {
   render() {
     const {fundingResponse, walletInfo} = this.props.route.params;
-    console.log('fundingResponse', fundingResponse);
     return (
       <ScrollView contentContainerStyle={styles.sv}>
         <View style={styles.mainView}>

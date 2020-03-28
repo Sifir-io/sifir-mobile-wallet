@@ -53,7 +53,6 @@ function SifirLNNodeSelectScreen(props) {
   };
   const nodeId = QRdataORuserInput.split('@')[0];
   const isValidNode = nodeRegx.test(nodeId);
-  console.log('selectedNode', selectedNode);
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
