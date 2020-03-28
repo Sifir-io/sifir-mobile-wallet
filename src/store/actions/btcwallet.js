@@ -98,9 +98,9 @@ const getWalletDetails = ({label, type}) => async dispatch => {
         // ]);
         break;
       case C.STR_SPEND_WALLET_TYPE:
-        balance = await btcClient.getBalance(label);
+        balance = await btcClient.getBalance();
         await new Promise((res, resj) => setTimeout(res, 500));
-        txnData = await btcClient.getTxnsSpending(label);
+        txnData = await btcClient.getTxnsSpending();
         // [balance, txnData] = await Promise.all([
         //   btcClient.getBalance(),
         //   btcClient.getTxnsSpending(),

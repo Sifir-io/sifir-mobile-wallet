@@ -35,7 +35,7 @@ const SifirLNChannelFundingScreen = ({
         msatoshi: fundingAmount,
       });
       // checking !== failed to handle timedout exception too
-      if (fundingResponse.result !== 'failed') {
+      if (fundingResponse && fundingResponse.result !== 'failed') {
         navigation.navigate('LnChannelConfirmed', {
           fundingResponse,
           walletInfo,
@@ -55,7 +55,7 @@ const SifirLNChannelFundingScreen = ({
         actions={[
           {
             text: C.STR_GO_BACK,
-            onPress: () => navigation.navigate('Account', {walletInfo}),
+            onPress: () => navigation.navigate('AccountList'),
           },
         ]}
       />

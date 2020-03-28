@@ -119,7 +119,7 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
       data={txnData}
       style={height}
       width={width}
-      keyExtractor={(item, index) => item.bolt11 + item.txid}
+      keyExtractor={(item, index) => item.bolt11 + item.txid + index}
       renderItem={({item}) => {
         if (type === C.STR_LN_WALLET_TYPE) {
           return <SifirInvEntry inv={item} unit={unit} />;

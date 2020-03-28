@@ -148,7 +148,10 @@ class SifirSettingModal extends Component {
                   label={C.Open_Channels}
                   onPress={() => {
                     this.props.hideModal();
-                    navigation.navigate('LNChannelRoute');
+                    navigation.navigate('LNChannelRoute', {
+                      screen: 'LnNodeSelect',
+                      params: {walletInfo},
+                    });
                   }}
                 />
               )}

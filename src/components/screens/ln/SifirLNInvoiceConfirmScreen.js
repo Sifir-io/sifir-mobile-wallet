@@ -91,13 +91,13 @@ const SifirLNInvoiceConfirmScreen = props => {
   if (error) {
     return (
       <ErrorScreen
-        title={C.STR_ERROR_btc_action}
-        desc={C.STR_ERROR_txn_error}
+        title={C.STR_ERROR_transaction}
+        desc={C.STR_ERROR_btc_txn_error}
         error={error}
         actions={[
           {
             text: C.STR_GO_BACK,
-            onPress: () => this.backToAccount(),
+            onPress: () => props.navigation.navigate('Account', {walletInfo}),
           },
         ]}
       />
