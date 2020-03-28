@@ -104,18 +104,19 @@ const getLnWalletDetails = () => async dispatch => {
     });
 
     const txnData = [...invoices, ...listPays];
-
-    txnData.sort((a, b) => {
-      if (a.decodedBolt) {
-        return moment(b.decodedBolt.timestamp * 1000).diff(
-          moment(a.decodedBolt.timestamp * 1000),
-        );
-      }
+    // remove invalid txns from array
+    const filteredTxnDatatxnData = txnData.filter(
+      txn => txn.decodedBolt?.timestamp > 1,
+    );
+    filteredTxnDatatxnData.sort((a, b) => {
+      return moment(b.decodedBolt.timestamp * 1000).diff(
+        moment(a.decodedBolt.timestamp * 1000),
+      );
     });
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
-    return {balance, txnData};
+    return {balance, txnData: filteredTxnDatatxnData};
   } catch (err) {
     error(err);
     dispatch({
@@ -232,13 +233,15 @@ const getPeers = nodeId => async dispatch => {
 };
 
 const createInvoice = invoice => async dispatch => {
-  invoice = {
-    msatoshi: 9999,
-    label: 'Top-Up 3rd',
-    description: 'By hamza',
-    expiry: 100000,
-    callback_url: 'CallBackUrl',
-  };
+  // Commenting it for future testing
+
+  // invoice = {
+  //   msatoshi: 9999,
+  //   label: 'Test in',
+  //   description: 'Test inv 3.28.2020',
+  //   expiry: 100000,
+  //   callback_url: 'CallBackUrl',
+  // };
   dispatch({type: types.LN_WALLET_CREATE_INVOICE + PENDING});
   try {
     await dispatch(initLnClient());
