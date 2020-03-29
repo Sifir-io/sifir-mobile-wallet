@@ -36,11 +36,8 @@ const SifirLNInvoiceConfirmScreen = props => {
     channel = routeFound.channels[0];
     const {channel_id} = channel;
     openChannelLabel = `${channel_id.slice(0, 4)}-${channel_id.slice(-4)} - `;
-
     // Generate total fees paid along route by subtracting msatoshi at index=0 from msatoshi of last entry in routes.
-    const lastIndexMsatoshi =
-      routes.length > 1 ? routes[routes.length - 1].msatoshi : 0; //msatoshi from last index  or 0(if only one route in array)
-    totalFees = routes[0].msatoshi - lastIndexMsatoshi;
+    totalFees = routes[0].msatoshi - routes[routes.length - 1].msatoshi;
   }
 
   useEffect(() => {

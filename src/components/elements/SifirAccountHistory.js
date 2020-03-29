@@ -19,11 +19,14 @@ const SifirAccountHistory = ({loading, loaded, txnData, btcUnit, type}) => {
         <TouchableOpacity>
           <Image source={Images.icon_setting} style={styles.settingIcon} />
         </TouchableOpacity>
+        {loading && (
+          <ActivityIndicator
+            style={styles.spinner}
+            color={AppStyle.mainColor}
+          />
+        )}
       </View>
       <View style={styles.txnListView}>
-        {loading && (
-          <ActivityIndicator size="large" color={AppStyle.mainColor} />
-        )}
         <SifirTxnList
           txnData={txnData}
           type={type}
@@ -55,6 +58,7 @@ const styles = StyleSheet.create({
     marginLeft: 25,
   },
   settingIcon: {width: 20, height: 20, marginLeft: 20, marginTop: 7},
+  spinner: {right: 30, position: 'absolute', alignSelf: 'center'},
 });
 
 export default SifirAccountHistory;
