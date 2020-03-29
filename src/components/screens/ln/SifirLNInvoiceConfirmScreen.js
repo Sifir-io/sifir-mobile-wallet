@@ -24,6 +24,25 @@ const SifirLNInvoiceConfirmScreen = props => {
   const [peers, setPeers] = useState([]);
   const [routeFound, setRouteFound] = useState({});
   const [progress, setProgress] = useState(10);
+  const isRouteFound = routeFound?.id ? true : false;
+  const childRef = useRef();
+  const {amount_msat, description, expiry} = props.route.params.invoice;
+  const {loading, loaded, error, isPayingBolt} = props.lnWallet;
+  const {walletInfo, bolt11} = props.route.params;
+  let openChannelLabel;
+  let channel;
+  let totalFees;
+  if (isRouteFound) {
+    channel = routeFound.channels[0];
+    const {channel_id} = channel;
+    openChannelLabel = `${channel_id.slice(0, 4)}-${channel_id.slice(-4)} - `;
+
+    // Generate total fees paid along route by subtracting msatoshi at index=0 from msatoshi of last entry in routes.
+    const lastIndexMsatoshi =
+      routes.length > 1 ? routes[routes.length - 1].msatoshi : 0; //msatoshi from last index  or 0(if only one route in array)
+    totalFees = routes[0].msatoshi - lastIndexMsatoshi;
+  }
+
   useEffect(() => {
     (async () => {
       const {invoice} = props.route.params;
@@ -39,7 +58,6 @@ const SifirLNInvoiceConfirmScreen = props => {
   }, []);
 
   const handleSendButton = async () => {
-    const {bolt11, walletInfo} = props.route.params;
     const txnInfo = await props.payBolt(bolt11);
     if (txnInfo.status === 'complete') {
       props.navigation.navigate('LnInvoicePaymentConfirmed', {
@@ -58,12 +76,11 @@ const SifirLNInvoiceConfirmScreen = props => {
     childRef.current?.onRequestClose();
     props.navigation.navigate('LNChannelRoute', {
       screen: 'LnNodeSelect',
-      params: {walletInfo},
+      params: {walletInfo, boltInputRequired: false, routes},
     });
   };
 
   useEffect(() => {
-    const {loading} = props.lnWallet;
     // TODO replace it with Animated API.
     let progressBar;
     if (loading) {
@@ -73,21 +90,8 @@ const SifirLNInvoiceConfirmScreen = props => {
     } else {
       clearTimeout(progressBar);
     }
-  }, [props.lnWallet, progress]);
-  const isRouteFound = routeFound?.id ? true : false;
-  const childRef = useRef();
-  const {amount_msat, description, expiry} = props.route.params.invoice;
-  const {loading, loaded, error, isPayingBolt} = props.lnWallet;
-  const {walletInfo} = props.route.params;
-  let openChannelLabel;
-  let channel;
-  if (isRouteFound) {
-    channel = routeFound.channels[0];
-    openChannelLabel = `${channel.channel_id.slice(
-      0,
-      4,
-    )}-${channel.channel_id.slice(-4)} - `;
-  }
+  }, [loading, progress]);
+
   if (error) {
     return (
       <ErrorScreen
@@ -201,10 +205,7 @@ const SifirLNInvoiceConfirmScreen = props => {
                   ]}>
                   {!isRouteFound ? 'OPEN CHANNEL' : openChannelLabel}
                   {isRouteFound && (
-                    <SifirBTCAmount
-                      amount={channel.spendable_msatoshi}
-                      unit="MSAT"
-                    />
+                    <SifirBTCAmount amount={totalFees} unit="MSAT" />
                   )}
                 </Text>
               </View>
