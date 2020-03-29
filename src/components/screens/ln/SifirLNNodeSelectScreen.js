@@ -7,6 +7,7 @@ import {
   Image,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
@@ -20,6 +21,8 @@ function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const {boltInputRequired, routes} = props.route.params;
   const [QRdataORuserInput, setQRorUserInput] = useState('');
+  const {loading, loaded} = props.lnWallet;
+
   useEffect(() => {
     (async () => {
       const nodeId = props.lnWallet.nodeInfo[0].id;
@@ -77,23 +80,26 @@ function SifirLNNodeSelectScreen(props) {
             </View>
           </View>
         )}
-        <Text
-          style={[
-            styles.text_large,
-            styles.text_white,
-            styles.text_bold,
-            styles.margin_top_30,
-            styles.mb_20,
-          ]}>
-          {boltInputRequired ? 'Browse Nodes' : 'Path to Invoice Node'}
-        </Text>
-        <SifirNodesTable
-          nodes={props.lnWallet.peers}
-          routes={routes}
-          loading={props.lnWallet.loading}
-          loaded={props.lnWallet.loaded}
-          boltInputRequired={boltInputRequired}
-        />
+        <View style={styles.headingAndSpinnerRow}>
+          <Text
+            style={[
+              styles.text_large,
+              styles.text_white,
+              styles.text_bold,
+              styles.margin_top_30,
+              styles.mb_20,
+            ]}>
+            {boltInputRequired ? 'Browse Nodes' : 'Path to Invoice Node'}
+          </Text>
+          {loading && !loaded && <ActivityIndicator />}
+        </View>
+        <View style={styles.nodesTblContainer}>
+          <SifirNodesTable
+            nodes={props.lnWallet.peers}
+            routes={routes}
+            boltInputRequired={boltInputRequired}
+          />
+        </View>
       </View>
       <TouchableOpacity
         disabled={isButtonDisabled}
@@ -196,7 +202,6 @@ const styles = StyleSheet.create({
   },
   margin_30: {
     margin: 30,
-    marginBottom: 120,
   },
   margin_top_30: {marginTop: 30},
   continueBtn: {
@@ -208,4 +213,10 @@ const styles = StyleSheet.create({
     right: 0,
     margin: 30,
   },
+  headingAndSpinnerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+  },
+  nodesTblContainer: {flex: 1, paddingBottom: 120},
 });

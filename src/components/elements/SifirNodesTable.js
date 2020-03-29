@@ -55,7 +55,7 @@ const Row = props => {
 };
 
 const SifirNodesTable = props => {
-  const {nodes, routes, loading, loaded, boltInputRequired} = props;
+  const {nodes, routes, boltInputRequired} = props;
   const tableData = boltInputRequired ? nodes : routes;
 
   const renderRow = (item, rowIndex) => {
@@ -94,7 +94,6 @@ const SifirNodesTable = props => {
   return (
     <View style={[styles.table, props.style]}>
       <Columns boltInputRequired={boltInputRequired} />
-      {loading && !loaded && <ActivityIndicator size="large" />}
       <ScrollView>{tableData.map((item, i) => renderRow(item, i))}</ScrollView>
     </View>
   );
