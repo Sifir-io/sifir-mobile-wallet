@@ -45,12 +45,16 @@ function SifirLNNodeSelectScreen(props) {
     return false;
   };
   const handleContinueBtn = () => {
-    const {walletInfo} = props.route.params;
-    props.navigation.navigate('LnChannelFunding', {
-      selectedNode,
-      nodeAddress: QRdataORuserInput,
-      walletInfo,
-    });
+    if (boltInputRequired) {
+      const {walletInfo} = props.route.params;
+      props.navigation.navigate('LnChannelFunding', {
+        selectedNode,
+        nodeAddress: QRdataORuserInput,
+        walletInfo,
+      });
+    } else {
+      props.navigation.goBack();
+    }
   };
 
   const isButtonDisabled = isContinueButtonDisabled();
