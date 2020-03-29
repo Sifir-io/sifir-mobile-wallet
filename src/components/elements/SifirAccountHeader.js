@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, ActivityIndicator, Image} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import LinearGradient from 'react-native-linear-gradient';
+const BTN_WIDTH = C.SCREEN_WIDTH / 2;
 
 const SifirAccountHeader = ({
   loading,
@@ -12,7 +13,6 @@ const SifirAccountHeader = ({
   btcUnit,
   label,
 }) => {
-  const BTN_WIDTH = C.SCREEN_WIDTH / 2;
   const walletIcon =
     type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
   return (
@@ -29,7 +29,9 @@ const SifirAccountHeader = ({
           )}
           {loaded === true && loading === false && (
             <>
-              <Text style={styles.boxTxt}>{label}</Text>
+              <Text style={styles.boxTxt} numberOfLines={1}>
+                {label}
+              </Text>
               {type === C.STR_WATCH_WALLET_TYPE && (
                 <Text style={styles.boxTxt}>{C.STR_WATCHING}</Text>
               )}
@@ -86,6 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginLeft: 13,
     marginBottom: -10,
+    marginRight: 4,
   },
   balanceView: {
     flex: 5,
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
   balAmountTxt: {
     color: 'white',
     fontFamily: AppStyle.mainFont,
-    fontSize: 50,
+    fontSize: BTN_WIDTH / 4,
   },
   balanceTxt: {
     color: AppStyle.mainColor,

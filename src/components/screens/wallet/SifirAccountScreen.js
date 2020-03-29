@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
   mainView: {
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
+    paddingTop: 10,
   },
   backNavView: {
     display: 'flex',
