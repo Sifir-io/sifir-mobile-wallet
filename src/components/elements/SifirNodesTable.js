@@ -10,49 +10,58 @@ import {
 import {AppStyle} from '@common/index';
 
 const Columns = props => {
+  let columns = [];
+  const {boltInputRequired} = props;
+  if (boltInputRequired) {
+    columns = ['Alias', 'Status', 'Capacity'];
+  } else {
+    columns = ['Channel', 'ID', 'Fees'];
+  }
+
   return (
     <View style={styles.columnWrapper}>
-      <View style={styles.columnBox}>
-        <Text style={styles.columnText}>Alias</Text>
-      </View>
-
-      <View style={styles.columnBox}>
-        <Text style={styles.columnText}>Status</Text>
-      </View>
-
-      <View style={styles.rowBox}>
-        <Text style={styles.columnText}>Capacity</Text>
-      </View>
+      {columns.map((col, index) => (
+        <View
+          style={
+            index === columns.length - 1 ? styles.rowBox : styles.columnBox
+          }>
+          <Text style={styles.columnText}>{col}</Text>
+        </View>
+      ))}
     </View>
   );
 };
+
 const Row = props => {
   const {
-    channelStatus,
-    capacity,
-    alias,
+    secondCol,
+    thirdCol,
+    firstCol,
     bgIndicator,
     selected,
     onSelect,
   } = props;
-  let backgroundColor = selected
+  const backgroundColor = selected
     ? '#ffa500'
     : bgIndicator % 2 === 0
     ? '#102c3a'
     : '#1f4c5f';
   return (
-    <TouchableOpacity style={{backgroundColor}} onPress={onSelect} key={alias}>
+    <TouchableOpacity
+      style={{backgroundColor}}
+      onPress={onSelect}
+      key={firstCol}>
       <View style={styles.rowWrapper}>
         <View style={styles.rowBox}>
-          <Text style={styles.columnTextRow}>{alias}</Text>
+          <Text style={styles.columnTextRow}>{firstCol}</Text>
         </View>
 
         <View style={styles.rowBox}>
-          <Text style={styles.columnTextRow}>{channelStatus}</Text>
+          <Text style={styles.columnTextRow}>{secondCol}</Text>
         </View>
 
         <View style={styles.rowBox}>
-          <Text style={styles.columnTextRow}>{capacity}</Text>
+          <Text style={styles.columnTextRow}>{thirdCol}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -60,37 +69,59 @@ const Row = props => {
 };
 
 const SifirNodesTable = props => {
-  const {nodes, loading, loaded} = props;
-  const renderRow = (item, i) => {
+  const {nodes, routes, loading, loaded, boltInputRequired} = props;
+  const tableData = boltInputRequired ? nodes : routes;
+
+  const renderRow = (item, rowIndex) => {
     const {selected, onSelect} = props;
-    const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
-    const channelStatus = item.channels[0]?.state;
-    const capacity = item.channels[0]?.spendable_msat;
-    return (
-      <Row
-        key={item.id}
-        alias={alias}
-        channelStatus={channelStatus}
-        capacity={capacity}
-        bgIndicator={i}
-        selected={selected && item.id === selected.id}
-        onSelect={() => onSelect(item)}
-      />
-    );
+    if (boltInputRequired) {
+      const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
+      const channelStatus = item.channels[0]?.state;
+      const capacity = item.channels[0]?.spendable_msat;
+      return (
+        <Row
+          key={item.id}
+          firstCol={alias}
+          secondCol={channelStatus}
+          thirdCol={capacity}
+          bgIndicator={rowIndex}
+          selected={selected && item.id === selected.id}
+          onSelect={() => onSelect(item)}
+        />
+      );
+    } else {
+      const {channel, id, msatoshi} = item;
+      const formattedID = `${id.slice(0, 4)} - ${id.slice(-4)}`;
+      let hopFee = 0;
+      if (rowIndex > 0) {
+        hopFee = msatoshi - routes[rowIndex - 1]?.msatoshi;
+      }
+      return (
+        <Row
+          key={item.id}
+          firstCol={channel}
+          secondCol={formattedID}
+          thirdCol={hopFee}
+          bgIndicator={rowIndex}
+          selected={selected && item.id === selected.id}
+          onSelect={() => onSelect(item)}
+        />
+      );
+    }
   };
 
   return (
     <View style={[styles.table, props.style]}>
-      <Columns />
+      <Columns boltInputRequired={boltInputRequired} />
       {loading && !loaded && <ActivityIndicator size="large" />}
-      <ScrollView>{nodes.map((item, i) => renderRow(item, i))}</ScrollView>
+      <ScrollView>{tableData.map((item, i) => renderRow(item, i))}</ScrollView>
     </View>
   );
 };
 export default SifirNodesTable;
 
 const styles = StyleSheet.create({
-  table: {flex: 1, backgroundColor: 'black'},
+  table: {backgroundColor: 'black'},
   columnWrapper: {
     padding: 10,
     flexDirection: 'row',
@@ -113,6 +144,6 @@ const styles = StyleSheet.create({
   columnTextRow: {
     color: AppStyle.mainColor,
     textAlign: 'center',
-    width: '70%',
+    width: '80%',
   },
 });
