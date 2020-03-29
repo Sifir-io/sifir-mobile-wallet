@@ -33,24 +33,10 @@ const Columns = props => {
 };
 
 const Row = props => {
-  const {
-    secondCol,
-    thirdCol,
-    firstCol,
-    bgIndicator,
-    selected,
-    onSelect,
-  } = props;
-  const backgroundColor = selected
-    ? '#ffa500'
-    : bgIndicator % 2 === 0
-    ? '#102c3a'
-    : '#1f4c5f';
+  const {secondCol, thirdCol, firstCol, bgIndicator} = props;
+  const backgroundColor = bgIndicator % 2 === 0 ? '#102c3a' : '#1f4c5f';
   return (
-    <TouchableOpacity
-      style={{backgroundColor}}
-      onPress={onSelect}
-      key={firstCol}>
+    <View style={{backgroundColor}} key={firstCol}>
       <View style={styles.rowWrapper}>
         <View style={styles.rowBox}>
           <Text style={styles.columnTextRow}>{firstCol}</Text>
@@ -64,7 +50,7 @@ const Row = props => {
           <Text style={styles.columnTextRow}>{thirdCol}</Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -73,7 +59,6 @@ const SifirNodesTable = props => {
   const tableData = boltInputRequired ? nodes : routes;
 
   const renderRow = (item, rowIndex) => {
-    const {selected, onSelect} = props;
     if (boltInputRequired) {
       const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
       const channelStatus = item.channels[0]?.state;
@@ -85,8 +70,6 @@ const SifirNodesTable = props => {
           secondCol={channelStatus}
           thirdCol={capacity}
           bgIndicator={rowIndex}
-          selected={selected && item.id === selected.id}
-          onSelect={() => onSelect(item)}
         />
       );
     } else {
@@ -103,8 +86,6 @@ const SifirNodesTable = props => {
           secondCol={formattedID}
           thirdCol={hopFee}
           bgIndicator={rowIndex}
-          selected={selected && item.id === selected.id}
-          onSelect={() => onSelect(item)}
         />
       );
     }

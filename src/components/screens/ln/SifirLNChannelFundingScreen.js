@@ -24,9 +24,8 @@ const SifirLNChannelFundingScreen = ({
 }) => {
   const [ln_enable_set_fees, setFeesEnabled] = useState(false);
   const [fundingAmount, setFundingAmount] = useState(0);
-  const {selectedNode, nodeAddress, walletInfo} = route.params;
-  // FIXME where to get nodeAlias? I didn't find it in above peers or selectedNode object.
-  const {id, nodeAlias} = selectedNode;
+  const {nodeAddress, walletInfo} = route.params;
+  const {id, alias} = walletInfo;
   const {loading, loaded, error} = lnWallet;
   const handleOpenChannelBtn = async () => {
     if (!isNaN(fundingAmount) && fundingAmount > 0) {
@@ -100,11 +99,11 @@ const SifirLNChannelFundingScreen = ({
           </View>
 
           <View style={[styles.margin_15, styles.margin_top_30]}>
-            {nodeAlias && (
+            {alias && (
               <>
                 <Text style={[styles.textBright]}>Alias</Text>
                 <Text style={[styles.text_white, styles.text_large]}>
-                  {nodeAlias}
+                  {alias}
                 </Text>
               </>
             )}

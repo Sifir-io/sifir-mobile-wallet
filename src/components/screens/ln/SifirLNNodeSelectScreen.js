@@ -20,7 +20,6 @@ function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
   const {boltInputRequired, routes} = props.route.params;
   const [QRdataORuserInput, setQRorUserInput] = useState('');
-  const [selectedNode, setSelectedNode] = useState({});
   useEffect(() => {
     (async () => {
       const nodeId = props.lnWallet.nodeInfo[0].id;
@@ -48,7 +47,6 @@ function SifirLNNodeSelectScreen(props) {
     if (boltInputRequired) {
       const {walletInfo} = props.route.params;
       props.navigation.navigate('LnChannelFunding', {
-        selectedNode,
         nodeAddress: QRdataORuserInput,
         walletInfo,
       });
@@ -92,12 +90,6 @@ function SifirLNNodeSelectScreen(props) {
         <SifirNodesTable
           nodes={props.lnWallet.peers}
           routes={routes}
-          selected={selectedNode}
-          onSelect={node =>
-            selectedNode.id === node.id
-              ? setSelectedNode({})
-              : setSelectedNode(node)
-          }
           loading={props.lnWallet.loading}
           loaded={props.lnWallet.loaded}
           boltInputRequired={boltInputRequired}

@@ -76,7 +76,11 @@ const SifirLNInvoiceConfirmScreen = props => {
     childRef.current?.onRequestClose();
     props.navigation.navigate('LNChannelRoute', {
       screen: 'LnNodeSelect',
-      params: {walletInfo, boltInputRequired: false, routes},
+      params: {
+        walletInfo,
+        boltInputRequired: isRouteFound ? false : true,
+        routes,
+      },
     });
   };
 
