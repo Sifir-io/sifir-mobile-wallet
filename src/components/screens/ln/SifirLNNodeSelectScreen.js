@@ -7,7 +7,6 @@ import {
   Image,
   TextInput,
   Modal,
-  Alert,
 } from 'react-native';
 import {AppStyle, Images} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
@@ -19,7 +18,7 @@ const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
 
 function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
-  // TODO set this null
+  const {boltInputRequired, routes} = props.route.params;
   const [QRdataORuserInput, setQRorUserInput] = useState('');
   const [selectedNode, setSelectedNode] = useState({});
   useEffect(() => {
@@ -37,41 +36,45 @@ function SifirLNNodeSelectScreen(props) {
     setModalVisible(false);
   };
 
-  const handleContinueBtn = () => {
-    const nodeId = QRdataORuserInput.split('@')[0];
-    const {walletInfo} = props.route.params;
-    if (nodeRegx.test(nodeId)) {
-      props.navigation.navigate('LnChannelFunding', {
-        selectedNode,
-        peers: props.lnWallet.peers,
-        nodeAddress: QRdataORuserInput,
-        walletInfo,
-      });
-    } else {
-      Alert.alert('Oops!', 'Entered node ID is invalid.');
+  const isContinueButtonDisabled = () => {
+    if (boltInputRequired) {
+      const nodeId = QRdataORuserInput.split('@')[0];
+      const isValidNode = nodeRegx.test(nodeId);
+      return isValidNode ? false : true;
     }
+    return false;
   };
-  const nodeId = QRdataORuserInput.split('@')[0];
-  const isValidNode = nodeRegx.test(nodeId);
+  const handleContinueBtn = () => {
+    const {walletInfo} = props.route.params;
+    props.navigation.navigate('LnChannelFunding', {
+      selectedNode,
+      nodeAddress: QRdataORuserInput,
+      walletInfo,
+    });
+  };
+
+  const isButtonDisabled = isContinueButtonDisabled();
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            placeholder="Enter Node URL"
-            placeholderTextColor="white"
-            style={[styles.input]}
-            selectionColor="white"
-            value={QRdataORuserInput}
-            onChangeText={txt => setQRorUserInput(txt)}
-          />
-          <View style={[styles.space_around]}>
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Image source={Images.camera_blue} style={styles.camera_icon} />
-            </TouchableOpacity>
-            <Image source={Images.icon_setting} style={styles.burger_icon} />
+        {boltInputRequired && (
+          <View style={styles.inputWrapper}>
+            <TextInput
+              placeholder="Enter Node URL"
+              placeholderTextColor="white"
+              style={[styles.input]}
+              selectionColor="white"
+              value={QRdataORuserInput}
+              onChangeText={txt => setQRorUserInput(txt)}
+            />
+            <View style={[styles.space_around]}>
+              <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <Image source={Images.camera_blue} style={styles.camera_icon} />
+              </TouchableOpacity>
+              <Image source={Images.icon_setting} style={styles.burger_icon} />
+            </View>
           </View>
-        </View>
+        )}
         <Text
           style={[
             styles.text_large,
@@ -80,10 +83,11 @@ function SifirLNNodeSelectScreen(props) {
             styles.margin_top_30,
             styles.mb_20,
           ]}>
-          Browse Nodes
+          {boltInputRequired ? 'Browse Nodes' : 'Path to Invoice Node'}
         </Text>
         <SifirNodesTable
           nodes={props.lnWallet.peers}
+          routes={routes}
           selected={selectedNode}
           onSelect={node =>
             selectedNode.id === node.id
@@ -92,25 +96,23 @@ function SifirLNNodeSelectScreen(props) {
           }
           loading={props.lnWallet.loading}
           loaded={props.lnWallet.loaded}
+          boltInputRequired={boltInputRequired}
         />
-
-        <TouchableOpacity
-          disabled={!isValidNode}
-          onPress={() => handleContinueBtn()}
-          // Adding inline style as condition is needed to be evaluated
-          style={[
-            styles.continueBtn,
-            // eslint-disable-next-line react-native/no-inline-styles
-            {
-              backgroundColor: isValidNode ? '#ffa500' : 'lightgrey',
-            },
-          ]}>
-          <Text
-            style={[styles.text_large, styles.text_center, styles.text_bold]}>
-            CONTINUE
-          </Text>
-        </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        disabled={isButtonDisabled}
+        onPress={() => handleContinueBtn()}
+        style={[
+          styles.continueBtn,
+          // eslint-disable-next-line react-native/no-inline-styles
+          {
+            backgroundColor: !isButtonDisabled ? '#ffa500' : 'lightgrey',
+          },
+        ]}>
+        <Text style={[styles.text_large, styles.text_center, styles.text_bold]}>
+          CONTINUE
+        </Text>
+      </TouchableOpacity>
       <Modal
         visible={isModalVisible}
         onRequestClose={() => setModalVisible(false)}
@@ -143,6 +145,7 @@ SifirLNNodeSelectScreen.navigationOptions = {
 const styles = StyleSheet.create({
   flex1: {
     flex: 1,
+    overflow: 'hidden',
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -197,11 +200,16 @@ const styles = StyleSheet.create({
   },
   margin_30: {
     margin: 30,
+    marginBottom: 120,
   },
   margin_top_30: {marginTop: 30},
   continueBtn: {
     padding: 20,
     borderRadius: 10,
-    marginTop: 50,
+    bottom: 0,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    margin: 30,
   },
 });
