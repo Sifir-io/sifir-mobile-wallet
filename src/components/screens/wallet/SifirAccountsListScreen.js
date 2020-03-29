@@ -72,9 +72,14 @@ class SifirAccountsListScreen extends React.Component {
         />
       );
     }
+    console.log('btcWalletList--', btcWalletList);
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
+          {(loading || lnLoading) && btcWalletList.length !== 0 && (
+            <ActivityIndicator size="large" color={AppStyle.mainColor} />
+          )}
+          <View />
           <TouchableOpacity
             activeOpacity={1}
             disabled={loading || lnLoading}
@@ -96,41 +101,33 @@ class SifirAccountsListScreen extends React.Component {
             />
           </View>
         )}
-        {loading && (
+        {btcWalletList.length === 0 && (
           <View style={styles.loading}>
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
         )}
+
         <View style={styles.gridView}>
-          {loaded === true &&
-            loading === false &&
-            btcWalletList.map((wallet, i) => (
+          {btcWalletList.map((wallet, i) => (
+            <SifirWalletButton
+              key={wallet.label}
+              width={CARD_SIZE}
+              height={CARD_SIZE * 1.1}
+              walletInfo={wallet}
+              navigate={navigate}
+            />
+          ))}
+          {nodeInfo.map((info, i) => {
+            return (
               <SifirWalletButton
-                key={wallet.label}
+                key={info.alias}
                 width={CARD_SIZE}
                 height={CARD_SIZE * 1.1}
-                walletInfo={wallet}
+                walletInfo={info}
                 navigate={navigate}
               />
-            ))}
-          {loaded && lnLoading && (
-            <View style={styles.LnSpinner}>
-              <ActivityIndicator size="large" color={AppStyle.mainColor} />
-            </View>
-          )}
-          {lnLoaded === true &&
-            lnLoading === false &&
-            nodeInfo.map((info, i) => {
-              return (
-                <SifirWalletButton
-                  key={info.alias}
-                  width={CARD_SIZE}
-                  height={CARD_SIZE * 1.1}
-                  walletInfo={info}
-                  navigate={navigate}
-                />
-              );
-            })}
+            );
+          })}
         </View>
       </View>
     );
@@ -141,7 +138,7 @@ const styles = StyleSheet.create({
   settingView: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     padding: 30,
     marginTop: 10,
     height: 100,
