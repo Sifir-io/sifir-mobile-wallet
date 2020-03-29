@@ -72,7 +72,6 @@ class SifirAccountsListScreen extends React.Component {
         />
       );
     }
-    console.log('btcWalletList--', btcWalletList);
     return (
       <View style={styles.mainView}>
         <View style={styles.settingView}>
