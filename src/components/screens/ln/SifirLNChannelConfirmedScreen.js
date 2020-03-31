@@ -24,9 +24,9 @@ class SifirLNChannelConfirmedScreen extends Component {
             <Text style={styles.addrTxt}>{fundingResponse.message}</Text>
             {fundingResponse.result && (
               <>
-                <Text style={styles.addrTxt}>TxID</Text>
+                <Text style={styles.addrTxt}>{C.STR_TxID}</Text>
                 <Text style={styles.payAddrTxt}>{fundingResponse.txid}</Text>
-                <Text style={styles.addrTxt}>Channel ID</Text>
+                <Text style={styles.addrTxt}>{C.STR_ChannelID}</Text>
                 <Text style={styles.payAddrTxt}>
                   {fundingResponse.channel_id}
                 </Text>

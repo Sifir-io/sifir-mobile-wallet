@@ -41,7 +41,7 @@ const SifirLNChannelFundingScreen = ({
         });
       }
     } else {
-      Alert.alert('Error', 'Please enter a valid funding amount.');
+      Alert.alert(C.STR_ERROR, C.STR_ERROR_enter_valid_amount);
     }
   };
 
@@ -76,7 +76,7 @@ const SifirLNChannelFundingScreen = ({
                   styles.text_normal,
                   styles.text_bold,
                 ]}>
-                Open Channel
+                {C.STR_Open_Channel}
               </Text>
             </TouchableOpacity>
           </View>
@@ -84,7 +84,7 @@ const SifirLNChannelFundingScreen = ({
           <View style={[styles.fuding_wrapper]}>
             <Text
               style={[styles.textBright, styles.text_normal, styles.text_bold]}>
-              FUNDING AMOUNT
+              {C.STR_FUNDING_AMOUNT}
             </Text>
             <View style={styles.fundingAmountInputContainer}>
               <TextInput
@@ -110,31 +110,35 @@ const SifirLNChannelFundingScreen = ({
             {id && (
               <>
                 <Text style={[styles.textBright, styles.margin_top_15]}>
-                  Node Id
+                  {C.STR_Node_Id}
                 </Text>
                 <Text style={[styles.text_white, styles.text_large]}>{id}</Text>
               </>
             )}
             <Text style={[styles.textBright, styles.margin_top_15]}>
-              Node Address
+              {C.STR_Node_Address}
             </Text>
             <Text style={[styles.text_white, styles.text_large]}>
               {nodeAddress}
             </Text>
 
-            <Text style={[styles.textBright, styles.margin_top_15]}>Port</Text>
-            <Text style={[styles.text_white, styles.text_large]}>Public</Text>
+            <Text style={[styles.textBright, styles.margin_top_15]}>
+              {C.STR_Port}
+            </Text>
+            <Text style={[styles.text_white, styles.text_large]}>
+              {C.STR_Public}
+            </Text>
 
             {ln_enable_set_fees && (
               <Text style={[styles.textBright, styles.margin_top_15]}>
-                Fees
+                {C.STR_Fees}
               </Text>
             )}
             <View style={[styles.space_between, styles.mt7]}>
               {ln_enable_set_fees && (
                 <View style={styles.outline_button}>
                   <Text style={[styles.text_white, styles.text_large]}>
-                    0.015 BTC
+                    0.015 {C.STR_BTC}
                   </Text>
                 </View>
               )}
@@ -158,9 +162,11 @@ const SifirLNChannelFundingScreen = ({
                 )}
                 {ln_enable_set_fees && (
                   <View style={styles.row}>
-                    <Text style={styles.textBright}>Approximate wait</Text>
+                    <Text style={styles.textBright}>
+                      {C.STR_Approximate_wait}
+                    </Text>
                     <Text style={[styles.text_white, {marginLeft: 40}]}>
-                      4 hours
+                      4 {C.STR_hours}
                     </Text>
                   </View>
                 )}
@@ -173,7 +179,7 @@ const SifirLNChannelFundingScreen = ({
             onPress={() => handleOpenChannelBtn()}>
             <Text
               style={[styles.text_26, styles.text_center, styles.text_bold]}>
-              OPEN CHANNEL
+              {C.STR_OPEN_CHANNEL}
             </Text>
           </TouchableOpacity>
         </View>

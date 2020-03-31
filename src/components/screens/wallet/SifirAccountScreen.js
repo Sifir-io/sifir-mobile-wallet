@@ -45,6 +45,28 @@ class SifirAccountScreen extends React.Component {
     this.stopLoading();
   }
 
+  handleReceiveButton = () => {
+    const {walletInfo} = this.props.route.params;
+    this.props.navigation.navigate('BtcReceiveTxn', {walletInfo});
+  };
+
+  handleSendBtn = () => {
+    const {
+      walletInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    if (type === C.STR_LN_WALLET_TYPE) {
+      this.props.navigation.navigate('LNPayInvoiceRoute', {
+        screen: 'LnScanBolt',
+        params: {walletInfo},
+      });
+    } else {
+      this.props.navigation.navigate('BtcReceiveTxn', {
+        walletInfo,
+      });
+    }
+  };
+
   render() {
     const {balance, txnData} = this.state;
     const {navigate} = this.props.navigation;
@@ -96,6 +118,8 @@ class SifirAccountScreen extends React.Component {
           type={type}
           label={label}
           walletInfo={walletInfo}
+          handleReceiveButton={this.handleReceiveButton}
+          handleSendBtn={this.handleSendBtn}
         />
         <SifirAccountHistory
           loading={loading || loadingLN}

@@ -11,8 +11,8 @@ import {AppStyle} from '@common/index';
 
 const Columns = props => {
   let columns = [];
-  const {boltInputRequired} = props;
-  if (boltInputRequired) {
+  const {nodeInputRequired} = props;
+  if (nodeInputRequired) {
     columns = ['Alias', 'Status', 'Capacity'];
   } else {
     columns = ['Channel', 'ID', 'Fees'];
@@ -55,11 +55,11 @@ const Row = props => {
 };
 
 const SifirNodesTable = props => {
-  const {nodes, routes, boltInputRequired} = props;
-  const tableData = boltInputRequired ? nodes : routes;
+  const {nodes, routes, nodeInputRequired} = props;
+  const tableData = nodeInputRequired ? nodes : routes;
 
   const renderRow = (item, rowIndex) => {
-    if (boltInputRequired) {
+    if (nodeInputRequired) {
       const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
       const channelStatus = item.channels[0]?.state;
       const capacity = item.channels[0]?.spendable_msat;
@@ -93,7 +93,7 @@ const SifirNodesTable = props => {
 
   return (
     <View style={[styles.table, props.style]}>
-      <Columns boltInputRequired={boltInputRequired} />
+      <Columns nodeInputRequired={nodeInputRequired} />
       <ScrollView>{tableData.map((item, i) => renderRow(item, i))}</ScrollView>
     </View>
   );

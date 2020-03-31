@@ -3,16 +3,13 @@ import {View, StyleSheet} from 'react-native';
 import {AppStyle} from '@common/index';
 
 export const SifirChannelProgress = props => {
-  let {loaded, routes, isRouteFound, loading} = props;
+  const {loaded, routes, isRouteFound, loading} = props;
   const primaryColor =
     !loading && !isRouteFound ? '#21827D' : AppStyle.mainColor;
   const isGoldenColor = routes.length ? true : false;
-  let completed = loaded;
-  let remaining = 100 - loaded;
-  let startDotColor = loaded === 0 ? 'rgb(30, 73, 95)' : primaryColor;
-  let firstViewColor = primaryColor;
-  let endDotColor = loaded === 100 ? primaryColor : 'rgb(30, 73, 95)';
-  let secondViewColor = 'rgb(30, 73, 95)';
+  const remaining = 100 - loaded;
+  const startDotColor = loaded === 0 ? 'rgb(30, 73, 95)' : primaryColor;
+  const endDotColor = loaded === 100 ? primaryColor : 'rgb(30, 73, 95)';
 
   const styles = StyleSheet.create({
     progress_wrapper: {
@@ -22,16 +19,16 @@ export const SifirChannelProgress = props => {
       alignItems: 'center',
     },
     completed: {
-      width: `${completed - 2}%`,
+      width: `${loaded - 2}%`,
       borderWidth: 1,
       borderStyle: loaded === 100 ? 'solid' : 'dashed',
-      borderColor: isGoldenColor ? AppStyle.orange : firstViewColor,
+      borderColor: isGoldenColor ? AppStyle.orange : primaryColor,
     },
     remaining: {
       width: `${remaining}%`,
       borderWidth: 1,
       borderStyle: 'dashed',
-      borderColor: secondViewColor,
+      borderColor: 'rgb(30, 73, 95)',
     },
     startDot: {
       position: 'absolute',

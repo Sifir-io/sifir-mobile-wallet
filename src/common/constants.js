@@ -18,6 +18,23 @@ export const C = {
   TRANSACTIONS: 'Transactions',
   STR_SEND: 'SEND',
   STR_Send: 'Send',
+  STR_TxID: 'TxID',
+  STR_ChannelID: 'Channel ID',
+  STR_Open_Channel: 'Open Channel',
+  STR_FUNDING_AMOUNT: 'FUNDING AMOUNT',
+  STR_Node_Id: 'Node Id',
+  STR_Node_Address: 'Node Address',
+  STR_Fees: 'Fees',
+  STR_hours: 'hours',
+  STR_Public: 'Public',
+  STR_Port: 'Port',
+  STR_Approximate_wait: 'Approximate wait',
+  STR_INVOICE_AMOUNT: 'INVOICE AMOUNT',
+  STR_EXPIRES_IN: 'EXPIRES IN',
+  STR_from_now: 'from now',
+  STR_Enter_Node_URL: 'Enter Node URL',
+  STR_Browse_Nodes: 'Browse Nodes',
+  STR_Path_to_Node: 'Path to Invoice Node',
   STR_RECEIVE: 'RECEIVE',
   Open_Channels: 'OPEN CHANNELS',
   TOP_UP: 'TOP UP',
@@ -97,11 +114,13 @@ export const C = {
   STR_Wallet_balance: 'Wallet Balance',
   // --- ERRORS --
   STR_ERROR_app: 'App Error',
+  STR_ERROR: 'Error',
   STR_ERROR_app_unhandled:
     'An undetermined error has occured, this will be logged',
   STR_ERROR_btc_action: 'BTC Wallet Error',
   STR_ERROR_transaction: 'Transaction Error',
   STR_ERROR_channel_action: 'Channel Error',
+  STR_ERROR_enter_valid_amount: 'Please enter a valid funding amount.',
   STR_ERROR_account_screen:
     'An error occured while trying to load your Wallet details',
   STR_ERROR_account_list_screen:
@@ -111,4 +130,5 @@ export const C = {
   STR_ERROR_txn_error: 'An error occured while opening a channel',
   STR_ERROR_btc_txn_error:
     'An error occured while completing this transaction.',
+  LN_ERROR_Funding_timeout_sucess_response: 'Please check peer list',
 };

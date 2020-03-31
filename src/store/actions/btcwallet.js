@@ -114,7 +114,7 @@ const getWalletDetails = ({label, type}) => async dispatch => {
     });
 
     txnData.sort((a, b) => {
-      return moment(b.timereceived * 1000).diff(moment(a.timereceived * 1000));
+      return b.timereceived - a.timereceived;
     });
     return {balance, txnData};
   } catch (err) {

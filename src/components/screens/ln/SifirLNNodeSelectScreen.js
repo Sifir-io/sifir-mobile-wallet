@@ -9,17 +9,16 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import {AppStyle, Images} from '@common/index';
+import {AppStyle, Images, C} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
 import {getPeers} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
-
-const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
+import {isValidLnNodeId} from '@helpers/validations';
 
 function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
-  const {boltInputRequired, routes} = props.route.params;
+  const {nodeInputRequired, routes} = props.route.params;
   const [QRdataORuserInput, setQRorUserInput] = useState('');
   const {loading, loaded} = props.lnWallet;
 
@@ -39,15 +38,14 @@ function SifirLNNodeSelectScreen(props) {
   };
 
   const isContinueButtonDisabled = () => {
-    if (boltInputRequired) {
+    if (nodeInputRequired) {
       const nodeId = QRdataORuserInput.split('@')[0];
-      const isValidNode = nodeRegx.test(nodeId);
-      return isValidNode ? false : true;
+      return isValidLnNodeId(nodeId) ? false : true;
     }
     return false;
   };
   const handleContinueBtn = () => {
-    if (boltInputRequired) {
+    if (nodeInputRequired) {
       const {walletInfo} = props.route.params;
       props.navigation.navigate('LnChannelFunding', {
         nodeAddress: QRdataORuserInput,
@@ -62,10 +60,10 @@ function SifirLNNodeSelectScreen(props) {
   return (
     <View style={styles.container}>
       <View style={[styles.margin_30, styles.flex1]}>
-        {boltInputRequired && (
+        {nodeInputRequired && (
           <View style={styles.inputWrapper}>
             <TextInput
-              placeholder="Enter Node URL"
+              placeholder={C.STR_Enter_Node_URL}
               placeholderTextColor="white"
               style={[styles.input]}
               selectionColor="white"
@@ -89,7 +87,7 @@ function SifirLNNodeSelectScreen(props) {
               styles.margin_top_30,
               styles.mb_20,
             ]}>
-            {boltInputRequired ? 'Browse Nodes' : 'Path to Invoice Node'}
+            {nodeInputRequired ? C.STR_Browse_Nodes : C.STR_Path_to_Node}
           </Text>
           {loading && !loaded && <ActivityIndicator />}
         </View>
@@ -97,7 +95,7 @@ function SifirLNNodeSelectScreen(props) {
           <SifirNodesTable
             nodes={props.lnWallet.peers}
             routes={routes}
-            boltInputRequired={boltInputRequired}
+            nodeInputRequired={nodeInputRequired}
           />
         </View>
       </View>
@@ -112,7 +110,7 @@ function SifirLNNodeSelectScreen(props) {
           },
         ]}>
         <Text style={[styles.text_large, styles.text_center, styles.text_bold]}>
-          CONTINUE
+          {C.STR_CONTINUE}
         </Text>
       </TouchableOpacity>
       <Modal

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Text,
+  ScrollView,
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {sendBitcoin} from '@actions/btcwallet';
@@ -14,6 +15,7 @@ import {withdrawFunds} from '@actions/lnWallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 import {ErrorScreen} from '@screens/error';
+import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 class SifirBtcSendTxnConfirmScreen extends Component {
   constructor(props, context) {
@@ -49,13 +51,13 @@ class SifirBtcSendTxnConfirmScreen extends Component {
   };
 
   sendBitcoin = async () => {
-    const {
-      txnInfo,
-      walletInfo: {type},
-    } = this.props.route.params;
+    const {txnInfo, walletInfo} = this.props.route.params;
     const {address, amount} = txnInfo;
     await this.props.sendBitcoin({address, amount});
-    // TODO handle navigation here
+    this.props.navigation.navigate('BtcTxnConfirmed', {
+      txnInfo: {...txnInfo, isSendTxn: true},
+      walletInfo,
+    });
   };
 
   handleSendBtn = () => {
@@ -76,7 +78,6 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     } = this.props.route.params;
     const amountFontSize =
       (C.vw * 80) / (amount.length < 3 ? 5 : amount.length);
-    const btcUnitFontSize = amountFontSize * 0.6;
     const recTxtFontSize = (C.vw * 120) / address.length;
     const {loading: btcLoading, error: btcError} = this.props.lnWallet;
     const {loading: lnLoading, error: lnError} = this.props.btcWallet;
@@ -99,66 +100,68 @@ class SifirBtcSendTxnConfirmScreen extends Component {
 
     return (
       <View style={styles.mainView}>
-        <View
-          style={styles.setting}
-          onTouchEnd={() =>
-            feeSettingEnabled && this.setState({modalVisible: true})
-          }>
-          <TouchableOpacity>
-            <Image source={Images.icon_setting} style={styles.settingImg} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.addressContainer}>
-          <Text style={styles.recTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
-          <Text style={[styles.addrTxt, {fontSize: recTxtFontSize}]}>
-            {address}
-          </Text>
-          <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
-        </View>
-        <View style={styles.valueTxt}>
-          <View style={styles.amountContainer}>
-            <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
-              {amount}{' '}
+        <ScrollView>
+          <View
+            style={styles.setting}
+            onTouchEnd={() =>
+              feeSettingEnabled && this.setState({modalVisible: true})
+            }>
+            <TouchableOpacity>
+              <Image source={Images.icon_setting} style={styles.settingImg} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.addressContainer}>
+            <Text style={styles.recTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
+            <Text style={[styles.addrTxt, {fontSize: recTxtFontSize}]}>
+              {address}
             </Text>
-            <Text style={[styles.amountUniLabel, {fontSize: btcUnitFontSize}]}>
-              {type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
-            </Text>
+            <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
           </View>
-          <View style={styles.lineView} />
-        </View>
-        {feeSettingEnabled && (
-          <View style={styles.setArea}>
-            <Text style={styles.setTxt}>{C.STR_FEES}</Text>
-            <Text style={styles.btcAmountTxt}>{amount} BTC</Text>
-            <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
+          <View style={styles.valueTxt}>
+            <View style={styles.amountContainer}>
+              <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
+                <SifirBTCAmount
+                  amount={amount}
+                  unit={type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
+                />
+              </Text>
+            </View>
+            <View style={styles.lineView} />
           </View>
-        )}
-        {(btcLoading || lnLoading) && <ActivityIndicator size="large" />}
-        <TouchableOpacity
-          onLongPress={this.handleSendBtn}
-          style={styles.sendBtnTouchable}>
-          <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
-            <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
-            <Image source={Images.icon_up_dark} style={styles.sendImg} />
-          </View>
-        </TouchableOpacity>
-        <Overlay
-          visible={this.state.modalVisible}
-          onClose={this.onClose}
-          closeOnTouchOutside
-          animationType="zoomIn"
-          containerStyle={styles.overlayContainer}
-          childrenWrapperStyle={styles.dlgChild}
-          animationDuration={500}>
-          {hideModal => (
-            <SifirSettingModal
-              hideModal={hideModal}
-              feeEnabled={feeSettingEnabled}
-              showSettings={true}
-              showManageFunds={true}
-            />
+          {feeSettingEnabled && (
+            <View style={styles.setArea}>
+              <Text style={styles.setTxt}>{C.STR_FEES}</Text>
+              <Text style={styles.btcAmountTxt}>{amount} BTC</Text>
+              <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
+            </View>
           )}
-        </Overlay>
+          {(btcLoading || lnLoading) && <ActivityIndicator size="large" />}
+          <TouchableOpacity
+            onLongPress={this.handleSendBtn}
+            style={styles.sendBtnTouchable}>
+            <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
+              <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
+              <Image source={Images.icon_up_dark} style={styles.sendImg} />
+            </View>
+          </TouchableOpacity>
+          <Overlay
+            visible={this.state.modalVisible}
+            onClose={this.onClose}
+            closeOnTouchOutside
+            animationType="zoomIn"
+            containerStyle={styles.overlayContainer}
+            childrenWrapperStyle={styles.dlgChild}
+            animationDuration={500}>
+            {hideModal => (
+              <SifirSettingModal
+                hideModal={hideModal}
+                feeEnabled={feeSettingEnabled}
+                showSettings={true}
+                showManageFunds={true}
+              />
+            )}
+          </Overlay>
+        </ScrollView>
       </View>
     );
   }

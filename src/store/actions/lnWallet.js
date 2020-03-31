@@ -4,9 +4,7 @@ import _ln from '@io/lnClient';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
-import lightningPayReq from '../../../bolt11.min';
-import moment from 'moment';
-
+import bolt11Lib from '@helpers/bolt11.min';
 let lnClient;
 
 const initLnClient = () => async (dispatch, getState) => {
@@ -90,33 +88,35 @@ const getLnWalletDetails = () => async dispatch => {
     }, 0);
     const balance = inChannelBalance + outputBalance;
 
-    invoices.forEach(inv => {
+    const invoicesWithDecodedBolts = [...invoices];
+    const paysWithDecodedBolts = [...listPays];
+
+    invoicesWithDecodedBolts.map(inv => {
       try {
-        inv.decodedBolt = lightningPayReq.decode(inv.bolt11);
+        inv.decodedBolt = bolt11Lib.decode(inv.bolt11);
         inv.type = 'invoice';
       } catch {}
     });
-    listPays.forEach(pay => {
+
+    paysWithDecodedBolts.map(pay => {
       try {
-        pay.decodedBolt = lightningPayReq.decode(pay.bolt11);
+        pay.decodedBolt = bolt11Lib.decode(pay.bolt11);
         pay.type = 'pays';
       } catch {}
     });
 
-    const txnData = [...invoices, ...listPays];
+    const txnData = [...invoicesWithDecodedBolts, ...paysWithDecodedBolts];
     // remove invalid txns from array
-    const filteredTxnDatatxnData = txnData.filter(
+    const filteredTxnData = txnData.filter(
       txn => txn.decodedBolt?.timestamp > 1,
     );
-    filteredTxnDatatxnData.sort((a, b) => {
-      return moment(b.decodedBolt.timestamp * 1000).diff(
-        moment(a.decodedBolt.timestamp * 1000),
-      );
+    filteredTxnData.sort((a, b) => {
+      return b.decodedBolt.timestamp - a.decodedBolt.timestamp;
     });
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
-    return {balance, txnData: filteredTxnDatatxnData};
+    return {balance, txnData: filteredTxnData};
   } catch (err) {
     error(err);
     dispatch({
@@ -258,7 +258,6 @@ const createInvoice = invoice => async dispatch => {
     });
   }
 };
-
 const openAndFundPeerChannel = payload => async dispatch => {
   dispatch({type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + PENDING});
   try {
@@ -272,7 +271,7 @@ const openAndFundPeerChannel = payload => async dispatch => {
     // if timedout; consider it as success.
     if (typeof err?.err === 'string' && err.err.includes('timedout')) {
       const fundingResponse = {
-        message: 'Please check peer list',
+        message: C.LN_ERROR_Funding_timeout_sucess_response,
       };
       dispatch({
         type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + FULFILLED,

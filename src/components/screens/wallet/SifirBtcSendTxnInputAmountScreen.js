@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import {AppStyle, C} from '@common/index';
+import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 export default class SifirBtcSendTxnInputAmountScreen extends Component {
   constructor(props, context) {
@@ -61,12 +62,13 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               <Text style={styles.recLblTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
               <Text style={styles.recTxt}>{address}</Text>
               <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
-              <TouchableOpacity onPress={() => this.checkAndSetInput(balance)}>
-                <Text style={styles.smallWhiteText}>
-                  {`${C.STR_Wallet_balance}: ${balance} `}
-                  {type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
-                </Text>
-              </TouchableOpacity>
+              <Text style={styles.smallWhiteText}>
+                {`${C.STR_Wallet_balance}: `}
+                <SifirBTCAmount
+                  amount={balance}
+                  unit={type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
+                />
+              </Text>
             </View>
             <View style={{marginTop: 15}}>
               <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>

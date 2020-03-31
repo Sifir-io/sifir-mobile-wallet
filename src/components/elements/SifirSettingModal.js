@@ -150,7 +150,7 @@ class SifirSettingModal extends Component {
                     this.props.hideModal();
                     navigation.navigate('LNChannelRoute', {
                       screen: 'LnNodeSelect',
-                      params: {walletInfo, boltInputRequired: true},
+                      params: {walletInfo, nodeInputRequired: true},
                     });
                   }}
                 />

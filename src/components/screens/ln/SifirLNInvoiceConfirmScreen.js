@@ -1,12 +1,11 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect, createRef, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Image,
-  Dimensions,
   ScrollView,
 } from 'react-native';
 import {AppStyle, Images, C} from '@common/index';
@@ -75,7 +74,7 @@ const SifirLNInvoiceConfirmScreen = props => {
       screen: 'LnNodeSelect',
       params: {
         walletInfo,
-        boltInputRequired: isRouteFound ? false : true,
+        nodeInputRequired: isRouteFound ? false : true,
         routes,
       },
     });
@@ -93,6 +92,12 @@ const SifirLNInvoiceConfirmScreen = props => {
     }
   }, [loading, progress]);
 
+  const formatExpiryDate = () => {
+    return moment(Date.now() + expiry * 1000)
+      .fromNow()
+      .substr(3);
+  };
+
   if (error) {
     return (
       <ErrorScreen
@@ -108,6 +113,8 @@ const SifirLNInvoiceConfirmScreen = props => {
       />
     );
   }
+
+  const expiryDate = formatExpiryDate();
   return (
     <View style={styles.container}>
       <ScrollView
@@ -116,7 +123,7 @@ const SifirLNInvoiceConfirmScreen = props => {
         <View style={[styles.margin_30, styles.flex1]}>
           <View style={[styles.funding_wrapper]}>
             <Text style={[styles.textBright, styles.text_11, styles.text_bold]}>
-              INVOICE AMOUNT
+              {C.STR_INVOICE_AMOUNT}
             </Text>
             <View style={[styles.textRow]}>
               <Text style={[styles.text_white, styles.text_x_large]}>
@@ -127,13 +134,10 @@ const SifirLNInvoiceConfirmScreen = props => {
               {description}
             </Text>
             <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
-              EXPIRES IN{'  '}
+              {C.STR_EXPIRES_IN}
+              {'  '}
               <Text style={[styles.text_white, styles.text_18]}>
-                {/* convert seconds to MS by * with 1000 */}
-                {moment(Date.now() + expiry * 1000)
-                  .fromNow()
-                  .substr(3)}{' '}
-                from now
+                {expiryDate} {C.STR_from_now}
               </Text>
             </Text>
           </View>
@@ -163,7 +167,7 @@ const SifirLNInvoiceConfirmScreen = props => {
                     opacity: isRouteFound ? 1 : 0.7,
                   },
                 ]}>
-                SEND
+                {C.STR_SEND}
               </Text>
               <Image
                 source={
@@ -204,9 +208,9 @@ const SifirLNInvoiceConfirmScreen = props => {
                     isRouteFound ? styles.orangeColor : styles.darkColor,
                     styles.text_large,
                   ]}>
-                  {!isRouteFound ? 'OPEN CHANNEL' : openChannelLabel}
+                  {!isRouteFound ? C.STR_OPEN_CHANNEL : openChannelLabel}
                   {isRouteFound && (
-                    <SifirBTCAmount amount={totalFees} unit="MSAT" />
+                    <SifirBTCAmount amount={totalFees} unit={C.STR_MSAT} />
                   )}
                 </Text>
               </View>

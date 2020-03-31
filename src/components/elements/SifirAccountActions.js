@@ -8,21 +8,8 @@ import {
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 
-const SifirAccountActions = ({navigate, type, label, walletInfo}) => {
+const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
   const [btnStatus, setButtonStatus] = useState(0);
-
-  const handleSendBtn = () => {
-    if (type === C.STR_LN_WALLET_TYPE) {
-      navigate('LNPayInvoiceRoute', {
-        screen: 'LnScanBolt',
-        params: {walletInfo},
-      });
-    } else {
-      navigate('BtcReceiveTxn', {
-        walletInfo: {type, label},
-      });
-    }
-  };
 
   return (
     <View style={styles.btnAreaView}>
@@ -30,7 +17,7 @@ const SifirAccountActions = ({navigate, type, label, walletInfo}) => {
         <TouchableWithoutFeedback
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(1)}
-          onPressOut={() => handleSendBtn()}>
+          onPressOut={handleSendBtn}>
           <View
             style={[
               styles.txnBtnView,
@@ -50,7 +37,7 @@ const SifirAccountActions = ({navigate, type, label, walletInfo}) => {
           onPressIn={() => setButtonStatus(2)}
           onPressOut={() => {
             setButtonStatus(0);
-            navigate('BtcReceiveTxn', {walletInfo: {type, label}});
+            handleReceiveButton();
           }}>
           <View
             style={[

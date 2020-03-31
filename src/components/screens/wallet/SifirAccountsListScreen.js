@@ -47,13 +47,8 @@ class SifirAccountsListScreen extends React.Component {
     const CARD_SIZE = C.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
     const {
-      btcWallet: {btcWalletList, loaded, loading, error},
-      lnWallet: {
-        nodeInfo,
-        loaded: lnLoaded,
-        loading: lnLoading,
-        nodeError: lnError,
-      },
+      btcWallet: {btcWalletList, loading, error},
+      lnWallet: {nodeInfo, loading: lnLoading, nodeError: lnError},
     } = this.props;
     if (error || lnError) {
       return (
