@@ -28,9 +28,9 @@ class SifirAccountsListScreen extends React.Component {
   };
 
   componentDidMount() {
-    this._init();
-    this.stopLoading = this.props.navigation.addListener('focus', () =>
-      this._init(),
+    this.stopLoading = this.props.navigation.addListener(
+      'focus',
+      this._init.bind(this),
     );
   }
   componentWillUnmount() {

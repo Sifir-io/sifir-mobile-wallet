@@ -52,25 +52,26 @@ const getLnNodeInfo = () => async dispatch => {
   dispatch({type: types.LN_WALLET_NODEINFO + PENDING});
   await dispatch(initLnClient());
   try {
-    const [{channels, outputs}, nodeInfo] = await Promise.all([
-      lnClient.listFunds(),
-      lnClient.getNodeInfo(),
-    ]);
-    const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
-      balance += channel_sat;
-      return balance;
-    }, 0);
-    const outputBalance = outputs.reduce((balance, {value}) => {
-      balance += value;
-      return balance;
-    }, 0);
-    const balance = inChannelBalance + outputBalance;
+    const nodeInfo = await lnClient.getNodeInfo();
+    //const [{channels, outputs}, nodeInfo] = await Promise.all([
+    //  lnClient.listFunds(),
+    //  lnClient.getNodeInfo(),
+    //]);
+    //const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
+    //  balance += channel_sat;
+    //  return balance;
+    //}, 0);
+    //const outputBalance = outputs.reduce((balance, {value}) => {
+    //  balance += value;
+    //  return balance;
+    //}, 0);
+    //const balance = inChannelBalance + outputBalance;
     nodeInfo.pageURL = 'Account';
     nodeInfo.type = C.STR_LN_WALLET_TYPE;
     nodeInfo.label = nodeInfo.alias;
     nodeInfo.iconURL = Images.icon_light;
     nodeInfo.iconClickedURL = Images.icon_light_clicked;
-    nodeInfo.balance = balance;
+    // nodeInfo.balance = balance;
     dispatch({
       type: types.LN_WALLET_NODEINFO + FULFILLED,
       payload: {nodeInfo},
@@ -111,7 +112,7 @@ const getLnWalletDetails = () => async dispatch => {
       try {
         return {
           ...inv,
-          decodedBolt: bolt11Lib.decode(inv.bolt11),
+          // decodedBolt: bolt11Lib.decode(inv.bolt11),
           type: 'invoice',
         };
       } catch {}
@@ -119,26 +120,28 @@ const getLnWalletDetails = () => async dispatch => {
     console.log('TIME1', time - Date.now());
     const time2 = Date.now();
     const paysWithDecodedBolts = pays.map(pay => {
-      console.log('Decoding', pay);
       try {
         return {
           ...pay,
-          decodedBolt: bolt11Lib.decode(pay.bolt11),
+          // decodedBolt: bolt11Lib.decode(pay.bolt11),
           type: 'pays',
         };
       } catch {}
     });
     console.log('TIME2', time2 - Date.now());
 
-    const txnData = [...invoicesWithDecodedBolts, ...paysWithDecodedBolts];
+    // const txnData = [...invoicesWithDecodedBolts, ...paysWithDecodedBolts];
     // remove invalid txns from array
-    const filteredTxnData = txnData
-      .filter(txn => txn?.decodedBolt?.timestamp > 1)
-      .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
+    //const filteredTxnData = txnData
+    //  .filter(txn => txn?.decodedBolt?.timestamp > 1)
+    //  .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
-    return {balance, txnData: filteredTxnData};
+    return {
+      balance,
+      txnData: [...paysWithDecodedBolts, ...invoicesWithDecodedBolts],
+    };
   } catch (err) {
     error(err);
     dispatch({

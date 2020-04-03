@@ -10,6 +10,7 @@ import {
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import moment from 'moment';
 import {Images, AppStyle, C} from '@common/index';
+import bolt11Lib from '@helpers/bolt11.min';
 
 const makeInvoiceRenderData = ({decodedBolt, description: desc, status}) => {
   let amount, imgURL, description, timeStr;
@@ -33,6 +34,7 @@ const makePaysRenderData = ({decodedBolt, preimage}) => {
   const {millisatoshis, complete, timestamp} = decodedBolt;
   if (complete) {
     imgURL = Images.icon_send;
+    // FIXME strings to constants...
     description = `Paid - ${preimage.slice(0, 3)} .. ${preimage.slice(-3)}`;
     amount = millisatoshis;
     timeStr = moment(timestamp * 1000).fromNow();
@@ -66,6 +68,7 @@ const makeTxnRenderData = ({category, txid, amount, timereceived}) => {
   return {imgURL, txIDStr, amount, timeStr};
 };
 
+// FIXME this file is starting to get conjected , move these to elements
 const SifirTxnEntry = ({txn, unit}) => {
   const {imgURL, txIDStr, amount, timeStr} = makeTxnRenderData(txn);
   return (
@@ -79,22 +82,40 @@ const SifirTxnEntry = ({txn, unit}) => {
   );
 };
 
-const SifirInvEntry = ({inv, inv: {type, decodedBolt}, unit}) => {
-  if (decodedBolt) {
-    const {amount, imgURL, timeStr, description} =
-      type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
-    return (
-      <ListItem
-        title={timeStr}
-        description={description}
-        amount={amount}
-        unit={unit}
-        imgURL={imgURL}
-      />
-    );
-  }
-  return null;
+const SifirInvEntry = ({inv, unit}) => {
+  const {type, bolt11} = inv;
+  const decodedBolt = bolt11Lib.decode(bolt11);
+  console.log('Siiifff', type, bolt11, decodedBolt);
+  const {amount, imgURL, timeStr, description} =
+    type === 'invoice'
+      ? makeInvoiceRenderData({decodedBolt, ...inv})
+      : makePaysRenderData({decodedBolt, ...inv});
+  return (
+    <ListItem
+      title={timeStr}
+      description={description}
+      amount={amount}
+      unit={unit}
+      imgURL={imgURL}
+    />
+  );
 };
+//const SifirInvEntry = ({inv, inv: {type, decodedBolt}, unit}) => {
+//  if (decodedBolt) {
+//    const {amount, imgURL, timeStr, description} =
+//      type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
+//    return (
+//      <ListItem
+//        title={timeStr}
+//        description={description}
+//        amount={amount}
+//        unit={unit}
+//        imgURL={imgURL}
+//      />
+//    );
+//  }
+//  return null;
+//};
 
 const ListItem = ({title, description, imgURL, amount, unit}) => {
   return (

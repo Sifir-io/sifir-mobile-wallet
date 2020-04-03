@@ -4,7 +4,6 @@ import _btc from '@io/btcClient';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
-import moment from 'moment';
 let btcClient;
 
 const initBtcClient = () => async (dispatch, getState) => {
@@ -42,7 +41,6 @@ const getBtcWalletList = () => async dispatch => {
 
   try {
     await dispatch(initBtcClient());
-    await new Promise((res, resj) => setTimeout(res, 500));
     const watchedPub32 = await btcClient.getWatchedPub32();
     watchedPub32.forEach(({pub32, label}) =>
       btcWalletList.push({
@@ -127,7 +125,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
 };
 
 const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
-  log('getwalletaddress');
   dispatch({type: types.BTC_WALLET_ADDRESS + PENDING});
   let address = null;
 
@@ -144,12 +141,10 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
       default:
         break;
     }
-    log('dispatch getwalletaddress');
     dispatch({
       type: types.BTC_WALLET_ADDRESS + FULFILLED,
       payload: {address},
     });
-    log('getwalletaddress goinghome');
   } catch (err) {
     error(err);
     dispatch({
