@@ -1,21 +1,23 @@
 import * as types from '@types/';
 import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
 import _ln from '@io/lnClient';
+import _sifir from '@io/sifirClient';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
 import bolt11Lib from '@helpers/bolt11.min';
 let lnClient;
+let sifirClient;
 
 const initLnClient = () => async (dispatch, getState) => {
   if (!lnClient) {
-    log('btcWallet:starting btc client');
+    log('lnWallet:starting ln client');
     const {
       auth: {token, key, nodePubkey, devicePgpKey},
     } = getState();
 
     if (!token || !key || !nodePubkey) {
-      throw 'Unable to init btc client';
+      throw 'Unable to init ln client';
     }
     const transport = await getTransportFromToken({
       token,
@@ -25,6 +27,25 @@ const initLnClient = () => async (dispatch, getState) => {
     lnClient = await _ln({transport});
   }
   return lnClient;
+};
+const initSifirClient = () => async (dispatch, getState) => {
+  if (!sifirClient) {
+    log('sifir:starting sifir client');
+    const {
+      auth: {token, key, nodePubkey, devicePgpKey},
+    } = getState();
+
+    if (!token || !key || !nodePubkey) {
+      throw 'Unable to init sifir client';
+    }
+    const transport = await getTransportFromToken({
+      token,
+      nodePubkey,
+      devicePgpKey,
+    });
+    sifirClient = await _sifir({transport});
+  }
+  return sifirClient;
 };
 
 const getLnNodeInfo = () => async dispatch => {
@@ -66,18 +87,12 @@ const getLnNodeInfo = () => async dispatch => {
 const getLnWalletDetails = () => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
-    await dispatch(initLnClient());
-    const {channels, outputs} = await lnClient.listFunds();
-    await new Promise((res, resj) => setTimeout(res, 500));
-    const invoices = await lnClient.getInvoice();
-    await new Promise((res, resj) => setTimeout(res, 500));
-    const listPays = await lnClient.listPays();
-
-    // const [{channels, outputs}, invoices, listPays] = await Promise.all([
-    //   lnClient.listFunds(),
-    //   lnClient.getInvoice(),
-    //   lnClient.listPays(),
-    // ]);
+    await dispatch(initSifirClient());
+    const {
+      funds: {channels, outputs},
+      invoices,
+      pays,
+    } = await sifirClient.getLnWalletSnapshot();
     const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
       balance += channel_sat;
       return balance;
@@ -88,31 +103,38 @@ const getLnWalletDetails = () => async dispatch => {
     }, 0);
     const balance = inChannelBalance + outputBalance;
 
-    const invoicesWithDecodedBolts = [...invoices];
-    const paysWithDecodedBolts = [...listPays];
-
-    invoicesWithDecodedBolts.map(inv => {
+    // FIXME THIS SHIT
+    // const invoicesWithDecodedBolts = [...invoices];
+    // const paysWithDecodedBolts = [...pays];
+    const time = Date.now();
+    const invoicesWithDecodedBolts = invoices.map(inv => {
       try {
-        inv.decodedBolt = bolt11Lib.decode(inv.bolt11);
-        inv.type = 'invoice';
+        return {
+          ...inv,
+          decodedBolt: bolt11Lib.decode(inv.bolt11),
+          type: 'invoice',
+        };
       } catch {}
     });
-
-    paysWithDecodedBolts.map(pay => {
+    console.log('TIME1', time - Date.now());
+    const time2 = Date.now();
+    const paysWithDecodedBolts = pays.map(pay => {
+      console.log('Decoding', pay);
       try {
-        pay.decodedBolt = bolt11Lib.decode(pay.bolt11);
-        pay.type = 'pays';
+        return {
+          ...pay,
+          decodedBolt: bolt11Lib.decode(pay.bolt11),
+          type: 'pays',
+        };
       } catch {}
     });
+    console.log('TIME2', time2 - Date.now());
 
     const txnData = [...invoicesWithDecodedBolts, ...paysWithDecodedBolts];
     // remove invalid txns from array
-    const filteredTxnData = txnData.filter(
-      txn => txn.decodedBolt?.timestamp > 1,
-    );
-    filteredTxnData.sort((a, b) => {
-      return b.decodedBolt.timestamp - a.decodedBolt.timestamp;
-    });
+    const filteredTxnData = txnData
+      .filter(txn => txn?.decodedBolt?.timestamp > 1)
+      .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });

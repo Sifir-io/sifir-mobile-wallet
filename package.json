@@ -26,7 +26,7 @@
     "base-64": "^0.1.0",
     "bolt11": "^1.2.7",
     "browserify": "^16.5.0",
-    "cyphernode-js-sdk": "git+https://github.com/gabidi/cyphernode-js-sdk.git#feature/rn",
+    "sifir-js-sdk": "git+https://github.com/Sifir-io/sifir-js-sdk.git#feature/rn",
     "cyphernode-js-sdk-transports": "git+https://github.com/gabidi/cyphernode-js-sdk-transports.git#feature/rn",
     "moment": "^2.24.0",
     "node-libs-react-native": "^1.0.3",

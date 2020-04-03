@@ -1,4 +1,4 @@
-import {btcClient} from 'cyphernode-js-sdk';
+import {btcClient} from 'sifir-js-sdk';
 let _btcClient = null;
 export default async ({transport}) => {
   if (!_btcClient) {

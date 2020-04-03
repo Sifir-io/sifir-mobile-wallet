@@ -1,4 +1,4 @@
-import {lnClient} from 'cyphernode-js-sdk';
+import {lnClient} from 'sifir-js-sdk';
 let _lnClient = null;
 export default async ({transport}) => {
   if (!_lnClient) {
