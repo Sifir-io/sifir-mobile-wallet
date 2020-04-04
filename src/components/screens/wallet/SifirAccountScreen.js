@@ -51,17 +51,15 @@ class SifirAccountScreen extends React.Component {
   };
 
   handleSendBtn = () => {
-    const {
-      walletInfo,
-      walletInfo: {type},
-    } = this.props.route.params;
+    const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
     if (type === C.STR_LN_WALLET_TYPE) {
       this.props.navigation.navigate('LNPayInvoiceRoute', {
         screen: 'LnScanBolt',
         params: {walletInfo},
       });
     } else {
-      this.props.navigation.navigate('BtcReceiveTxn', {
+      this.props.navigation.navigate('GetAddress', {
         walletInfo,
       });
     }
@@ -118,7 +116,9 @@ class SifirAccountScreen extends React.Component {
           type={type}
           label={label}
           walletInfo={walletInfo}
-          handleReceiveButton={this.handleReceiveButton}
+          handleReceiveButton={
+            type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
+          }
           handleSendBtn={this.handleSendBtn}
         />
         <SifirAccountHistory
@@ -146,7 +146,10 @@ const mapDispatchToProps = {
 };
 
 // eslint-disable-next-line prettier/prettier
-export default connect(mapStateToProps, mapDispatchToProps)(SifirAccountScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirAccountScreen);
 
 const styles = StyleSheet.create({
   navBtn: {flex: 0.7},

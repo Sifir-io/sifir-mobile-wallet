@@ -115,7 +115,7 @@ class SifirGetAddrScreen extends Component {
     const {showModal, scannedQRdata} = this.state;
     const {loading, error} = this.props.lnWallet;
     const {
-      walletInfo: {type},
+      walletInfo: {type, label},
     } = this.props.route.params;
     const placeHolder =
       type === C.STR_LN_WALLET_TYPE ? C.STR_Enter_bolt : C.STR_Enter_addr;
@@ -149,7 +149,7 @@ class SifirGetAddrScreen extends Component {
               }
               style={styles.btcImg}
             />
-            <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
+            <Text style={styles.backNavTxt}>{label}</Text>
           </TouchableOpacity>
 
           <View style={styles.titleStyle}>
@@ -215,7 +215,10 @@ const mapDispatchToProps = {
 };
 
 // eslint-disable-next-line prettier/prettier
-export default connect(mapStateToProps, mapDispatchToProps)(SifirGetAddrScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirGetAddrScreen);
 
 const styles = StyleSheet.create({
   mainView: {

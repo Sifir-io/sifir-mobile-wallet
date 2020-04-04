@@ -10,14 +10,16 @@ import {Images, AppStyle, C} from '@common/index';
 
 const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
   const [btnStatus, setButtonStatus] = useState(0);
-
   return (
     <View style={styles.btnAreaView}>
-      {(type === C.STR_SPEND_WALLET_TYPE || type === C.STR_LN_WALLET_TYPE) && (
+      {!!handleSendBtn && (
         <TouchableWithoutFeedback
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(1)}
-          onPressOut={handleSendBtn}>
+          onPressOut={() => {
+            setButtonStatus(0);
+            handleSendBtn();
+          }}>
           <View
             style={[
               styles.txnBtnView,
@@ -31,7 +33,7 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
           </View>
         </TouchableWithoutFeedback>
       )}
-      {type !== C.STR_LN_WALLET_TYPE && (
+      {!!handleReceiveButton && (
         <TouchableWithoutFeedback
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(2)}
