@@ -11,7 +11,7 @@ import SifirBTCAmount from '@elements/SifirBTCAmount';
 import moment from 'moment';
 import {Images, AppStyle, C} from '@common/index';
 import bolt11Lib from '@helpers/bolt11.min';
-
+import {useMemo, useState} from 'react';
 const makeInvoiceRenderData = ({decodedBolt, description: desc, status}) => {
   let amount, imgURL, description, timeStr;
   const {millisatoshis, timestamp} = decodedBolt;
@@ -82,41 +82,6 @@ const SifirTxnEntry = ({txn, unit}) => {
   );
 };
 
-const SifirInvEntry = ({inv, unit}) => {
-  const {type, bolt11} = inv;
-  const decodedBolt = bolt11Lib.decode(bolt11);
-  console.log('Siiifff', type, bolt11, decodedBolt);
-  const {amount, imgURL, timeStr, description} =
-    type === 'invoice'
-      ? makeInvoiceRenderData({decodedBolt, ...inv})
-      : makePaysRenderData({decodedBolt, ...inv});
-  return (
-    <ListItem
-      title={timeStr}
-      description={description}
-      amount={amount}
-      unit={unit}
-      imgURL={imgURL}
-    />
-  );
-};
-//const SifirInvEntry = ({inv, inv: {type, decodedBolt}, unit}) => {
-//  if (decodedBolt) {
-//    const {amount, imgURL, timeStr, description} =
-//      type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
-//    return (
-//      <ListItem
-//        title={timeStr}
-//        description={description}
-//        amount={amount}
-//        unit={unit}
-//        imgURL={imgURL}
-//      />
-//    );
-//  }
-//  return null;
-//};
-
 const ListItem = ({title, description, imgURL, amount, unit}) => {
   return (
     <TouchableOpacity>
@@ -133,11 +98,53 @@ const ListItem = ({title, description, imgURL, amount, unit}) => {
     </TouchableOpacity>
   );
 };
+const SifirInvEntry = React.memo(({inv, unit}) => {
+  const {type} = inv;
+  try {
+    const {amount, imgURL, timeStr, description} =
+      type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
+    return (
+      <ListItem
+        title={timeStr}
+        description={description}
+        amount={amount}
+        unit={unit}
+        imgURL={imgURL}
+      />
+    );
+  } catch (err) {
+    return null;
+  }
+});
 
 const SifirTxnList = ({width, height, unit, txnData, type}) => {
+  const [txnDataCached, setTxnDataCached] = useState([]);
+  if (txnData.length !== txnDataCached.length) {
+    setTxnDataCached(txnData);
+  }
+  const txnListToRender = React.useMemo(() => {
+    if (type === C.STR_LN_WALLET_TYPE) {
+      return txnData
+        .map(inv => {
+          try {
+            const decodedBolt = bolt11Lib.decode(inv.bolt11);
+            return {
+              ...inv,
+              decodedBolt,
+            };
+          } catch (err) {
+            return null;
+          }
+        })
+        .filter(txn => txn && txn?.decodedBolt?.timestamp > 1)
+        .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
+    } else {
+      return txnData;
+    }
+  }, [txnDataCached]);
   return (
     <FlatList
-      data={txnData}
+      data={txnListToRender}
       style={height}
       width={width}
       keyExtractor={(item, index) => item.bolt11 + item.txid + index}
