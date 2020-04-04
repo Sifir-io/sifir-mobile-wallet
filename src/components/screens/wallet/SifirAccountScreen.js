@@ -68,16 +68,24 @@ class SifirAccountScreen extends React.Component {
   render() {
     const {balance, txnData} = this.state;
     const {navigate} = this.props.navigation;
-    const {label, type} = this.props.route.params.walletInfo;
-    const {loading, loaded, error} = this.props.btcWallet;
-    const {loading: loadingLN, loaded: loadedLN} = this.props.lnWallet;
     const {walletInfo} = this.props.route.params;
+    const {label, type} = walletInfo;
+    const {loading, loaded, error: errorBtc} = this.props.btcWallet;
+    const {
+      loading: loadingLN,
+      loaded: loadedLN,
+      error: errorLN,
+    } = this.props.lnWallet;
     const btcUnit = type === C.STR_LN_WALLET_TYPE ? C.STR_MSAT : C.STR_BTC;
-    if (error) {
+    const isLoading = type === C.STR_LN_WALLET_TYPE ? loadingLN : loading;
+    const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
+    const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
+    if (hasError) {
       return (
         <ErrorScreen
           title={C.STR_ERROR_btc_action}
           desc={C.STR_ERROR_account_screen}
+          error={hasError}
           actions={[
             {
               text: C.STR_TRY_AGAIN,
@@ -104,8 +112,8 @@ class SifirAccountScreen extends React.Component {
           </TouchableOpacity>
         </View>
         <SifirAccountHeader
-          loading={loading}
-          loaded={loaded}
+          loading={isLoading}
+          loaded={isLoaded}
           type={type}
           label={label}
           balance={balance}
@@ -122,8 +130,8 @@ class SifirAccountScreen extends React.Component {
           handleSendBtn={this.handleSendBtn}
         />
         <SifirAccountHistory
-          loading={loading || loadingLN}
-          loaded={loaded || loadedLN}
+          loading={isLoading}
+          loaded={isLoaded}
           type={type}
           txnData={txnData}
           btcUnit={btcUnit}

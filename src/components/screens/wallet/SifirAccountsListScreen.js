@@ -46,6 +46,7 @@ class SifirAccountsListScreen extends React.Component {
   render() {
     const CARD_SIZE = C.SCREEN_WIDTH / 2 - 40;
     const {navigate} = this.props.navigation;
+    const {init} = this;
     const {
       btcWallet: {btcWalletList, loading, error},
       lnWallet: {nodeInfo, loading: lnLoading, nodeError: lnError},
@@ -58,10 +59,7 @@ class SifirAccountsListScreen extends React.Component {
           actions={[
             {
               text: C.STR_TRY_AGAIN,
-              onPress: () =>
-                error
-                  ? this.props.getBtcWalletList()
-                  : this.props.getLnNodeInfo(),
+              onPress: init.bind(this),
             },
           ]}
         />
