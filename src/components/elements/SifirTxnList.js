@@ -117,18 +117,18 @@ const SifirInvEntry = React.memo(({inv, unit}) => {
   }
 });
 
-const SifirTxnList = ({width, height, unit, txnData, type}) => {
-  const [txnDataCached, setTxnDataCached] = useState([]);
-  if (txnData.length !== txnDataCached.length) {
-    setTxnDataCached(txnData);
-  }
-  const txnListToRender = React.useMemo(() => {
-    if (type === C.STR_LN_WALLET_TYPE) {
-      return txnData
-        .map(inv => {
+let debugCounter = 0;
+/**
+ * Takes equal slices of invoices and payments decodes them and sorts them
+ */
+const processLnTxnList = (txnData, start = 0, length = 5) =>
+  [
+    ...(txnData?.invoices
+      ? txnData.invoices.slice(start, length).map(inv => {
           try {
-            const decodedBolt = bolt11Lib.decode(inv.bolt11);
+            const decodedBolt = inv.decodedBolt || bolt11Lib.decode(inv.bolt11);
             return {
+              type: 'invoice',
               ...inv,
               decodedBolt,
             };
@@ -136,8 +136,37 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
             return null;
           }
         })
-        .filter(txn => txn && txn?.decodedBolt?.timestamp > 1)
-        .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
+      : []),
+    ...(txnData?.pays
+      ? txnData.pays.slice(start, length).map(inv => {
+          try {
+            const decodedBolt = inv.decodedBolt || bolt11Lib.decode(inv.bolt11);
+            return {
+              type: 'pays',
+              ...inv,
+              decodedBolt,
+            };
+          } catch (err) {
+            return null;
+          }
+        })
+      : []),
+  ]
+    .filter(txn => txn && txn?.decodedBolt?.timestamp > 1)
+    .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
+
+const SifirTxnList = ({width, height, unit, txnData, type}) => {
+  const [txnDataCached, setTxnDataCached] = useState([]);
+  // FIXME proper array compare
+  if (txnData.length !== txnDataCached.length) {
+    setTxnDataCached(txnData);
+  }
+  // TODO this should really be moved to a persistnat store and refreshed on a next txn hash. Maybe for ms3
+  const txnListToRender = React.useMemo(() => {
+    if (type === C.STR_LN_WALLET_TYPE) {
+      console.log('txnListToRender update');
+      // return [];
+      return processLnTxnList(txnData, txnData.length - 5, 5);
     } else {
       return txnData;
     }

@@ -5,7 +5,6 @@ import _sifir from '@io/sifirClient';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
-import bolt11Lib from '@helpers/bolt11.min';
 let lnClient;
 let sifirClient;
 
@@ -103,44 +102,29 @@ const getLnWalletDetails = () => async dispatch => {
       return balance;
     }, 0);
     const balance = inChannelBalance + outputBalance;
+    //const invoicesWithDecodedBolts = invoices.map(inv => {
+    //  try {
+    //    return {
+    //      ...inv,
+    //      type: 'invoice',
+    //    };
+    //  } catch {}
+    //});
+    //const paysWithDecodedBolts = pays.map(pay => {
+    //  try {
+    //    return {
+    //      ...pay,
+    //      type: 'pays',
+    //    };
+    //  } catch {}
+    //});
 
-    // FIXME THIS SHIT
-    // const invoicesWithDecodedBolts = [...invoices];
-    // const paysWithDecodedBolts = [...pays];
-    const time = Date.now();
-    const invoicesWithDecodedBolts = invoices.map(inv => {
-      try {
-        return {
-          ...inv,
-          // decodedBolt: bolt11Lib.decode(inv.bolt11),
-          type: 'invoice',
-        };
-      } catch {}
-    });
-    console.log('TIME1', time - Date.now());
-    const time2 = Date.now();
-    const paysWithDecodedBolts = pays.map(pay => {
-      try {
-        return {
-          ...pay,
-          // decodedBolt: bolt11Lib.decode(pay.bolt11),
-          type: 'pays',
-        };
-      } catch {}
-    });
-    console.log('TIME2', time2 - Date.now());
-
-    // const txnData = [...invoicesWithDecodedBolts, ...paysWithDecodedBolts];
-    // remove invalid txns from array
-    //const filteredTxnData = txnData
-    //  .filter(txn => txn?.decodedBolt?.timestamp > 1)
-    //  .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
     return {
       balance,
-      txnData: [...paysWithDecodedBolts, ...invoicesWithDecodedBolts],
+      txnData: {invoices, pays},
     };
   } catch (err) {
     error(err);

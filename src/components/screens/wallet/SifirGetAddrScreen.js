@@ -96,10 +96,8 @@ class SifirGetAddrScreen extends Component {
   };
 
   handleBackButton = () => {
-    const {
-      walletInfo,
-      walletInfo: {type},
-    } = this.props.route.params;
+    const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
     if (type === C.STR_LN_WITHDRAW) {
       this.props.navigation.goBack();
     } else {
@@ -214,7 +212,6 @@ const mapDispatchToProps = {
   decodeBolt,
 };
 
-// eslint-disable-next-line prettier/prettier
 export default connect(
   mapStateToProps,
   mapDispatchToProps,

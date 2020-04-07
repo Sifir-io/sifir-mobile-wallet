@@ -15,14 +15,13 @@ import {Slider} from 'react-native-elements';
 import {openAndFundPeerChannel} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 import {ErrorScreen} from '@screens/error';
-
 const SifirLNChannelFundingScreen = ({
   navigation,
   route,
   openAndFundPeerChannel,
   lnWallet,
 }) => {
-  const [ln_enable_set_fees, setFeesEnabled] = useState(false);
+  const [enableSetFees, setEnableSetFees] = useState(false);
   const [fundingAmount, setFundingAmount] = useState(0);
   const {nodeAddress, walletInfo} = route.params;
   const {id, alias} = walletInfo;
@@ -129,13 +128,13 @@ const SifirLNChannelFundingScreen = ({
               {C.STR_Public}
             </Text>
 
-            {ln_enable_set_fees && (
+            {enableSetFees && (
               <Text style={[styles.textBright, styles.margin_top_15]}>
                 {C.STR_Fees}
               </Text>
             )}
             <View style={[styles.space_between, styles.mt7]}>
-              {ln_enable_set_fees && (
+              {enableSetFees && (
                 <View style={styles.outline_button}>
                   <Text style={[styles.text_white, styles.text_large]}>
                     0.015 {C.STR_BTC}
@@ -145,22 +144,20 @@ const SifirLNChannelFundingScreen = ({
               <View
                 style={[
                   styles.slider_wrapper,
-                  {marginLeft: ln_enable_set_fees ? 20 : 0},
+                  {marginLeft: enableSetFees ? 20 : 0},
                 ]}>
-                {ln_enable_set_fees && (
+                {enableSetFees && (
                   <Slider
-                    disabled={!ln_enable_set_fees}
+                    disabled={!enableSetFees}
                     value={0.6}
                     onValueChange={value => {}}
-                    style={
-                      ln_enable_set_fees ? styles.width_60 : styles.width_100
-                    }
+                    style={enableSetFees ? styles.width_60 : styles.width_100}
                     thumbTintColor="white"
                     maximumTrackTintColor="rgba(45, 171, 226,0.2)"
                     minimumTrackTintColor="rgb(45, 171, 226)"
                   />
                 )}
-                {ln_enable_set_fees && (
+                {enableSetFees && (
                   <View style={styles.row}>
                     <Text style={styles.textBright}>
                       {C.STR_Approximate_wait}

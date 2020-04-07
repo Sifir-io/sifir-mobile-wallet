@@ -153,7 +153,6 @@ const mapDispatchToProps = {
   getLnWalletDetails,
 };
 
-// eslint-disable-next-line prettier/prettier
 export default connect(
   mapStateToProps,
   mapDispatchToProps,

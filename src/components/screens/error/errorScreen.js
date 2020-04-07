@@ -40,7 +40,8 @@ export default class ErrorScreen extends Component {
           <Text style={styles.technicalTxt}>{printableErrorDetails}</Text>
         </View>
         <View style={styles.gridView}>
-          {actions && actions.length > 0 ? actions.map(action => (
+          {actions && actions.length > 0
+            ? actions.map(action => (
                 <View>
                   <TouchableOpacity
                     style={styles.doneTouch}
