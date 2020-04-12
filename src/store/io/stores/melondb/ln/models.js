@@ -35,7 +35,7 @@ class LnNodeBolt11Records extends Model {
   };
   @nochange @field('bolt11_id') bolt11;
   @field('type') type;
-  @field('decoded_bolt11') decodedBolt11;
+  @json('decoded_bolt11', jsn => jsn) decodedBolt11;
   @json('meta', jsn => jsn) meta;
   @readonly @date('created_at') createdAt;
   @relation('ln_nodes', 'pubkey_id') lnNodePubkey;

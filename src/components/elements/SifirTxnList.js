@@ -11,7 +11,10 @@ import SifirBTCAmount from '@elements/SifirBTCAmount';
 import moment from 'moment';
 import {Images, AppStyle, C} from '@common/index';
 import {useMemo, useState} from 'react';
-const makeInvoiceRenderData = ({decodedBolt11, description: desc, status}) => {
+const makeInvoiceRenderData = ({
+  decodedBolt11,
+  meta: {description: desc, status},
+}) => {
   let amount, imgURL, description, timeStr;
   const {millisatoshis, timestamp} = decodedBolt11;
   amount = millisatoshis;
@@ -28,7 +31,7 @@ const makeInvoiceRenderData = ({decodedBolt11, description: desc, status}) => {
   return {amount, description, imgURL, timeStr};
 };
 
-const makePaysRenderData = ({decodedBolt11, preimage}) => {
+const makePaysRenderData = ({decodedBolt11, meta: {preimage}}) => {
   let amount, imgURL, description, timeStr;
   const {millisatoshis, complete, timestamp} = decodedBolt11;
   if (complete) {
@@ -119,7 +122,7 @@ const SifirInvEntry = React.memo(({inv, unit}) => {
 /**
  * Takes equal slices of invoices and payments decodes them and sorts them
  */
-const processLnTxnList = (txnData, start = 0, length = 5) =>
+const processLnTxnList = (txnData, start = 0, length = 20) =>
   [...(txnData?.invoices || []), ...(txnData?.pays || [])]
     .filter(txn => txn && txn?.decodedBolt11?.timestamp > 1)
     .sort((a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp)

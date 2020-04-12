@@ -5,7 +5,7 @@ import SQLiteAdapter from '@nozbe/watermelondb/adapters/sqlite';
 // TODO adapter as param to inject
 const db = ({tableSchemas, modelClasses}) => {
   const schema = appSchema({
-    version: 6,
+    version: 7,
     tables: tableSchemas,
   });
   // First, create the adapter to the underlying database:
