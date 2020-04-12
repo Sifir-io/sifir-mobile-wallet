@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-
+apply plugin: 'kotlin-android'
 import com.android.build.OutputFile
 
 /**
@@ -207,6 +207,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"
     implementation project(path: ':gopenpgp')
+    implementation project(':watermelondb')
     // Rudder includes
     implementation 'com.rudderstack.android.sdk:core:1.0'
     implementation 'com.google.code.gson:gson:2.8.6'

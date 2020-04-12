@@ -10,11 +10,10 @@ import {
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import moment from 'moment';
 import {Images, AppStyle, C} from '@common/index';
-import bolt11Lib from '@helpers/bolt11.min';
 import {useMemo, useState} from 'react';
-const makeInvoiceRenderData = ({decodedBolt, description: desc, status}) => {
+const makeInvoiceRenderData = ({decodedBolt11, description: desc, status}) => {
   let amount, imgURL, description, timeStr;
-  const {millisatoshis, timestamp} = decodedBolt;
+  const {millisatoshis, timestamp} = decodedBolt11;
   amount = millisatoshis;
   description = desc;
   switch (status) {
@@ -29,9 +28,9 @@ const makeInvoiceRenderData = ({decodedBolt, description: desc, status}) => {
   return {amount, description, imgURL, timeStr};
 };
 
-const makePaysRenderData = ({decodedBolt, preimage}) => {
+const makePaysRenderData = ({decodedBolt11, preimage}) => {
   let amount, imgURL, description, timeStr;
-  const {millisatoshis, complete, timestamp} = decodedBolt;
+  const {millisatoshis, complete, timestamp} = decodedBolt11;
   if (complete) {
     imgURL = Images.icon_send;
     // FIXME strings to constants...
@@ -117,43 +116,14 @@ const SifirInvEntry = React.memo(({inv, unit}) => {
   }
 });
 
-let debugCounter = 0;
 /**
  * Takes equal slices of invoices and payments decodes them and sorts them
  */
 const processLnTxnList = (txnData, start = 0, length = 5) =>
-  [
-    ...(txnData?.invoices
-      ? txnData.invoices.slice(start, length).map(inv => {
-          try {
-            const decodedBolt = inv.decodedBolt || bolt11Lib.decode(inv.bolt11);
-            return {
-              type: 'invoice',
-              ...inv,
-              decodedBolt,
-            };
-          } catch (err) {
-            return null;
-          }
-        })
-      : []),
-    ...(txnData?.pays
-      ? txnData.pays.slice(start, length).map(inv => {
-          try {
-            const decodedBolt = inv.decodedBolt || bolt11Lib.decode(inv.bolt11);
-            return {
-              type: 'pays',
-              ...inv,
-              decodedBolt,
-            };
-          } catch (err) {
-            return null;
-          }
-        })
-      : []),
-  ]
-    .filter(txn => txn && txn?.decodedBolt?.timestamp > 1)
-    .sort((a, b) => b.decodedBolt.timestamp - a.decodedBolt.timestamp);
+  [...(txnData?.invoices || []), ...(txnData?.pays || [])]
+    .filter(txn => txn && txn?.decodedBolt11?.timestamp > 1)
+    .sort((a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp)
+    .slice(start, length);
 
 const SifirTxnList = ({width, height, unit, txnData, type}) => {
   const [txnDataCached, setTxnDataCached] = useState([]);
@@ -161,12 +131,9 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
   if (txnData.length !== txnDataCached.length) {
     setTxnDataCached(txnData);
   }
-  // TODO this should really be moved to a persistnat store and refreshed on a next txn hash. Maybe for ms3
   const txnListToRender = React.useMemo(() => {
     if (type === C.STR_LN_WALLET_TYPE) {
-      console.log('txnListToRender update');
-      // return [];
-      return processLnTxnList(txnData, txnData.length - 5, 5);
+      return processLnTxnList(txnData, 0, 20);
     } else {
       return txnData;
     }
@@ -176,7 +143,7 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
       data={txnListToRender}
       style={height}
       width={width}
-      keyExtractor={(item, index) => item.bolt11 + item.txid + index}
+      keyExtractor={(item, index) => item?.bolt11 + item?.txid + index}
       renderItem={({item}) => {
         if (type === C.STR_LN_WALLET_TYPE) {
           return <SifirInvEntry inv={item} unit={unit} />;

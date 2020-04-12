@@ -9,7 +9,7 @@ import {
 import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
 import {getBtcWalletList} from '@actions/btcwallet';
-import {getLnNodeInfo} from '@actions/lnWallet';
+import {getLnNodesList} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
 import {ErrorScreen} from '@screens/error';
 import SifirSettingModal from '@elements/SifirSettingModal';
@@ -24,7 +24,7 @@ class SifirAccountsListScreen extends React.Component {
 
   _init = () => {
     this.props.getBtcWalletList();
-    this.props.getLnNodeInfo();
+    this.props.getLnNodesList();
   };
 
   componentDidMount() {
@@ -186,7 +186,7 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {getBtcWalletList, getLnNodeInfo};
+const mapDispatchToProps = {getBtcWalletList, getLnNodesList};
 
 export default connect(
   mapStateToProps,

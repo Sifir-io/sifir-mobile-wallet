@@ -15,6 +15,8 @@
     "usb": "adb reverse tcp:8081 tcp:8081"
   },
   "dependencies": {
+    "@nozbe/watermelondb": "^0.16.0",
+    "@nozbe/with-observables": "^1.0.5",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/cli": "^3.1.0",
     "@react-native-community/masked-view": "^0.1.6",
@@ -26,7 +28,6 @@
     "base-64": "^0.1.0",
     "bolt11": "^1.2.7",
     "browserify": "^16.5.0",
-    "sifir-js-sdk": "git+https://github.com/Sifir-io/sifir-js-sdk.git#feature/rn",
     "cyphernode-js-sdk-transports": "git+https://github.com/gabidi/cyphernode-js-sdk-transports.git#feature/rn",
     "moment": "^2.24.0",
     "node-libs-react-native": "^1.0.3",
@@ -59,11 +60,13 @@
     "react-redux": "^7.1.1",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
+    "sifir-js-sdk": "git+https://github.com/Sifir-io/sifir-js-sdk.git#feature/rn",
     "uuid": "^3.4.0",
     "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/runtime": "^7.6.3",
     "@react-native-community/eslint-config": "^0.0.5",
     "babel-jest": "^24.9.0",

@@ -22,7 +22,7 @@ class SifirAccountScreen extends React.Component {
   async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
     if (type === C.STR_LN_WALLET_TYPE) {
-      const {balance, txnData} = await this.props.getLnWalletDetails();
+      const {balance, txnData} = await this.props.getLnWalletDetails({label});
       this.setState({balance, txnData});
     } else {
       const {balance, txnData} = await this.props.getWalletDetails({

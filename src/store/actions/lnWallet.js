@@ -1,10 +1,12 @@
 import * as types from '@types/';
 import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
-import _ln from '@io/lnClient';
+import {lnClient as _ln} from '@io/lnClient';
 import _sifir from '@io/sifirClient';
+import {lnStore} from '@io/stores';
 import {Images, C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
 import {log, error} from '@io/events/';
+import bolt11Lib from '@helpers/bolt11.min';
 let lnClient;
 let sifirClient;
 
@@ -47,24 +49,36 @@ const initSifirClient = () => async (dispatch, getState) => {
   return sifirClient;
 };
 
-const getLnNodeInfo = () => async dispatch => {
+const getLnNodesList = () => async dispatch => {
+  await dispatch(initLnClient());
+  const lnNodes = await lnStore.getLnNodes();
+  if (!lnNodes?.length) {
+    // FIXME cold boot hack
+    // mainly to stay backward compatible with old archittecture FIXME
+    // Either go to observable or fix this shit
+    const nodeInfo = await lnClient.getNodeInfo();
+    dispatch(getLnNodeInfo(nodeInfo.alias));
+  } else {
+    dispatch(getLnNodeInfo(lnNodes[0].nodeInfo.alias));
+  }
+};
+const getLnNodeInfo = label => async dispatch => {
   dispatch({type: types.LN_WALLET_NODEINFO + PENDING});
   await dispatch(initLnClient());
   try {
-    const nodeInfo = await lnClient.getNodeInfo();
-    //const [{channels, outputs}, nodeInfo] = await Promise.all([
-    //  lnClient.listFunds(),
-    //  lnClient.getNodeInfo(),
-    //]);
-    //const inChannelBalance = channels.reduce((balance, {channel_sat}) => {
-    //  balance += channel_sat;
-    //  return balance;
-    //}, 0);
-    //const outputBalance = outputs.reduce((balance, {value}) => {
-    //  balance += value;
-    //  return balance;
-    //}, 0);
-    //const balance = inChannelBalance + outputBalance;
+    let nodeInfo;
+    const cachedNodeInfo = await lnStore.getLnNodeByAlias(label);
+    if (
+      cachedNodeInfo &&
+      Date.now() - cachedNodeInfo.updatedAt.getTime() < 1000 * 60 * 10
+    ) {
+      log('Found cached node', cachedNodeInfo.updatedAt, cachedNodeInfo);
+      nodeInfo = {...cachedNodeInfo.nodeInfo};
+    } else {
+      nodeInfo = await lnClient.getNodeInfo();
+      log('inserting new LnNode', nodeInfo);
+      await lnStore.upsertLnNodeByPubkey(nodeInfo.id, {...nodeInfo, nodeInfo});
+    }
     nodeInfo.pageURL = 'Account';
     nodeInfo.type = C.STR_LN_WALLET_TYPE;
     nodeInfo.label = nodeInfo.alias;
@@ -84,7 +98,7 @@ const getLnNodeInfo = () => async dispatch => {
   }
 };
 
-const getLnWalletDetails = () => async dispatch => {
+const getLnWalletDetails = ({label}) => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
     await dispatch(initSifirClient());
@@ -102,29 +116,62 @@ const getLnWalletDetails = () => async dispatch => {
       return balance;
     }, 0);
     const balance = inChannelBalance + outputBalance;
-    //const invoicesWithDecodedBolts = invoices.map(inv => {
-    //  try {
-    //    return {
-    //      ...inv,
-    //      type: 'invoice',
-    //    };
-    //  } catch {}
-    //});
-    //const paysWithDecodedBolts = pays.map(pay => {
-    //  try {
-    //    return {
-    //      ...pay,
-    //      type: 'pays',
-    //    };
-    //  } catch {}
-    //});
-
+    // get cached node info
+    const lnNode = await lnStore.getLnNodeByAlias(label);
+    if (!lnNode) {
+      throw 'LN node not found, please reload your wallets';
+    }
+    // FIXME here lazy loaded transactions ? and maybe promises neede to be waiting ?
+    // move the fetch to model?
+    const nodeTransactions = await lnNode.transactions.fetch();
+    const nodeBoltsToInsert = [];
+    const [processedInvoices, processedPays] = [invoices, pays].map(
+      (collection, i) =>
+        collection.map(inv => {
+          const type = i === 0 ? 'invoice' : 'pay';
+          let payload;
+          try {
+            const cachedBolt = nodeTransactions.find(
+              ({bolt11, type: rType}) =>
+                rType === type && bolt11 === inv.bolt11,
+            );
+            if (cachedBolt) {
+              payload = {
+                decodedBolt11: cachedBolt.decodedBolt11,
+                bolt11: cachedBolt.bolt11,
+                type: cachedBolt.type,
+                meta: cachedBolt.meta,
+              };
+              log('cached bolt', payload);
+            } else {
+              // decode and insert it
+              const decodedBolt11 = bolt11Lib.decode(inv.bolt11);
+              payload = {
+                decodedBolt11,
+                bolt11: inv.bolt11,
+                type,
+                meta: inv,
+              };
+              nodeBoltsToInsert.push(payload);
+            }
+            return payload;
+          } catch (err) {
+            error('processing bolt', err);
+          }
+        }),
+    );
+    if (nodeBoltsToInsert.length) {
+      await lnStore.batchInsertLnNodeDecodedBolts(
+        lnNode.pubkey,
+        nodeBoltsToInsert,
+      );
+    }
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
     });
     return {
       balance,
-      txnData: {invoices, pays},
+      txnData: {invoices: processedInvoices, pays: processedPays},
     };
   } catch (err) {
     error(err);
@@ -334,6 +381,7 @@ const withdrawFunds = (address, amount) => async dispatch => {
 
 export {
   getFunds,
+  getLnNodesList,
   getLnNodeInfo,
   getLnWalletDetails,
   decodeBolt,
