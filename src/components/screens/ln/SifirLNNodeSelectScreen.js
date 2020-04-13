@@ -87,7 +87,7 @@ function SifirLNNodeSelectScreen(props) {
               styles.margin_top_30,
               styles.mb_20,
             ]}>
-            {nodeInputRequired ? C.STR_Browse_Nodes : C.STR_Path_to_Node}
+            {nodeInputRequired ? C.STR_Browse_Channels : C.STR_Path_to_Node}
           </Text>
           {loading && !loaded && <ActivityIndicator />}
         </View>

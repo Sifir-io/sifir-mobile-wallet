@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     height: 55,
     marginLeft: 26,
     marginRight: 26,
-    marginTop: 30,
+    marginTop: 10,
   },
   txnBtnView: {
     flex: 1,

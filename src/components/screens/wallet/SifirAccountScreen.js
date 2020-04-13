@@ -118,6 +118,11 @@ class SifirAccountScreen extends React.Component {
           label={label}
           balance={balance}
           btcUnit={btcUnit}
+          headerText={
+            type === C.STR_LN_WALLET_TYPE
+              ? C.STR_Balance_Channels_n_Outputs
+              : C.STR_Cur_Balance
+          }
         />
         <SifirAccountActions
           navigate={navigate}

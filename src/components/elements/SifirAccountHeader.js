@@ -12,6 +12,7 @@ const SifirAccountHeader = ({
   balance,
   btcUnit,
   label,
+  headerText = C.STR_Cur_Balance,
 }) => {
   const walletIcon =
     type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
@@ -29,7 +30,7 @@ const SifirAccountHeader = ({
           )}
           {loaded === true && loading === false && (
             <>
-              <Text style={styles.boxTxt} numberOfLines={1}>
+              <Text style={styles.boxTxt} numberOfLines={2}>
                 {label}
               </Text>
               {type === C.STR_WATCH_WALLET_TYPE && (
@@ -53,7 +54,7 @@ const SifirAccountHeader = ({
                 <SifirBTCAmount amount={balance} unit={btcUnit} />
               </Text>
             </View>
-            <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
+            <Text style={styles.balanceTxt}>{headerText}</Text>
           </>
         )}
       </View>

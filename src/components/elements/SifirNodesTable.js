@@ -13,9 +13,9 @@ const Columns = props => {
   let columns = [];
   const {nodeInputRequired} = props;
   if (nodeInputRequired) {
-    columns = ['Alias', 'Status', 'Capacity'];
+    columns = ['Channel Node id', 'Channel Status', 'Spendable MSAT'];
   } else {
-    columns = ['Channel', 'ID', 'Fees'];
+    columns = ['Channel', 'Node id', 'Node Fees'];
   }
 
   return (
@@ -61,8 +61,8 @@ const SifirNodesTable = props => {
   const renderRow = (item, rowIndex) => {
     if (nodeInputRequired) {
       const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
-      const channelStatus = item.channels[0]?.state;
-      const capacity = item.channels[0]?.spendable_msat;
+      const channelStatus = item.channels[0]?.state || 'NA';
+      const capacity = item.channels[0]?.spendable_msatoshi || 'NA';
       return (
         <Row
           key={item.id}
@@ -103,11 +103,11 @@ export default SifirNodesTable;
 const styles = StyleSheet.create({
   table: {backgroundColor: 'black'},
   columnWrapper: {
-    padding: 10,
+    padding: 7,
     flexDirection: 'row',
   },
   rowWrapper: {
-    padding: 20,
+    padding: 10,
     flexDirection: 'row',
   },
   rowBox: {

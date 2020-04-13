@@ -28,13 +28,17 @@ const SifirLNInvoiceConfirmScreen = props => {
   const {amount_msat, description, expiry} = props.route.params.invoice;
   const {loading, loaded, error, isPayingBolt} = props.lnWallet;
   const {walletInfo, bolt11} = props.route.params;
-  let openChannelLabel;
-  let channel;
+  let routeFoundLabel;
+  // let channel;
   let totalFees;
+  //TODO fix this mess of a component....
   if (isRouteFound) {
-    channel = routeFound.channels[0];
-    const {channel_id} = channel;
-    openChannelLabel = `${channel_id.slice(0, 4)}-${channel_id.slice(-4)} - `;
+    // channel = routeFound.channels[0];
+    // const {channel_id} = channel;
+    // routeFoundLabel = `${channel_id.slice(0, 4)}-${channel_id.slice(-4)} - `;
+    routeFoundLabel = `${routes.length} ${C.STR_Hops_to_payee}, ${
+      C.STR_Fees
+    }:  `;
     // Generate total fees paid along route by subtracting msatoshi at index=0 from msatoshi of last entry in routes.
     totalFees = routes[0].msatoshi - routes[routes.length - 1].msatoshi;
   }
@@ -208,7 +212,7 @@ const SifirLNInvoiceConfirmScreen = props => {
                     isRouteFound ? styles.orangeColor : styles.darkColor,
                     styles.text_large,
                   ]}>
-                  {!isRouteFound ? C.STR_OPEN_CHANNEL : openChannelLabel}
+                  {!isRouteFound ? C.STR_OPEN_CHANNEL : routeFoundLabel}
                   {isRouteFound && (
                     <SifirBTCAmount amount={totalFees} unit={C.STR_MSAT} />
                   )}
