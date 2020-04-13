@@ -156,7 +156,7 @@ const getLnWalletDetails = ({label}) => async dispatch => {
             }
             return payload;
           } catch (err) {
-            error('processing bolt', err);
+            log('error processing lnwallet bolt', err);
           }
         }),
     );

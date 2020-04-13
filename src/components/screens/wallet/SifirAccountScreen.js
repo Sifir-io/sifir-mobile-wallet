@@ -125,9 +125,13 @@ class SifirAccountScreen extends React.Component {
           label={label}
           walletInfo={walletInfo}
           handleReceiveButton={
+            // TODO update this when invoices done
             type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
           }
-          handleSendBtn={this.handleSendBtn}
+          handleSendBtn={
+            // For now only watching wallets cant send
+            type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
+          }
         />
         <SifirAccountHistory
           loading={isLoading}
