@@ -36,7 +36,7 @@ const SifirLNInvoiceConfirmScreen = props => {
     // channel = routeFound.channels[0];
     // const {channel_id} = channel;
     // routeFoundLabel = `${channel_id.slice(0, 4)}-${channel_id.slice(-4)} - `;
-    routeFoundLabel = `${routes.length} ${C.STR_Hops_to_payee}, ${
+    routeFoundLabel = `${routes.length} ${C.STR_Hops_to_route}, ${
       C.STR_Fees
     }:  `;
     // Generate total fees paid along route by subtracting msatoshi at index=0 from msatoshi of last entry in routes.
@@ -62,11 +62,11 @@ const SifirLNInvoiceConfirmScreen = props => {
     if (txnInfo.status === 'complete') {
       props.navigation.navigate('LnInvoicePaymentConfirmed', {
         walletInfo,
-        displayUnit: C.STR_MSAT,
         isSendTxn: true,
         txnInfo: {
           amount: txnInfo.msatoshi,
           address: txnInfo.payment_preimage,
+          unit: C.STR_MSAT,
         },
       });
     }

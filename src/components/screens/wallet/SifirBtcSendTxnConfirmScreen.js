@@ -74,7 +74,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
   render() {
     const {
       walletInfo: {feeSettingEnabled, type},
-      txnInfo: {address, amount},
+      txnInfo: {address, amount, unit},
     } = this.props.route.params;
     const amountFontSize =
       (C.vw * 80) / (amount.length < 3 ? 5 : amount.length);
@@ -120,10 +120,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
           <View style={styles.valueTxt}>
             <View style={styles.amountContainer}>
               <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
-                <SifirBTCAmount
-                  amount={amount}
-                  unit={type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
-                />
+                <SifirBTCAmount amount={amount} unit={unit} />
               </Text>
             </View>
             <View style={styles.lineView} />

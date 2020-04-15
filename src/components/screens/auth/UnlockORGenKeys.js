@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 20,
     width: C.SCREEN_WIDTH * 0.8,
-    marginLeft: C.SCREEN_WIDTH * 0.1,
+    // marginLeft: C.SCREEN_WIDTH * 0.1,
     height: 70,
     borderRadius: 10,
     borderColor: AppStyle.mainColor,

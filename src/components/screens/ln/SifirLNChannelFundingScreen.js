@@ -67,7 +67,7 @@ const SifirLNChannelFundingScreen = ({
             <Image source={Images.icon_indicator} style={styles.back} />
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Links');
+                navigation.navigate('LnNodeSelect');
               }}>
               <Text
                 style={[
@@ -93,7 +93,7 @@ const SifirLNChannelFundingScreen = ({
                 value={fundingAmount.toString()}
                 onChangeText={amount => setFundingAmount(amount)}
               />
-              <Text style={styles.fundingAmountUnit}>{C.STR_MSAT}</Text>
+              <Text style={styles.fundingAmountUnit}>{C.STR_SAT}</Text>
             </View>
           </View>
 
@@ -109,20 +109,20 @@ const SifirLNChannelFundingScreen = ({
             {id && (
               <>
                 <Text style={[styles.textBright, styles.margin_top_15]}>
-                  {C.STR_Node_Id}
+                  {C.STR_From_Node}
                 </Text>
                 <Text style={[styles.text_white, styles.text_large]}>{id}</Text>
               </>
             )}
             <Text style={[styles.textBright, styles.margin_top_15]}>
-              {C.STR_Node_Address}
+              {C.STR_To_Node}
             </Text>
             <Text style={[styles.text_white, styles.text_large]}>
               {nodeAddress}
             </Text>
 
             <Text style={[styles.textBright, styles.margin_top_15]}>
-              {C.STR_Port}
+              {C.STR_Channel_visibility}
             </Text>
             <Text style={[styles.text_white, styles.text_large]}>
               {C.STR_Public}

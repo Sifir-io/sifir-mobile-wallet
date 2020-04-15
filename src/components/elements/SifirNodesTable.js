@@ -1,27 +1,13 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
-import {AppStyle} from '@common/index';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {AppStyle, C} from '@common/index';
 
-const Columns = props => {
-  let columns = [];
-  const {nodeInputRequired} = props;
-  if (nodeInputRequired) {
-    columns = ['Channel Node id', 'Channel Status', 'Spendable MSAT'];
-  } else {
-    columns = ['Channel', 'Node id', 'Node Fees'];
-  }
-
+const Columns = ({columns}) => {
   return (
     <View style={styles.columnWrapper}>
       {columns.map((col, index) => (
         <View
+          id={`${index}-${col.replace(' ', '')}`}
           style={
             index === columns.length - 1 ? styles.rowBox : styles.columnBox
           }>
@@ -60,13 +46,13 @@ const SifirNodesTable = props => {
 
   const renderRow = (item, rowIndex) => {
     if (nodeInputRequired) {
-      const alias = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
+      const nodeId = `${item.id.slice(0, 4)} - ${item.id.slice(-4)}`;
       const channelStatus = item.channels[0]?.state || 'NA';
       const capacity = item.channels[0]?.spendable_msatoshi || 'NA';
       return (
         <Row
           key={item.id}
-          firstCol={alias}
+          firstCol={nodeId}
           secondCol={channelStatus}
           thirdCol={capacity}
           bgIndicator={rowIndex}
@@ -93,7 +79,13 @@ const SifirNodesTable = props => {
 
   return (
     <View style={[styles.table, props.style]}>
-      <Columns nodeInputRequired={nodeInputRequired} />
+      <Columns
+        columns={
+          nodeInputRequired
+            ? [C.STR_Channel_Node_Id, C.STR_Channel_Status, C.STR_Spendable]
+            : [C.STR_Channel, C.STR_Node_Id, C.STR_Channel_Fees]
+        }
+      />
       <ScrollView>{tableData.map((item, i) => renderRow(item, i))}</ScrollView>
     </View>
   );

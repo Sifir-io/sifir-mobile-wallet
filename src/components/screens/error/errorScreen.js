@@ -41,8 +41,8 @@ export default class ErrorScreen extends Component {
         </View>
         <View style={styles.gridView}>
           {actions && actions.length > 0
-            ? actions.map(action => (
-                <View>
+            ? actions.map((action, index) => (
+                <View id={index}>
                   <TouchableOpacity
                     style={styles.doneTouch}
                     onPressOut={() => action.onPress()}>

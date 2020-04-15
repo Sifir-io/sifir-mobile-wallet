@@ -10,12 +10,19 @@ import {
 import {Images, AppStyle, C} from '@common/index';
 import SifirTxnList from '@elements/SifirTxnList';
 
-const SifirAccountHistory = ({loading, loaded, txnData, btcUnit, type}) => {
+const SifirAccountHistory = ({
+  loading,
+  loaded,
+  txnData,
+  btcUnit,
+  type,
+  headerText,
+}) => {
   const BTN_WIDTH = C.SCREEN_WIDTH / 2;
   return (
     <>
       <View style={styles.txnSetView}>
-        <Text style={styles.txnLblTxt}>{C.TRANSACTIONS}</Text>
+        <Text style={styles.txnLblTxt}>{headerText}</Text>
         <TouchableOpacity>
           <Image source={Images.icon_setting} style={styles.settingIcon} />
         </TouchableOpacity>

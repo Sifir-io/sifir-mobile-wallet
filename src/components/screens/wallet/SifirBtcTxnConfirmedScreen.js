@@ -23,11 +23,23 @@ class SifirBtcTxnConfirmedScreen extends Component {
   };
 
   render() {
-    const {type, displayUnit} = this.props.route.params;
+    const {type} = this.props.route.params;
     const addrTxtFontSize = (C.vw * 250) / address?.length || 25;
 
-    const {amount, address, isSendTxn} = this.props.route.params.txnInfo;
-
+    const {amount, address, isSendTxn, unit} = this.props.route.params.txnInfo;
+    const payTitleText =
+      type === C.STR_LN_WALLET_TYPE
+        ? C.STR_PAID
+        : isSendTxn
+        ? C.STR_SENT
+        : C.STR_RECEIVED;
+    const payDataTitleText = `${C.STR_PAYMENT} ${
+      type === C.STR_LN_WALLET_TYPE
+        ? C.STR_PRE_IMAGE
+        : isSendTxn
+        ? C.STR_RECEIPIENT
+        : C.STR_SENDER
+    }`;
     return (
       <View style={styles.mainView}>
         <ScrollView style={styles.sv}>
@@ -36,24 +48,14 @@ class SifirBtcTxnConfirmedScreen extends Component {
             <Text style={styles.paymentTxt}>
               {type === C.STR_LN_WALLET_TYPE ? C.STR_INVOICE : C.STR_PAYMENT}
             </Text>
-            <Text style={styles.addressLblTxt}>
-              {type === C.STR_LN_WALLET_TYPE
-                ? C.STR_PAID
-                : isSendTxn
-                ? C.STR_SENT
-                : C.STR_RECEIVED}
-            </Text>
-            <Text style={styles.payAddrTxt}>
-              {C.STR_PAYMENT +
-                ' ' +
-                (isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER)}
-            </Text>
+            <Text style={styles.addressLblTxt}>{payTitleText}</Text>
+            <Text style={styles.payAddrTxt}>{payDataTitleText}</Text>
             <Text style={[styles.addrTxt, {fontSize: addrTxtFontSize}]}>
               {address}
             </Text>
             <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
             <Text style={styles.amountTxt}>
-              <SifirBTCAmount amount={amount} unit={displayUnit} />
+              <SifirBTCAmount amount={amount} unit={unit} />
             </Text>
           </View>
           <TouchableOpacity

@@ -144,6 +144,11 @@ class SifirAccountScreen extends React.Component {
           type={type}
           txnData={txnData}
           btcUnit={btcUnit}
+          headerText={
+            type === C.STR_LN_WALLET_TYPE
+              ? C.STR_INVOICES_AND_PAYS
+              : C.STR_TRANSACTIONS
+          }
         />
       </View>
     );

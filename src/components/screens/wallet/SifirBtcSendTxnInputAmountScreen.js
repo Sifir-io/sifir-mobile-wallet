@@ -21,22 +21,27 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
     validAmount: false,
   };
 
-  goToConfirm = () => {
+  goToConfirm = ({unit}) => {
     const {txnInfo, walletInfo} = this.props.route.params;
     const {amount} = this.state;
     this.props.navigation.navigate('BtcSendTxnConfirm', {
-      txnInfo: {...txnInfo, amount},
+      txnInfo: {...txnInfo, amount, unit},
       walletInfo,
     });
   };
-  checkAndSetInput = inputamount => {
+  checkAndSetInput = (inputamount, unit) => {
+    // TODO this to proper SATS vs BTC unit parse
     const {
       walletInfo: {balance},
     } = this.props.route.params;
-    // TODO this to proper SATS vs BTC unit parse
     if (isNaN(inputamount)) {
       return this.setState({validAmount: false});
     }
+    /// msat and sats should be integer amounts
+    if (unit !== C.STR_BTC && !Number.isInteger(Number(inputamount))) {
+      return this.setState({validAmount: false});
+    }
+
     // Check amounts
     if (inputamount > balance) {
       return this.setState({validAmount: false});
@@ -54,6 +59,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
       txnInfo: {address},
       walletInfo: {balance, type},
     } = this.props.route.params;
+    const unit = type === C.STR_LN_WITHDRAW ? C.STR_SAT : C.STR_BTC;
     return (
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <View style={styles.mainView}>
@@ -64,10 +70,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
               <Text style={styles.smallWhiteText}>
                 {`${C.STR_Wallet_balance}: `}
-                <SifirBTCAmount
-                  amount={balance}
-                  unit={type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
-                />
+                <SifirBTCAmount amount={balance} unit={unit} />
               </Text>
             </View>
             <View style={{marginTop: 15}}>
@@ -77,11 +80,9 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
                   keyboardType="decimal-pad"
                   autoCorrect={false}
                   autoFocus={true}
-                  onChangeText={this.checkAndSetInput}
+                  onChangeText={input => this.checkAndSetInput(input, unit)}
                 />
-                <Text style={styles.btcTxt}>
-                  {type === C.STR_LN_WITHDRAW ? C.STR_MSAT : C.STR_BTC}
-                </Text>
+                <Text style={styles.btcTxt}>{unit}</Text>
               </View>
               <View style={styles.lineStyle} />
             </View>
@@ -91,7 +92,7 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               }}
               disabled={!validAmount}
               shadowColor="black"
-              onPress={() => this.goToConfirm()}
+              onPress={() => this.goToConfirm({unit})}
               shadowOffset="30">
               <View style={styles.btnStyle}>
                 <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
