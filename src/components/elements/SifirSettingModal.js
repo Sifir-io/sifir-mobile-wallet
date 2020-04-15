@@ -1,6 +1,13 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import Slider from 'react-native-slider';
 
 import {Images, AppStyle, C} from '@common/index';
@@ -39,10 +46,15 @@ class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
 
   // FIXME
-  // Create an array of menu items and map over it to render <MenuListItem/>, instead of manually rendering every menu item.
-
+  // Replace legacy shit with menuItems[] based rendering`
   render() {
-    const {navigation, walletInfo, toolTipStyle} = this.props;
+    const {
+      navigation,
+      walletInfo,
+      toolTipStyle,
+      isLoading,
+      menuItems,
+    } = this.props;
     return (
       <View style={styles.container}>
         {toolTipStyle && (
@@ -60,6 +72,25 @@ class SifirSettingModal extends Component {
           </>
         )}
         <View style={styles.bodyStyle}>
+          {isLoading && (
+            <View style={{flex: 1}}>
+              <ActivityIndicator size="small" color={AppStyle.mainColor} />
+            </View>
+          )}
+          {!isLoading && menuItems && menuItems.length && (
+            <View style={{flex: 1}}>
+              {menuItems.map((item, index) => (
+                <MenuListItem
+                  hideTopBorder={index === 0 ? true : false}
+                  icon={Images.icon_funds}
+                  label={item.label}
+                  onPress={() => {
+                    item.onPress ? item.onPress(item) : this.props.hideModal();
+                  }}
+                />
+              ))}
+            </View>
+          )}
           {this.state.curMenu === 1 && (
             <View style={styles.timeView}>
               <View style={{flexDirection: 'row'}}>

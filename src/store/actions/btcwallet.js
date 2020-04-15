@@ -26,6 +26,24 @@ const initBtcClient = () => async (dispatch, getState) => {
   return btcClient;
 };
 
+const getBlockChainInfo = () => async dispatch => {
+  dispatch({type: types.BTC_WALLET_GET_BLOCKCHAININFO + PENDING});
+  try {
+    await dispatch(initBtcClient());
+    const chainInfo = await btcClient.getBlockChainInfo();
+    dispatch({
+      type: types.BTC_WALLET_GET_BLOCKCHAININFO + FULFILLED,
+      payload: {chainInfo},
+    });
+    return chainInfo;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.BTC_WALLET_GET_BLOCKCHAININFO + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
 const getBtcWalletList = () => async dispatch => {
   dispatch({type: types.BTC_WALLET_LIST_DATA_SHOW + PENDING});
 
@@ -175,4 +193,5 @@ export {
   initBtcClient,
   getWalletAddress,
   sendBitcoin,
+  getBlockChainInfo,
 };

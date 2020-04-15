@@ -10,9 +10,36 @@ const initialState = {
   address: null,
   btcSendResult: null,
   feeSettingEnabled: false,
+  chainInfo: {},
 };
 
 const btcWallet = createReducer(initialState)({
+  [types.BTC_WALLET_GET_BLOCKCHAININFO + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.BTC_WALLET_GET_BLOCKCHAININFO + FULFILLED]: (
+    state,
+    {payload: {chainInfo}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    chainInfo,
+  }),
+  [types.BTC_WALLET_GET_BLOCKCHAININFO + REJECTED]: (
+    state,
+    {payload: {error}},
+  ) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
+
   [types.BTC_WALLET_LIST_DATA_SHOW + PENDING]: state => ({
     ...state,
     error: null,

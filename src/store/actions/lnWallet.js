@@ -57,7 +57,7 @@ const getLnNodesList = () => async dispatch => {
   const lnNodes = await lnStore.getLnNodes();
   if (!lnNodes?.length) {
     // FIXME cold boot hack
-    // mainly to stay backward compatible with old archittecture 
+    // mainly to stay backward compatible with old archittecture
     // Either go to observable or fix this shit
     const nodeInfo = await lnClient.getNodeInfo();
     dispatch(getLnNodeInfo(nodeInfo.alias));
@@ -369,11 +369,11 @@ const withdrawFunds = (address, amount) => async dispatch => {
   dispatch({type: types.LN_WALLET_WITHDRAW_FUNDS + PENDING});
   try {
     await dispatch(initLnClient());
-    const btcSendResult = await lnClient.withdrawFunds(address, amount);
+    const withdrawResult = await lnClient.withdrawFunds(address, amount);
     dispatch({
       type: types.LN_WALLET_WITHDRAW_FUNDS + FULFILLED,
     });
-    return btcSendResult;
+    return withdrawResult;
   } catch (err) {
     error(err);
     dispatch({

@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
-import {getBtcWalletList} from '@actions/btcwallet';
+import {getBtcWalletList, getBlockChainInfo} from '@actions/btcwallet';
 import {getLnNodesList} from '@actions/lnWallet';
 import {Images, AppStyle, C} from '@common/index';
 import {ErrorScreen} from '@screens/error';
@@ -38,7 +38,12 @@ class SifirAccountsListScreen extends React.Component {
   }
 
   handleMenuBtn() {
-    this.setState({modalVisible: !this.state.modalVisible});
+    if (this.state.modalVisible) {
+      this.setState({modalVisible: !this.state.modalVisible});
+    } else {
+      this.props.getBlockChainInfo();
+      this.setState({modalVisible: !this.state.modalVisible});
+    }
   }
 
   onClose = () => this.setState({modalVisible: false});
@@ -49,7 +54,7 @@ class SifirAccountsListScreen extends React.Component {
     const {
       _init,
       props: {
-        btcWallet: {btcWalletList, loading, error},
+        btcWallet: {btcWalletList, chainInfo, loading, error},
         lnWallet: {nodeInfo, loading: lnLoading, nodeError: lnError},
         navigation: {navigate},
       },
@@ -86,7 +91,17 @@ class SifirAccountsListScreen extends React.Component {
           <View
             style={styles.settingMenuContainer}
             onTouchEnd={() => this.handleMenuBtn()}>
-            <SifirSettingModal hideModal={() => this.handleMenuBtn()} />
+            <SifirSettingModal
+              toolTipStyle={true}
+              isLoading={loading}
+              menuItems={
+                chainInfo && [
+                  {label: `Chain: ${chainInfo.chain}`},
+                  {label: `Blocks: ${chainInfo.blocks}`},
+                ]
+              }
+              hideModal={() => this.handleMenuBtn()}
+            />
           </View>
         )}
         {btcWalletList.length === 0 && (
@@ -179,7 +194,11 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = {getBtcWalletList, getLnNodesList};
+const mapDispatchToProps = {
+  getBtcWalletList,
+  getLnNodesList,
+  getBlockChainInfo,
+};
 
 export default connect(
   mapStateToProps,
