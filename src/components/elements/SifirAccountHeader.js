@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, ActivityIndicator, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import SifirBTCAmount from '@elements/SifirBTCAmount';
 import LinearGradient from 'react-native-linear-gradient';
@@ -13,33 +20,36 @@ const SifirAccountHeader = ({
   btcUnit,
   label,
   headerText = C.STR_Cur_Balance,
+  accountIconOnPress,
 }) => {
   const walletIcon =
     type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
   return (
     <View style={styles.headerView}>
-      <LinearGradient
-        height={BTN_WIDTH - 50}
-        width={BTN_WIDTH - 40}
-        colors={['#52d4cd', '#54a5b1', '#57658c']}
-        style={styles.gradient}>
-        <View>
-          <Image source={walletIcon} style={styles.boxImage} />
-          {loading === true && (
-            <ActivityIndicator size="large" color={AppStyle.mainColor} />
-          )}
-          {loaded === true && loading === false && (
-            <>
-              <Text style={styles.boxTxt} numberOfLines={2}>
-                {label}
-              </Text>
-              {type === C.STR_WATCH_WALLET_TYPE && (
-                <Text style={styles.boxTxt}>{C.STR_WATCHING}</Text>
-              )}
-            </>
-          )}
-        </View>
-      </LinearGradient>
+      <TouchableOpacity onPress={accountIconOnPress}>
+        <LinearGradient
+          height={BTN_WIDTH - 50}
+          width={BTN_WIDTH - 40}
+          colors={['#52d4cd', '#54a5b1', '#57658c']}
+          style={styles.gradient}>
+          <View>
+            <Image source={walletIcon} style={styles.boxImage} />
+            {loading === true && (
+              <ActivityIndicator size="large" color={AppStyle.mainColor} />
+            )}
+            {loaded === true && loading === false && (
+              <>
+                <Text style={styles.boxTxt} numberOfLines={2}>
+                  {label}
+                </Text>
+                {type === C.STR_WATCH_WALLET_TYPE && (
+                  <Text style={styles.boxTxt}>{C.STR_WATCHING}</Text>
+                )}
+              </>
+            )}
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
       <View
         height={BTN_WIDTH - 30}
         width={BTN_WIDTH - 30}

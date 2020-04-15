@@ -80,7 +80,7 @@ const SifirLNChannelFundingScreen = ({
             </TouchableOpacity>
           </View>
 
-          <View style={[styles.fuding_wrapper]}>
+          <View style={[styles.funding_wrapper]}>
             <Text
               style={[styles.textBright, styles.text_normal, styles.text_bold]}>
               {C.STR_FUNDING_AMOUNT}
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   },
   margin_top_30: {marginTop: 30},
   margin_top_15: {marginTop: 15},
-  fuding_wrapper: {
+  funding_wrapper: {
     alignItems: 'center',
     marginTop: 50,
   },

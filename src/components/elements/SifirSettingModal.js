@@ -38,23 +38,27 @@ const MenuListItem = ({label, icon, onPress, hideTopBorder = false}) => {
 class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
 
-  // TODO
+  // FIXME
   // Create an array of menu items and map over it to render <MenuListItem/>, instead of manually rendering every menu item.
 
   render() {
-    const {navigation, walletInfo} = this.props;
+    const {navigation, walletInfo, toolTipStyle} = this.props;
     return (
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.closeBtn}
-          onPress={this.props.hideModal}>
-          <Image source={Images.icon_close} style={styles.closeImg} />
-        </TouchableOpacity>
-        <Image
-          source={Images.icon_dialog_arrow}
-          resizeMode="contain"
-          style={styles.upArrow}
-        />
+        {toolTipStyle && (
+          <>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={this.props.hideModal}>
+              <Image source={Images.icon_close} style={styles.closeImg} />
+            </TouchableOpacity>
+            <Image
+              source={Images.icon_dialog_arrow}
+              resizeMode="contain"
+              style={styles.upArrow}
+            />
+          </>
+        )}
         <View style={styles.bodyStyle}>
           {this.state.curMenu === 1 && (
             <View style={styles.timeView}>

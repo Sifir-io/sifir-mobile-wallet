@@ -103,7 +103,7 @@ const getWalletDetails = ({label, type}) => async dispatch => {
     dispatch({
       type: types.BTC_WALLET_DETAILS + FULFILLED,
     });
-
+    // TODO move this to component
     txnData.sort((a, b) => {
       return b.timereceived - a.timereceived;
     });

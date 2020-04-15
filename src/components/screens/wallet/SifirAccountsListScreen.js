@@ -86,14 +86,7 @@ class SifirAccountsListScreen extends React.Component {
           <View
             style={styles.settingMenuContainer}
             onTouchEnd={() => this.handleMenuBtn()}>
-            <SifirSettingModal
-              hideModal={() => this.handleMenuBtn()}
-              showOpenChannel={true}
-              showTopUp={true}
-              showWithdraw={true}
-              // FIXME using node from 0 index
-              walletInfo={nodeInfo[0]}
-            />
+            <SifirSettingModal hideModal={() => this.handleMenuBtn()} />
           </View>
         )}
         {btcWalletList.length === 0 && (

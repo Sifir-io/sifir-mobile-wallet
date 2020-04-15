@@ -48,13 +48,16 @@ const initSifirClient = () => async (dispatch, getState) => {
   }
   return sifirClient;
 };
+// TODO formalize cache expiry handling
+const isStaleCacheTimestamp = timestamp =>
+  Date.now() - timestamp < 1000 * 60 * 10;
 
 const getLnNodesList = () => async dispatch => {
   await dispatch(initLnClient());
   const lnNodes = await lnStore.getLnNodes();
   if (!lnNodes?.length) {
     // FIXME cold boot hack
-    // mainly to stay backward compatible with old archittecture FIXME
+    // mainly to stay backward compatible with old archittecture 
     // Either go to observable or fix this shit
     const nodeInfo = await lnClient.getNodeInfo();
     dispatch(getLnNodeInfo(nodeInfo.alias));
@@ -70,7 +73,7 @@ const getLnNodeInfo = label => async dispatch => {
     const cachedNodeInfo = await lnStore.getLnNodeByAlias(label);
     if (
       cachedNodeInfo &&
-      Date.now() - cachedNodeInfo.updatedAt.getTime() < 1000 * 60 * 10
+      isStaleCacheTimestamp(cachedNodeInfo.updatedAt.getTime())
     ) {
       log('Found cached node', cachedNodeInfo.updatedAt, cachedNodeInfo);
       nodeInfo = {...cachedNodeInfo.nodeInfo};

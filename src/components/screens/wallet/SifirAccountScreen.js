@@ -7,6 +7,7 @@ import {getLnWalletDetails} from '@actions/lnWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
+import SifirSettingModal from '@elements/SifirSettingModal';
 import {ErrorScreen} from '@screens/error';
 
 class SifirAccountScreen extends React.Component {
@@ -16,6 +17,7 @@ class SifirAccountScreen extends React.Component {
   state = {
     balance: 0,
     txnData: [],
+    isVisibleSettingsModal: false,
   };
   stopLoading = null;
 
@@ -44,6 +46,9 @@ class SifirAccountScreen extends React.Component {
   componentWillUnmount() {
     this.stopLoading();
   }
+  toggleSettingsModal() {
+    this.setState({isVisibleSettingsModal: !this.state.isVisibleSettingsModal});
+  }
 
   handleReceiveButton = () => {
     const {walletInfo} = this.props.route.params;
@@ -53,14 +58,15 @@ class SifirAccountScreen extends React.Component {
   handleSendBtn = () => {
     const {walletInfo} = this.props.route.params;
     const {type} = walletInfo;
+    const {balance} = this.state;
     if (type === C.STR_LN_WALLET_TYPE) {
       this.props.navigation.navigate('LNPayInvoiceRoute', {
         screen: 'LnScanBolt',
-        params: {walletInfo},
+        params: {walletInfo: {...walletInfo, balance}},
       });
     } else {
       this.props.navigation.navigate('GetAddress', {
-        walletInfo,
+        walletInfo: {...walletInfo, balance},
       });
     }
   };
@@ -80,6 +86,7 @@ class SifirAccountScreen extends React.Component {
     const isLoading = type === C.STR_LN_WALLET_TYPE ? loadingLN : loading;
     const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
     const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
+    const {toggleSettingsModal} = this;
     if (hasError) {
       return (
         <ErrorScreen
@@ -111,7 +118,26 @@ class SifirAccountScreen extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
+        {this.state.isVisibleSettingsModal && (
+          <View
+            style={styles.settingMenuContainer}
+            onTouchEnd={toggleSettingsModal.bind(this)}>
+            <SifirSettingModal
+              toolTipStyle={false}
+              hideModal={toggleSettingsModal.bind(this)}
+              showOpenChannel={true}
+              showTopUp={true}
+              showWithdraw={true}
+              walletInfo={{...walletInfo, balance}}
+            />
+          </View>
+        )}
         <SifirAccountHeader
+          accountIconOnPress={
+            type === C.STR_LN_WALLET_TYPE
+              ? toggleSettingsModal.bind(this)
+              : () => {}
+          }
           loading={isLoading}
           loaded={isLoaded}
           type={type}
@@ -206,5 +232,14 @@ const styles = StyleSheet.create({
     textAlignVertical: 'bottom',
     marginBottom: 7,
     marginLeft: 5,
+  },
+  settingMenuContainer: {
+    position: 'absolute',
+    paddingTop: 80,
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    height: '100%',
+    elevation: 10,
+    zIndex: 10,
   },
 });

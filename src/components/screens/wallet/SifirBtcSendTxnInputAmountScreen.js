@@ -94,7 +94,15 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               shadowColor="black"
               onPress={() => this.goToConfirm({unit})}
               shadowOffset="30">
-              <View style={styles.btnStyle}>
+              <View
+                style={[
+                  styles.btnStyle,
+                  {
+                    backgroundColor: validAmount
+                      ? AppStyle.mainColor
+                      : AppStyle.backgroundColor,
+                  },
+                ]}>
                 <Text style={styles.confirmTxtStyle}>{C.STR_CONFIRM}</Text>
               </View>
             </TouchableOpacity>
