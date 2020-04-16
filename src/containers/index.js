@@ -123,7 +123,6 @@ class Root extends React.Component {
             {
               //TODO Reset state gracfully and retry
               text: `${C.STR_PLEASE} ${C.STR_RELOAD_APP}`,
-              // onPress: () => this.props.getBtcWalletList(),
             },
           ]}
         />

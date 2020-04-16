@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  ScrollView,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
 import {error, log} from '@io/events';
@@ -14,22 +21,33 @@ export default class ErrorScreen extends Component {
   }
   render() {
     const {title, desc, error: passedError, actions} = this.props;
-    log({title, desc, passedError, actions});
     let printableErrorDetails = null;
     if (passedError) {
       if (passedError instanceof String) {
         printableErrorDetails = passedError;
       } else {
         try {
-          printableErrorDetails = JSON.stringify(
-            passedError,
-            Object.getOwnPropertyNames(passedError),
-          );
+          if (error?.toString()) {
+            printableErrorDetails = passedError.toString();
+          } else {
+            // try generic objec to string conversion
+            printableErrorDetails = JSON.stringify(
+              passedError,
+              Object.getOwnPropertyNames(passedError),
+            );
+          }
         } catch (err) {
           error('errorScreen: could not parse error type', err);
         }
       }
     }
+    log('ErrorScreen Data', {
+      title,
+      desc,
+      passedError,
+      actions,
+      printableErrorDetails,
+    });
 
     return (
       <View style={styles.mainView}>
@@ -37,15 +55,18 @@ export default class ErrorScreen extends Component {
           <Image source={Images.icon_failure} style={styles.checkImg} />
           <Text style={styles._headLine}>{title}</Text>
           <Text style={styles.descriptionTxt}>{desc}</Text>
-          <Text style={styles.technicalTxt}>{printableErrorDetails}</Text>
+          <ScrollView>
+            <Text style={styles.technicalTxt}>{printableErrorDetails}</Text>
+          </ScrollView>
         </View>
         <View style={styles.gridView}>
           {actions && actions.length > 0
             ? actions.map((action, index) => (
-                <View id={index}>
+                <View id={index} style={{flex: 1}}>
                   <TouchableOpacity
                     style={styles.doneTouch}
-                    onPressOut={() => action.onPress()}>
+                    disabled={action?.onPress ? false : true}
+                    onPressOut={() => action?.onPress && action.onPress()}>
                     <View
                       shadowColor="black"
                       shadowOffset="30"
@@ -55,7 +76,7 @@ export default class ErrorScreen extends Component {
                   </TouchableOpacity>
                 </View>
               ))
-            : []}
+            : null}
         </View>
       </View>
     );
@@ -78,6 +99,7 @@ const styles = StyleSheet.create({
     marginTop: -25,
     padding: 30,
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   doneView: {
     flexDirection: 'row',

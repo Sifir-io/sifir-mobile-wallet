@@ -20,7 +20,9 @@ import {
   loadDevicePgpKeys,
   storeEncryptedAuthInfo,
   deleteDevicePgpKeys,
+  restartPairingState,
 } from '@actions/auth';
+import {ErrorScreen} from '@screens/error';
 import {decryptMessage} from '@io/pgp';
 import uuid from 'uuid/v4';
 class UnlockORGenKeys extends Component {
@@ -95,7 +97,6 @@ class UnlockORGenKeys extends Component {
         return;
       } else {
         //not paired on auth info , send back to Landing
-        //FIXME handle errorin root
         error('unlockOrGenkeys.invalid.state');
         log('invalid state', this.props.auth);
       }
@@ -117,9 +118,7 @@ class UnlockORGenKeys extends Component {
           // more serious error, notify and try again
           error('unlockOrGenkeys.pairingError', err);
           this.setState({
-            retryablePairingError:
-              'An unexpected error happened while trying to pair:' +
-              err.toString(),
+            retryablePairingError: err,
           });
           break;
       }
@@ -140,7 +139,31 @@ class UnlockORGenKeys extends Component {
       error: pairingError,
     } = this.props.auth;
     const {pubkeyArmored} = devicePgpKey;
-
+    if (retryablePairingError || pairingError) {
+      return (
+        <ErrorScreen
+          title={C.STR_FAILED}
+          desc={'Error unlocking or generating keys'}
+          error={pairingError || retryablePairingError}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () => {
+                this.props.restartPairingState();
+                this.setState({retryablePairingError: null});
+              },
+            },
+            {
+              text: 'Restart Pairing',
+              onPress: () => {
+                this.props.restartPairingState();
+                this.props.navigation.navigate('ScanToPairScreen');
+              },
+            },
+          ]}
+        />
+      );
+    }
     let view;
     if (pairing || paired) {
       view = (
@@ -156,28 +179,6 @@ class UnlockORGenKeys extends Component {
             <Text style={styles.resultTxt}>
               {pairing ? C.STR_PAIRING_METHOD_IN_PROGRESS : C.STR_SUCCESS}
             </Text>
-          </View>
-        </View>
-      );
-      return view;
-    }
-    if (retryablePairingError) {
-      view = (
-        <View style={styles.mainView}>
-          <View style={styles.mainContent}>
-            <Text style={styles.resultTxt}>{C.STR_FAILED}</Text>
-            <Text style={styles.descriptionTxt}>{retryablePairingError}</Text>
-            <Text style={styles.descriptionTxt}>{pairingError}</Text>
-            <TouchableOpacity
-              onPress={() => this.setState({retryablePairingError: null})}
-              style={styles.doneTouch}>
-              <View
-                shadowColor="black"
-                shadowOffset="30"
-                style={styles.doneView}>
-                <Text style={styles.doneTxt}>{C.STR_TRY_AGAIN}</Text>
-              </View>
-            </TouchableOpacity>
           </View>
         </View>
       );
@@ -315,6 +316,7 @@ const mapDispatchToProps = {
   storeEncryptedAuthInfo,
   loadDevicePgpKeys,
   deleteDevicePgpKeys,
+  restartPairingState,
 };
 
 export default connect(

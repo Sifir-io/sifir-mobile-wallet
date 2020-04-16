@@ -1,4 +1,5 @@
 import {
+  RESTART,
   FULFILLED,
   PENDING,
   REJECTED,
@@ -195,6 +196,12 @@ const clearAuthInfo = () => async dispatch => {
   });
 };
 
+const restartPairingState = () => async dispatch => {
+  dispatch({
+    type: REQUEST_PAIR + RESTART,
+    payload: {},
+  });
+};
 export {
   loadEncryptedAuthInfo,
   storeEncryptedAuthInfo,
@@ -205,4 +212,5 @@ export {
   genAndSaveDevicePgpKeys,
   deleteDevicePgpKeys,
   initAndUnlockDeviceKeys,
+  restartPairingState,
 };

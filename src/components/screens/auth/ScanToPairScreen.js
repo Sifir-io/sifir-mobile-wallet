@@ -11,11 +11,8 @@ import {
 } from 'react-native';
 import {validatedTokenHash} from '@helpers/validations';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
-
 import {Images, AppStyle, C} from '@common/index';
-
-// import {pairPhoneWithToken} from '@actions/auth';
-
+// import {ErrorScreen} from '@screens/error';
 class ScanToPairScreen extends Component {
   constructor(props, context) {
     super(props, context);
@@ -24,6 +21,7 @@ class ScanToPairScreen extends Component {
   state = {
     showModal: false,
     qrError: null,
+    pairingError: null,
   };
   processQRCode = async qrdata => {
     this.setState({showModal: false});
@@ -38,14 +36,38 @@ class ScanToPairScreen extends Component {
   };
 
   continue = () => {
-    throw 'shold not get here';
+    throw 'INVALID_SCANTOPAIR_FLOW';
   };
-
+  // TODO refactor this component to use error component rather than mess below
+  // Note: UnlockGen component handles errors from pairing, this component should only handle token parsing errors etc..
+  //static getDerivedStateFromProps(props, state) {
+  //  if (props.error && !state.pairingError) {
+  //    return {...state, pairingError: props.error};
+  //  } else {
+  //    return null;
+  //  }
+  //}
   render() {
     const {
-      auth: {pairing, token, key, error},
+      auth: {pairing, token, key},
     } = this.props;
     const {qrError} = this.state;
+    // TODO refactor this component to use error component rather than mess below
+    //if (qrError) {
+    //  return (
+    //    <ErrorScreen
+    //      title={C.STR_FAILED}
+    //      desc={qrError}
+    //      error={this.state.pairingError}
+    //      actions={[
+    //        {
+    //          text: C.STR_TRY_AGAIN,
+    //          onPress: () => this.setState({pairingError: null}),
+    //        },
+    //      ]}
+    //    />
+    //  );
+    //}
     return (
       <View style={styles.mainView}>
         {pairing && (
@@ -60,24 +82,20 @@ class ScanToPairScreen extends Component {
                 source={
                   token
                     ? Images.icon_done
-                    : error || qrError
+                    : qrError
                     ? Images.icon_failure
                     : Images.icon_header
                 }
                 style={styles.checkImg}
               />
               <Text style={styles.resultTxt}>
-                {token
-                  ? C.STR_SUCCESS
-                  : error || qrError
-                  ? C.STR_FAILED
-                  : C.STR_WELCOME}
+                {token ? C.STR_SUCCESS : qrError ? C.STR_FAILED : C.STR_WELCOME}
               </Text>
               <Text style={styles.descriptionTxt}>
                 {token
                   ? C.STR_AUTH_SUCCESS
-                  : error || qrError
-                  ? error || qrError
+                  : qrError
+                  ? qrError
                   : C.STR_WELCOME_DESC}
               </Text>
             </View>
@@ -98,7 +116,7 @@ class ScanToPairScreen extends Component {
                 <Text style={styles.doneTxt}>
                   {token
                     ? C.STR_CONTINUE
-                    : error || qrError
+                    : qrError
                     ? C.STR_TRY_AGAIN
                     : C.STR_PAIR_NOW}
                 </Text>
@@ -173,7 +191,6 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {};
-// const mapDispatchToProps = {pairPhoneWithToken};
 
 export default connect(
   mapStateToProps,
