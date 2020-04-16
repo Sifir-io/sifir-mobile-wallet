@@ -96,8 +96,8 @@ class SifirAccountsListScreen extends React.Component {
               isLoading={loading}
               menuItems={
                 chainInfo && [
-                  {label: `Chain: ${chainInfo.chain}`},
-                  {label: `Blocks: ${chainInfo.blocks}`},
+                  {label: `CHAIN: ${chainInfo.chain.toUpperCase()}`},
+                  {label: `BLOCKS: ${chainInfo.blocks}`},
                 ]
               }
               hideModal={() => this.handleMenuBtn()}
