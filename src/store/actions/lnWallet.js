@@ -327,22 +327,10 @@ const openAndFundPeerChannel = payload => async dispatch => {
     });
     return fundingResponse;
   } catch (err) {
-    // TODO sometimes CN timesout while trying to connect to LN node, i think it's best we error out at this point and retry
-    // // if timedout; consider it as success.
-    // if (typeof err?.err === 'string' && err.err.includes('timedout')) {
-    //   const fundingResponse = {
-    //     message: C.LN_ERROR_Funding_timeout_sucess_response,
-    //   };
-    //   dispatch({
-    //     type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + FULFILLED,
-    //   });
-    //   return fundingResponse;
-    // } else {
     dispatch({
       type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + REJECTED,
-      payload: {error: err.err.err}, //nested err obj received :|
+      payload: {error: err}, //nested err obj received :|
     });
-    // }
   }
 };
 

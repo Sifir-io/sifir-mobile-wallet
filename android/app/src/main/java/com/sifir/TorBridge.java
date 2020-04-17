@@ -29,9 +29,9 @@ public class TorBridge extends ReactContextBaseJavaModule {
         this.client = new OkHttpClient()
                 .newBuilder()
                 .proxy(this.proxy)
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
                 .build();
     }
 

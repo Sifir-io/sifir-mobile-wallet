@@ -10,7 +10,7 @@ const initialState = {
   address: null,
   btcSendResult: null,
   feeSettingEnabled: false,
-  chainInfo: {},
+  chainInfo: null,
 };
 
 const btcWallet = createReducer(initialState)({

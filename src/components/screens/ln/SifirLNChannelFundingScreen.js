@@ -27,6 +27,7 @@ const SifirLNChannelFundingScreen = ({
   const {id, alias} = walletInfo;
   const {loading, loaded, error} = lnWallet;
   const handleOpenChannelBtn = async () => {
+    // TODO fix this validation
     if (!isNaN(fundingAmount) && fundingAmount > 0) {
       const fundingResponse = await openAndFundPeerChannel({
         peer: nodeAddress,
