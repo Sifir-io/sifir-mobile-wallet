@@ -173,6 +173,7 @@ const SifirLNChannelFundingScreen = ({
           </View>
           {loading && !loaded && <ActivityIndicator size="large" />}
           <TouchableOpacity
+            disabled={!!loading}
             style={styles.yellow_button}
             onPress={() => handleOpenChannelBtn()}>
             <Text

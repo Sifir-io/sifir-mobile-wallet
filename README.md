@@ -5,7 +5,7 @@
 - User friendly UX without compromising cypherpunk principles.
 
 :warning: Dragons lie ahead ! :warning:
-Sifir is still very much Alpha software with known issues. Please keep that in mind when using it. If you do find an issue while using the Sifir *please* open an issue for it so we can get on it.
+Sifir is still very much Alpha software. Please keep that in mind when using it. If you do find an issue while using the Sifir *please* open an issue for it so we can get on it.
 
 *ANDROID ONLY* Sifir has only been tested on android phones at this time.
 

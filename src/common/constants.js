@@ -32,7 +32,7 @@ export const C = {
   STR_Node_Id: 'Node Id',
   STR_Channel_Fees: 'Channel Fees',
   STR_Spendable: 'Spendable',
-  STR_FUNDING_AMOUNT: 'FUNDING AMOUNT',
+  STR_FUNDING_AMOUNT: 'CHANNEL FUNDING AMOUNT',
   STR_From_Node: 'From Node:',
   STR_To_Node: 'To Node:',
   STR_Fees: 'Fees',
