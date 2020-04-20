@@ -1,7 +1,7 @@
 import {signMessage, verifySignedMessage} from '@io/pgp/';
 import {rnTorTransport} from './sifirRnTorTransport';
 import base64 from 'base-64';
-import {log, error} from '@io/events/';
+import {error} from '@io/events/';
 const getTransport = (token, devicePgpKey, nodePubkey) => {
   const {onionUrl} = token;
   const {fingerprint} = devicePgpKey;
@@ -37,6 +37,9 @@ const getTransport = (token, devicePgpKey, nodePubkey) => {
       error(
         'error validating signature of incoming message',
         err,
+        'payload',
+        payload,
+        'fp,sig:',
         sigfingerprint,
         sig,
       );

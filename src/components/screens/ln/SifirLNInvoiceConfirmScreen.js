@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect, useRef} from 'react';
 import {
   StyleSheet,
@@ -23,39 +22,32 @@ const SifirLNInvoiceConfirmScreen = props => {
   const [peers, setPeers] = useState([]);
   const [routeFound, setRouteFound] = useState({});
   const [progress, setProgress] = useState(10);
-  const isRouteFound = routeFound?.id ? true : false;
+  const [routeLabel, setRouteLabel] = useState(null);
+  const [routeFees, setRouteFees] = useState(0);
   const childRef = useRef();
-  const {amount_msat, description, expiry} = props.route.params.invoice;
-  const {loading, loaded, error, isPayingBolt} = props.lnWallet;
+  const {loading, loaded, error: LnError, isPayingBolt} = props.lnWallet;
   const {walletInfo, bolt11} = props.route.params;
-  let routeFoundLabel;
-  // let channel;
-  let totalFees;
-  //TODO fix this mess of a component....
-  if (isRouteFound) {
-    // channel = routeFound.channels[0];
-    // const {channel_id} = channel;
-    // routeFoundLabel = `${channel_id.slice(0, 4)}-${channel_id.slice(-4)} - `;
-    routeFoundLabel = `${routes.length} ${C.STR_Hops_to_route}, ${
-      C.STR_Fees
-    }:  `;
-    // Generate total fees paid along route by subtracting msatoshi at index=0 from msatoshi of last entry in routes.
-    totalFees = routes[0].msatoshi - routes[routes.length - 1].msatoshi;
-  }
-
   useEffect(() => {
     (async () => {
       const {invoice} = props.route.params;
-      const [allroutes, allPeers] = await Promise.all([
+      console.log('processing invoice', invoice);
+      const [routes, peers] = await Promise.all([
         props.getRoute(invoice.payee, invoice.msatoshi),
         props.getPeers(),
       ]);
-      const foundRoute = allPeers.find(peer => peer.id === allroutes[0]?.id);
-      setRoutes(allroutes);
-      setPeers(allPeers);
-      setRouteFound(foundRoute);
+      setRoutes(routes);
+      setPeers(peers);
+      if (peers?.length && routes?.length) {
+        const foundRoute = peers.find(peer => peer.id === routes[0]?.id);
+        setRouteFound(foundRoute);
+        setRouteLabel(
+          `${routes.length} ${C.STR_Hops_to_route}, ${C.STR_Fees}:  `,
+        );
+        // Generate total fees paid along route by subtracting msatoshi at index=0 from msatoshi of last entry in routes.
+        setRouteFees(routes[0].msatoshi - routes[routes.length - 1].msatoshi);
+      }
     })();
-  }, []);
+  }, [props.route.params.invoice]);
 
   const handleSendButton = async () => {
     const txnInfo = await props.payBolt(bolt11);
@@ -89,25 +81,25 @@ const SifirLNInvoiceConfirmScreen = props => {
     let progressBar;
     if (loading) {
       progressBar = setTimeout(() => {
-        progress === 100 ? setProgress(10) : setProgress(progress + 2);
+        setProgress((progress % 100) + 2);
       }, 100);
     } else {
       clearTimeout(progressBar);
     }
   }, [loading, progress]);
 
-  const formatExpiryDate = () => {
-    return moment(Date.now() + expiry * 1000)
+  // TODO move to util
+  const formatExpiryDate = expiry =>
+    moment(Date.now() + expiry * 1000)
       .fromNow()
       .substr(3);
-  };
 
-  if (error) {
+  if (LnError) {
     return (
       <ErrorScreen
         title={C.STR_ERROR_transaction}
         desc={C.STR_ERROR_btc_txn_error}
-        error={error}
+        error={LnError}
         actions={[
           {
             text: C.STR_GO_BACK,
@@ -118,7 +110,8 @@ const SifirLNInvoiceConfirmScreen = props => {
     );
   }
 
-  const expiryDate = formatExpiryDate();
+  const isRouteFound = routeFound?.id ? true : false;
+  const {amount_msat, description, expiry} = props.route.params.invoice;
   return (
     <View style={styles.container}>
       <ScrollView
@@ -138,10 +131,9 @@ const SifirLNInvoiceConfirmScreen = props => {
               {description}
             </Text>
             <Text style={[styles.textBright, styles.text_14, styles.text_bold]}>
-              {C.STR_EXPIRES_IN}
-              {'  '}
+              {`${C.STR_EXPIRES_IN} `}
               <Text style={[styles.text_white, styles.text_18]}>
-                {expiryDate} {C.STR_from_now}
+                {formatExpiryDate(expiry)} {C.STR_from_now}
               </Text>
             </Text>
           </View>
@@ -158,7 +150,7 @@ const SifirLNInvoiceConfirmScreen = props => {
           {isPayingBolt && <ActivityIndicator size="large" />}
           <View style={styles.justify_center}>
             <TouchableOpacity
-              disabled={!loaded || loading || routes.length === 0}
+              disabled={!loaded || loading || !isRouteFound}
               style={
                 isRouteFound ? styles.send_button : styles.send_button_disabled
               }
@@ -189,12 +181,12 @@ const SifirLNInvoiceConfirmScreen = props => {
         </View>
       </ScrollView>
 
-      {loaded && !isPayingBolt && peers.length > 0 && (
+      {loaded && !isPayingBolt && peers?.length > 0 && (
         <View style={styles.justify_end}>
           <SlidingPanel
             ref={childRef}
             headerLayoutHeight={80}
-            AnimationSpeed={50}
+            AnimationSpeed={100}
             onAnimationStop={() => handleOpenChannelDrag()}
             onDragStop={() => handleOpenChannelDrag()}
             headerLayout={() => (
@@ -212,9 +204,9 @@ const SifirLNInvoiceConfirmScreen = props => {
                     isRouteFound ? styles.orangeColor : styles.darkColor,
                     styles.text_large,
                   ]}>
-                  {!isRouteFound ? C.STR_OPEN_CHANNEL : routeFoundLabel}
+                  {!isRouteFound ? C.STR_OPEN_CHANNEL : routeLabel}
                   {isRouteFound && (
-                    <SifirBTCAmount amount={totalFees} unit={C.STR_MSAT} />
+                    <SifirBTCAmount amount={routeFees} unit={C.STR_MSAT} />
                   )}
                 </Text>
               </View>

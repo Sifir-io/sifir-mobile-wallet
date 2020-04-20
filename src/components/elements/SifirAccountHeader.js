@@ -21,9 +21,8 @@ const SifirAccountHeader = ({
   label,
   headerText = C.STR_Cur_Balance,
   accountIconOnPress,
+  accountIcon,
 }) => {
-  const walletIcon =
-    type === C.STR_LN_WALLET_TYPE ? Images.icon_light : Images.icon_bitcoin;
   return (
     <View style={styles.headerView}>
       <TouchableOpacity onPress={accountIconOnPress}>
@@ -33,7 +32,7 @@ const SifirAccountHeader = ({
           colors={['#52d4cd', '#54a5b1', '#57658c']}
           style={styles.gradient}>
           <View>
-            <Image source={walletIcon} style={styles.boxImage} />
+            <Image source={accountIcon} style={styles.boxImage} />
             {loading === true && (
               <ActivityIndicator size="large" color={AppStyle.mainColor} />
             )}

@@ -6,7 +6,7 @@ export const SifirChannelProgress = props => {
   const {loaded, routes, isRouteFound, loading} = props;
   const primaryColor =
     !loading && !isRouteFound ? '#21827D' : AppStyle.mainColor;
-  const isGoldenColor = routes.length ? true : false;
+  const isGoldenColor = isRouteFound && routes?.length ? true : false;
   const remaining = 100 - loaded;
   const startDotColor = loaded === 0 ? 'rgb(30, 73, 95)' : primaryColor;
   const endDotColor = loaded === 100 ? primaryColor : 'rgb(30, 73, 95)';

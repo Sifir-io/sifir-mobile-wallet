@@ -133,6 +133,11 @@ class SifirAccountScreen extends React.Component {
           </View>
         )}
         <SifirAccountHeader
+          accountIcon={
+            type === C.STR_LN_WALLET_TYPE
+              ? Images.icon_light
+              : Images.icon_bitcoin
+          }
           accountIconOnPress={
             type === C.STR_LN_WALLET_TYPE
               ? toggleSettingsModal.bind(this)

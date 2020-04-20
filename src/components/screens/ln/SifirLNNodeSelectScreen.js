@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,12 +9,14 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
 import {AppStyle, Images, C} from '@common/index';
 import SifirNodesTable from '@elements/SifirNodesTable';
 import {getPeers} from '@actions/lnWallet';
 import {connect} from 'react-redux';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
 import {isValidLnNodeId} from '@helpers/validations';
+import {error} from '@io/events';
 
 function SifirLNNodeSelectScreen(props) {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -22,12 +24,14 @@ function SifirLNNodeSelectScreen(props) {
   const [QRdataORuserInput, setQRorUserInput] = useState('');
   const {loading, loaded} = props.lnWallet;
 
-  useEffect(() => {
-    (async () => {
-      const nodeId = props.lnWallet.nodeInfo[0].id;
-      props.getPeers(nodeId);
-    })();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const [{id}] = props.lnWallet.nodeInfo;
+      props.getPeers(id);
+      return () => {};
+    }, []),
+    [],
+  );
 
   const closeModal = data => {
     if (data === null) {

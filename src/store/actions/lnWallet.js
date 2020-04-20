@@ -222,9 +222,10 @@ const decodeBolt = bolt11 => async dispatch => {
     });
     return invoice;
   } catch (err) {
+    error(err);
     dispatch({
       type: types.LN_WALLET_DECODE_BOLT + REJECTED,
-      payload: {error: err.err.err},
+      payload: {error: err},
     });
   }
 };
@@ -240,7 +241,7 @@ const getRoute = (nodeId, msatoshi) => async dispatch => {
     return routes;
   } catch (err) {
     // if throws no found exception
-    if (err.err.err.code === 205) {
+    if (err?.err?.code === 205) {
       dispatch({
         type: types.LN_WALLET_GET_ROUTE + FULFILLED,
       });
@@ -248,6 +249,7 @@ const getRoute = (nodeId, msatoshi) => async dispatch => {
     } else {
       error(err);
       dispatch({
+        payload: {error: err},
         type: types.LN_WALLET_GET_ROUTE + REJECTED,
       });
     }
@@ -267,7 +269,7 @@ const payBolt = bolt11 => async dispatch => {
     error(err);
     dispatch({
       type: types.LN_WALLET_PAY_BOLT + REJECTED,
-      payload: {error: err.err.err},
+      payload: {error: err},
     });
   }
 };
@@ -292,15 +294,6 @@ const getPeers = nodeId => async dispatch => {
 };
 
 const createInvoice = invoice => async dispatch => {
-  // Commenting it for future testing
-
-  // invoice = {
-  //   msatoshi: 9999,
-  //   label: 'Test in',
-  //   description: 'Test inv 3.28.2020',
-  //   expiry: 100000,
-  //   callback_url: 'CallBackUrl',
-  // };
   dispatch({type: types.LN_WALLET_CREATE_INVOICE + PENDING});
   try {
     await dispatch(initLnClient());
@@ -370,7 +363,7 @@ const withdrawFunds = (address, amount) => async dispatch => {
     error(err);
     dispatch({
       type: types.LN_WALLET_WITHDRAW_FUNDS + REJECTED,
-      payload: {error: err.err.err},
+      payload: {error: err},
     });
   }
 };

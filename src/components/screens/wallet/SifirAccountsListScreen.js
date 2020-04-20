@@ -94,25 +94,23 @@ class SifirAccountsListScreen extends React.Component {
             <SifirSettingModal
               toolTipStyle={true}
               isLoading={loading}
-              menuItems={
-                chainInfo && [
-                  {
-                    label: `CONNECTION: ${
-                      chainInfo?.chain ? 'CONNECTED' : 'NO CONNECTION'
-                    }`,
-                  },
-                  {
-                    label: `CHAIN: ${
-                      chainInfo?.chain ? chainInfo.chain.toUpperCase() : 'NA'
-                    }`,
-                  },
-                  {
-                    label: `BLOCKS: ${
-                      chainInfo?.blocks ? chainInfo.blocks : 'NA'
-                    }`,
-                  },
-                ]
-              }
+              menuItems={[
+                {
+                  label: `CONNECTION: ${
+                    chainInfo?.chain ? 'CONNECTED' : 'NO CONNECTION'
+                  }`,
+                },
+                {
+                  label: `CHAIN: ${
+                    chainInfo?.chain ? chainInfo.chain.toUpperCase() : 'NA'
+                  }`,
+                },
+                {
+                  label: `BLOCKS: ${
+                    chainInfo?.blocks ? chainInfo.blocks : 'NA'
+                  }`,
+                },
+              ]}
               hideModal={() => this.handleMenuBtn()}
             />
           </View>

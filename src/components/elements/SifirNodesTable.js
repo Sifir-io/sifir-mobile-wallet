@@ -82,7 +82,11 @@ const SifirNodesTable = props => {
       <Columns
         columns={
           nodeInputRequired
-            ? [C.STR_Channel_Node_Id, C.STR_Channel_Status, C.STR_Spendable]
+            ? [
+                C.STR_Channel_Node_Id,
+                C.STR_Channel_Status,
+                `${C.STR_Spendable} ${C.STR_MSAT}`,
+              ]
             : [C.STR_Channel, C.STR_Node_Id, C.STR_Channel_Fees]
         }
       />

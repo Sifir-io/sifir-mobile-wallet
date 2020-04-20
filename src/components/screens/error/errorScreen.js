@@ -27,14 +27,20 @@ export default class ErrorScreen extends Component {
         printableErrorDetails = passedError;
       } else {
         try {
-          if (error?.toString()) {
-            printableErrorDetails = passedError.toString();
-          } else {
+          // TODO refactor this to helpers
+          const cypernodeError = passedError?.err;
+          printableErrorDetails = cypernodeError;
+          // Where we able to parse the error yet ?
+          if (!printableErrorDetails) {
             // try generic objec to string conversion
-            printableErrorDetails = JSON.stringify(
-              passedError,
-              Object.getOwnPropertyNames(passedError),
-            );
+            if (passedError?.toString()) {
+              printableErrorDetails = passedError.toString();
+            } else {
+              printableErrorDetails = JSON.stringify(
+                passedError,
+                Object.getOwnPropertyNames(passedError),
+              );
+            }
           }
         } catch (err) {
           error('errorScreen: could not parse error type', err);
