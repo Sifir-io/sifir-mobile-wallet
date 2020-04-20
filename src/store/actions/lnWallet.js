@@ -316,7 +316,7 @@ const openAndFundPeerChannel = payload => async dispatch => {
     await dispatch(initLnClient());
     const fundingResponse = await lnClient.openAndFundPeerChannel(payload);
     // cn error returns 200 but has result failed
-    if (fundingResponse.result === 'failed') {
+    if (fundingResponse.result !== 'success') {
       throw fundingResponse;
     }
     dispatch({
@@ -324,9 +324,10 @@ const openAndFundPeerChannel = payload => async dispatch => {
     });
     return fundingResponse;
   } catch (err) {
+    error(err);
     dispatch({
       type: types.LN_WALLET_OPEN_FUND_PEER_CHANNEL + REJECTED,
-      payload: {error: err}, //nested err obj received :|
+      payload: {error: err},
     });
   }
 };

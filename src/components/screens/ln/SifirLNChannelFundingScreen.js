@@ -52,6 +52,7 @@ const SifirLNChannelFundingScreen = ({
         error={error}
         actions={[
           {
+            // TODO change this to just clearing the state's error so we can retry rather than go all the way back to account
             text: C.STR_GO_BACK,
             onPress: () => navigation.navigate('Account', {walletInfo}),
           },
@@ -173,7 +174,9 @@ const SifirLNChannelFundingScreen = ({
           {loading && !loaded && <ActivityIndicator size="large" />}
           <TouchableOpacity
             disabled={!!loading}
-            style={styles.yellow_button}
+            style={
+              loading ? styles.yellow_button_disabled : styles.yellow_button
+            }
             onPress={() => handleOpenChannelBtn()}>
             <Text
               style={[styles.text_26, styles.text_center, styles.text_bold]}>
@@ -219,6 +222,13 @@ const styles = StyleSheet.create({
     padding: 25,
     borderRadius: 10,
     marginTop: 50,
+  },
+  yellow_button_disabled: {
+    backgroundColor: '#ffa500',
+    padding: 25,
+    borderRadius: 10,
+    marginTop: 50,
+    opacity: 0.5,
   },
   space_between: {
     flexDirection: 'row',
