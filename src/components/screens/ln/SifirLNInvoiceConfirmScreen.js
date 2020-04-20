@@ -30,7 +30,6 @@ const SifirLNInvoiceConfirmScreen = props => {
   useEffect(() => {
     (async () => {
       const {invoice} = props.route.params;
-      console.log('processing invoice', invoice);
       const [routes, peers] = await Promise.all([
         props.getRoute(invoice.payee, invoice.msatoshi),
         props.getPeers(),
