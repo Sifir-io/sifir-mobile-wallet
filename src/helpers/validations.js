@@ -15,4 +15,9 @@ const validatedTokenHash = tokenHash => {
   }
 };
 
-export {validatedTokenHash};
+const isValidLnNodeId = node => {
+  const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
+  return nodeRegx.test(node);
+};
+
+export {validatedTokenHash, isValidLnNodeId};

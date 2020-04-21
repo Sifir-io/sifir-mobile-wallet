@@ -1,10 +1,21 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Text,
+  ScrollView,
+} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import {sendBitcoin} from '@actions/btcwallet';
+import {withdrawFunds} from '@actions/lnWallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
+import {ErrorScreen} from '@screens/error';
+import SifirBTCAmount from '@elements/SifirBTCAmount';
 
 class SifirBtcSendTxnConfirmScreen extends Component {
   constructor(props, context) {
@@ -15,107 +26,139 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     btnStatus: 0,
     modalVisible: false,
   };
-  sendBtc = () => {
-    console.log('in send');
+
+  withdrawFunds = async () => {
+    const {
+      txnInfo,
+      walletInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    const {address, amount} = txnInfo;
+    const withdrawDetails = await this.props.withdrawFunds(address, amount);
+    if (withdrawDetails?.tx) {
+      this.props.navigation.navigate('BtcTxnConfirmed', {
+        txnInfo: {
+          ...txnInfo,
+          isSendTxn: true,
+          amount,
+          address,
+        },
+        walletInfo,
+        displayUnit: C.STR_MSAT,
+        type,
+      });
+    }
+  };
+
+  sendBitcoin = async () => {
     const {txnInfo, walletInfo} = this.props.route.params;
     const {address, amount} = txnInfo;
-    this.props.sendBitcoin({address, amount});
+    await this.props.sendBitcoin({address, amount});
     this.props.navigation.navigate('BtcTxnConfirmed', {
       txnInfo: {...txnInfo, isSendTxn: true},
       walletInfo,
     });
   };
 
+  handleSendBtn = () => {
+    const {
+      walletInfo: {type},
+    } = this.props.route.params;
+    if (type === C.STR_LN_WITHDRAW) {
+      this.withdrawFunds();
+    } else {
+      this.sendBitcoin();
+    }
+  };
+
   render() {
     const {
-      walletInfo: {feeSettingEnabled},
-      txnInfo: {address, amount},
+      walletInfo: {feeSettingEnabled, type},
+      txnInfo: {address, amount, unit},
     } = this.props.route.params;
-    const amountFontSize = (C.vw * 80) / amount.length;
-    const btcUnitFontSize = amountFontSize * 0.6;
-    const recTxtFontSize = (C.vw * 70) / address.length;
+    const amountFontSize =
+      (C.vw * 80) / (amount.length < 3 ? 5 : amount.length);
+    const recTxtFontSize = (C.vw * 120) / address.length;
+    const {loading: btcLoading, error: btcError} = this.props.lnWallet;
+    const {loading: lnLoading, error: lnError} = this.props.btcWallet;
+
+    if (btcError || lnError) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_transaction}
+          desc={C.STR_ERROR_btc_txn_error}
+          error={btcError || lnError}
+          actions={[
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => this.props.navigation.navigate('AccountList'),
+            },
+          ]}
+        />
+      );
+    }
 
     return (
       <View style={styles.mainView}>
-        <View
-          style={styles.setting}
-          onTouchEnd={() =>
-            feeSettingEnabled && this.setState({modalVisible: true})
-          }>
-          <TouchableOpacity>
-            <Image source={Images.icon_setting} style={styles.settingImg} />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            alignItems: 'center',
-            marginTop: 15,
-          }}>
-          <Text style={styles.recTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
-          <Text style={[styles.addrTxt, {fontSize: recTxtFontSize}]}>
-            {address}
-          </Text>
-          <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
-        </View>
-        <View style={styles.valueTxt}>
+        <ScrollView>
           <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-            }}>
-            <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
-              {amount}
+            style={styles.setting}
+            onTouchEnd={() =>
+              feeSettingEnabled && this.setState({modalVisible: true})
+            }>
+            <TouchableOpacity>
+              <Image source={Images.icon_setting} style={styles.settingImg} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.addressContainer}>
+            <Text style={styles.recTxt}>{C.STR_PAYMENT_RECEIPIENT}</Text>
+            <Text style={[styles.addrTxt, {fontSize: recTxtFontSize}]}>
+              {address}
             </Text>
-            <Text
-              style={{
-                color: 'white',
-                fontSize: btcUnitFontSize,
-                marginBottom: 5,
-              }}>
-              {C.STR_BTC}
-            </Text>
+            <Text style={styles.amountLblTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
           </View>
-          <View style={styles.lineView} />
-        </View>
-        {feeSettingEnabled && (
-          <View style={styles.setArea}>
-            <Text style={styles.setTxt}>{C.STR_FEES}</Text>
-            <Text style={styles.btcAmountTxt}>{amount} BTC</Text>
-            <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
+          <View style={styles.valueTxt}>
+            <View style={styles.amountContainer}>
+              <Text style={[styles.bigTxt, {fontSize: amountFontSize}]}>
+                <SifirBTCAmount amount={amount} unit={unit} />
+              </Text>
+            </View>
+            <View style={styles.lineView} />
           </View>
-        )}
-        <TouchableOpacity
-          onLongPress={this.sendBtc}
-          style={{
-            marginTop: 50,
-            alignItems: 'center',
-          }}>
-          <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
-            <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
-            <Image
-              source={Images.icon_up_dark}
-              style={{width: 20, height: 20}}
-            />
-          </View>
-        </TouchableOpacity>
-        <Overlay
-          visible={this.state.modalVisible}
-          onClose={this.onClose}
-          closeOnTouchOutside
-          animationType="zoomIn"
-          containerStyle={{
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            borderRadius: 15,
-          }}
-          childrenWrapperStyle={styles.dlgChild}
-          animationDuration={500}>
-          {hideModal => (
-            <SifirSettingModal
-              hideModal={hideModal}
-              feeEnabled={feeSettingEnabled}
-            />
+          {feeSettingEnabled && (
+            <View style={styles.setArea}>
+              <Text style={styles.setTxt}>{C.STR_FEES}</Text>
+              <Text style={styles.btcAmountTxt}>{amount} BTC</Text>
+              <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
+            </View>
           )}
-        </Overlay>
+          {(btcLoading || lnLoading) && <ActivityIndicator size="large" />}
+          <TouchableOpacity
+            onLongPress={this.handleSendBtn}
+            style={styles.sendBtnTouchable}>
+            <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
+              <Text style={styles.sendBtnTxt}>{C.STR_SEND}</Text>
+              <Image source={Images.icon_up_dark} style={styles.sendImg} />
+            </View>
+          </TouchableOpacity>
+          <Overlay
+            visible={this.state.modalVisible}
+            onClose={this.onClose}
+            closeOnTouchOutside
+            animationType="zoomIn"
+            containerStyle={styles.overlayContainer}
+            childrenWrapperStyle={styles.dlgChild}
+            animationDuration={500}>
+            {hideModal => (
+              <SifirSettingModal
+                hideModal={hideModal}
+                feeEnabled={feeSettingEnabled}
+                showSettings={true}
+                showManageFunds={true}
+              />
+            )}
+          </Overlay>
+        </ScrollView>
       </View>
     );
   }
@@ -123,10 +166,11 @@ class SifirBtcSendTxnConfirmScreen extends Component {
 const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
   };
 };
 
-const mapDispatchToProps = {sendBitcoin};
+const mapDispatchToProps = {sendBitcoin, withdrawFunds};
 
 export default connect(
   mapStateToProps,
@@ -182,7 +226,6 @@ const styles = StyleSheet.create({
   },
   bigTxt: {
     color: 'white',
-    width: C.SCREEN_WIDTH * 0.55,
     textAlign: 'center',
   },
   recTxt: {
@@ -228,4 +271,26 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
+  addressContainer: {
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  amountUniLabel: {
+    color: 'white',
+    marginBottom: 5,
+  },
+  sendBtnTouchable: {
+    marginTop: 50,
+    alignItems: 'center',
+  },
+  overlayContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 15,
+  },
+  sendImg: {width: 20, height: 20},
 });

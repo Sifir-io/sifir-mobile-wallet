@@ -26,6 +26,24 @@ const initBtcClient = () => async (dispatch, getState) => {
   return btcClient;
 };
 
+const getBlockChainInfo = () => async dispatch => {
+  dispatch({type: types.BTC_WALLET_GET_BLOCKCHAININFO + PENDING});
+  try {
+    await dispatch(initBtcClient());
+    const chainInfo = await btcClient.getBlockChainInfo();
+    dispatch({
+      type: types.BTC_WALLET_GET_BLOCKCHAININFO + FULFILLED,
+      payload: {chainInfo},
+    });
+    return chainInfo;
+  } catch (err) {
+    error(err);
+    dispatch({
+      type: types.BTC_WALLET_GET_BLOCKCHAININFO + REJECTED,
+      payload: {error: err},
+    });
+  }
+};
 const getBtcWalletList = () => async dispatch => {
   dispatch({type: types.BTC_WALLET_LIST_DATA_SHOW + PENDING});
 
@@ -54,7 +72,7 @@ const getBtcWalletList = () => async dispatch => {
       }),
     );
 
-    // Add spending walet
+    // Add spending wallet
     btcWalletList.push({
       label: 'Spending',
       desc: C.STR_WALLET,
@@ -102,7 +120,10 @@ const getWalletDetails = ({label, type}) => async dispatch => {
     }
     dispatch({
       type: types.BTC_WALLET_DETAILS + FULFILLED,
-      // payload: {btcWalletDetails: {balance, txnData, btcUnit}},
+    });
+    // TODO move this to component
+    txnData.sort((a, b) => {
+      return b.timereceived - a.timereceived;
     });
     return {balance, txnData};
   } catch (err) {
@@ -115,7 +136,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
 };
 
 const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
-  log('getwalletaddress');
   dispatch({type: types.BTC_WALLET_ADDRESS + PENDING});
   let address = null;
 
@@ -132,12 +152,10 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
       default:
         break;
     }
-    log('dispatch getwalletaddress');
     dispatch({
       type: types.BTC_WALLET_ADDRESS + FULFILLED,
       payload: {address},
     });
-    log('getwalletaddress goinghome');
   } catch (err) {
     error(err);
     dispatch({
@@ -175,4 +193,5 @@ export {
   initBtcClient,
   getWalletAddress,
   sendBitcoin,
+  getBlockChainInfo,
 };

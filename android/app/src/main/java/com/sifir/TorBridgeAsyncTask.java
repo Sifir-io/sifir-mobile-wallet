@@ -34,10 +34,9 @@ public class TorBridgeAsyncTask extends AsyncTask<String, String, WritableMap> {
     @Override
     protected void onPostExecute(WritableMap result) {
         if (this.error != null) {
-            Log.d("TorBridge","error onPostExecute" + this.error.toString());
+            Log.d("TorBridge", "error onPostExecute" + this.error.toString());
             mPromise.reject(this.error);
-        }
-        else {
+        } else {
             mPromise.resolve(result);
 
         }
@@ -68,9 +67,9 @@ public class TorBridgeAsyncTask extends AsyncTask<String, String, WritableMap> {
         }
         try (Response response = this.client.newCall(request.build()).execute()) {
             WritableMap resp = Arguments.createMap();
-            Map<String,List<String>> headers = response.headers().toMultimap();
-            resp.putString("headers",new JSONObject(headers).toString());
-            resp.putString("body",response.body().string());
+            Map<String, List<String>> headers = response.headers().toMultimap();
+            resp.putString("headers", new JSONObject(headers).toString());
+            resp.putString("body", response.body().string());
             return resp;
         }
     }
@@ -81,9 +80,10 @@ public class TorBridgeAsyncTask extends AsyncTask<String, String, WritableMap> {
         try {
             return run(params[0], params[1], params[2], params[3]);
         } catch (Exception e) {
+            Log.d("TorBridge", "error doInBackground" + e.toString());
             this.error = e;
             WritableMap resp = Arguments.createMap();
-            resp.putString("error",e.toString());
+            resp.putString("error", e.toString());
             return resp;
         }
     }

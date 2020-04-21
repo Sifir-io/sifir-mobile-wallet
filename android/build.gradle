@@ -6,6 +6,7 @@ buildscript {
         minSdkVersion = 16
         compileSdkVersion = 28
         targetSdkVersion = 28
+        kotlin_version = '1.3.21'
     }
     repositories {
         google()
@@ -13,6 +14,7 @@ buildscript {
     }
     dependencies {
         classpath('com.android.tools.build:gradle:3.5.0')
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -24,11 +26,24 @@ allprojects {
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url("$rootDir/../node_modules/react-native/android")
+            // Replace AAR from original RN with AAR from react-native-v8
+            url("$rootDir/../node_modules/react-native-v8/dist")
         }
+	// react-native-v8 mod
+        maven {
+            // prebuilt libv8android.so
+            url("$rootDir/../node_modules/v8-android/dist")
+         }
+        //	eof mod
         maven {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
+        // rudder mod 
+        maven {
+  	   url  "https://dl.bintray.com/rudderstack/rudderstack"
+        }
+
 
         google()
         jcenter()

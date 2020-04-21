@@ -7,7 +7,7 @@ import {ScanToPairScreen, UnlockORGenKeys} from '@screens/auth/index';
 import WalletTab from './WalletStack';
 import {connect} from 'react-redux';
 import {event} from '@io/events';
-import {Alert} from 'react-native';
+import {ErrorScreen} from '@screens/error';
 import {
   loadEncryptedAuthInfo,
   loadDevicePgpKeys,
@@ -15,7 +15,7 @@ import {
   clearAuthInfo,
 } from '@actions/auth';
 import {createStackNavigator} from '@react-navigation/stack';
-
+import {error} from '@io/events';
 const RootStack = createStackNavigator();
 const ContentStack = createStackNavigator();
 /**
@@ -82,6 +82,7 @@ class Root extends React.Component {
     initLoading: true,
     encAuthInfo: null,
     devicePgpKeys: null,
+    caughtError: false,
   };
   _bootstrapAsync = async () => {
     const [encAuthInfo, devicePgpKeys] = await Promise.all([
@@ -93,26 +94,40 @@ class Root extends React.Component {
   componentDidMount() {
     this._bootstrapAsync();
   }
+  static getDerivedStateFromError(err) {
+    // Update state so the next render will show the fallback UI.
+    return {caughtError: true, initLoading: false, caughtErrorObj: err};
+  }
+
   componentDidCatch(errorThrown, info) {
-    event('error.root.componentDidCatch', {errorThrown, info});
-    Alert.alert(
-      C.STR_ERROR_app,
-      C.STR_ERROR_app_unhandled,
-      [
-        {
-          text: 'Reload',
-          onPress: () => this._bootstrapAsync(),
-        },
-      ],
-      {cancelable: false},
-    );
+    error('containerIndex:componentDidCatch', errorThrown, info);
+    event('error.componentDidCatch', {
+      component: 'containerIndex',
+      errorThrown,
+      info,
+    });
   }
   render() {
     const {
       auth: {token, key, nodePubkey},
     } = this.props;
-    const {initLoading, encAuthInfo} = this.state;
+    const {initLoading, encAuthInfo, caughtError, caughtErrorObj} = this.state;
     const authStateReady = token && key && nodePubkey;
+    if (caughtError) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_app}
+          desc={C.STR_ERROR_app_unhandled}
+          error={caughtErrorObj}
+          actions={[
+            {
+              //TODO Reset state gracfully and retry
+              text: `${C.STR_PLEASE} ${C.STR_RELOAD_APP}`,
+            },
+          ]}
+        />
+      );
+    }
     return (
       <NavigationContainer>
         {initLoading ? (

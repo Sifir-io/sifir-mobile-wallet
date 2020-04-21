@@ -7,87 +7,165 @@ import {
   Text,
   TextInput,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 
 import {Images, AppStyle, C} from '@common/index';
 import SifirQrCodeCamera from '@elements/SifirQrCodeCamera';
+import {decodeBolt} from '@actions/lnWallet';
+import {connect} from 'react-redux';
+import {ErrorScreen} from '@screens/error';
 
-export default class SifirGetAddrScreen extends Component {
+class SifirGetAddrScreen extends Component {
   constructor(props, context) {
     super(props, context);
   }
   state = {
-    btnStatus: 0,
     showModal: false,
     torchOn: false,
-    address: null,
-    addrFontSize: 22,
+    scannedQRdata: null,
   };
   closeModal = data => {
     if (data === null) {
-      this.setState({showModal: false});
-      return;
+      return this.setState({showModal: false});
     }
-    this.setState({
-      address: data,
-      showModal: false,
-      addrFontSize: (1.2 * C.SCREEN_WIDTH) / data.length,
-    });
+    const {
+      walletInfo: {type},
+    } = this.props.route.params;
+
+    this.setState(
+      {
+        scannedQRdata: data,
+        showModal: false,
+      },
+      () => {
+        if (type === C.STR_LN_WITHDRAW) {
+          this.handleAddressScanned();
+        } else {
+          this.handleBoltScanned();
+        }
+      },
+    );
   };
 
-  goToEnterAmount = () => {
+  handleBoltScanned = async () => {
+    const {scannedQRdata} = this.state;
+    const invoice = await this.props.decodeBolt(scannedQRdata);
     const {walletInfo} = this.props.route.params;
-    const {address} = this.state;
-    this.props.navigation.navigate('BtcSendTxnInputAmount', {
-      txnInfo: {address},
-      walletInfo,
-    });
-  };
 
-  inputAddr = address => {
-    if (address.length * 22 < C.SCREEN_WIDTH) {
-      this.setState({address, addrFontSize: 22});
-    } else {
-      this.setState({
-        address,
-        addrFontSize: (1.2 * C.SCREEN_WIDTH) / address.length,
+    if (invoice?.amount_msat) {
+      this.props.navigation.navigate('LnInvoiceConfirm', {
+        invoice,
+        walletInfo,
+        bolt11: scannedQRdata,
       });
     }
   };
 
+  handleAddressScanned = () => {
+    const {walletInfo} = this.props.route.params;
+    const {scannedQRdata} = this.state;
+    this.props.navigation.navigate('BtcSendTxnInputAmount', {
+      txnInfo: {address: scannedQRdata},
+      walletInfo,
+    });
+  };
+  handleContinueBtn = async () => {
+    const {
+      walletInfo,
+      walletInfo: {type},
+    } = this.props.route.params;
+    const {scannedQRdata} = this.state;
+    if (type === C.STR_LN_WALLET_TYPE) {
+      // Bolt scanned
+      const invoice = await this.props.decodeBolt(scannedQRdata);
+      if (invoice?.amount_msat) {
+        this.props.navigation.navigate('LnInvoiceConfirm', {
+          invoice,
+          walletInfo,
+          bolt11: scannedQRdata,
+        });
+      }
+    } else {
+      // Normal btc Txn or 'Withdraw'
+      this.props.navigation.navigate('BtcSendTxnInputAmount', {
+        txnInfo: {address: scannedQRdata},
+        walletInfo,
+      });
+    }
+  };
+
+  handleBackButton = () => {
+    const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
+    if (type === C.STR_LN_WITHDRAW) {
+      this.props.navigation.goBack();
+    } else {
+      this.props.navigation.navigate('Account', {walletInfo});
+    }
+  };
+
+  inputAddr = address => {
+    this.setState({scannedQRdata: address});
+  };
+
   render() {
-    const {navigate} = this.props.navigation;
-    const {showModal, address, addrFontSize} = this.state;
+    const {showModal, scannedQRdata} = this.state;
+    const {loading, error} = this.props.lnWallet;
+    const {
+      walletInfo: {type, label},
+    } = this.props.route.params;
+    const placeHolder =
+      type === C.STR_LN_WALLET_TYPE ? C.STR_Enter_bolt : C.STR_Enter_addr;
+    if (error && scannedQRdata) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_transaction}
+          desc={C.STR_ERROR_btc_txn_error}
+          error={error}
+          actions={[
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => this.props.navigation.goBack(),
+            },
+          ]}
+        />
+      );
+    }
     return (
       <View style={styles.mainView}>
         <View style={styles.contentView}>
-          <TouchableOpacity>
-            <View
-              style={styles.backNavView}
-              onTouchEnd={() => navigate('Account')}>
-              <Image source={Images.icon_back} style={styles.backImg} />
-              <Image source={Images.icon_btc_cir} style={styles.btcImg} />
-              <Text style={styles.backNavTxt}>{C.STR_Send}</Text>
-            </View>
+          <TouchableOpacity
+            style={styles.backNavView}
+            onPress={() => this.handleBackButton()}>
+            <Image source={Images.icon_back} style={styles.backImg} />
+            <Image
+              source={
+                type === C.STR_LN_WALLET_TYPE
+                  ? Images.icon_bolt_cir
+                  : Images.icon_btc_cir
+              }
+              style={styles.btcImg}
+            />
+            <Text style={styles.backNavTxt}>{label}</Text>
           </TouchableOpacity>
 
           <View style={styles.titleStyle}>
-            <Text style={styles.commentTxt}>{C.STR_Enter_addr}</Text>
+            <Text style={styles.commentTxt}>{placeHolder}</Text>
             <Text style={styles.commentTxt}>{C.SCAN_ORSCAN}</Text>
           </View>
 
           <View style={styles.inputView}>
             <TextInput
-              placeholder={C.STR_Enter_Addr}
+              placeholder={placeHolder}
               placeholderTextColor="white"
-              style={[styles.inputTxtStyle, {fontSize: addrFontSize}]}
-              value={address}
+              style={styles.inputTxtStyle}
+              value={scannedQRdata}
               onChangeText={add => this.inputAddr(add)}
             />
           </View>
-
           <View
-            style={styles.qrScanView}
+            style={[styles.qrScanView]}
             onTouchEnd={() => {
               this.setState({showModal: true});
             }}>
@@ -95,33 +173,27 @@ export default class SifirGetAddrScreen extends Component {
               <Image source={Images.img_camera} style={styles.cameraImg} />
             </TouchableOpacity>
           </View>
-
-          {address != null && (
-            <TouchableOpacity>
-              <View
-                style={styles.continueBtnView}
-                onTouchEnd={() => this.goToEnterAmount()}>
-                <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
-                <Image
-                  source={Images.icon_up_blue}
-                  style={{width: 20, height: 20, marginLeft: 20}}
-                />
-              </View>
-            </TouchableOpacity>
-          )}
-          {address == null && (
-            <View style={[styles.continueBtnView, {opacity: 0.5}]}>
+          {loading && <ActivityIndicator size="large" style={styles.spinner} />}
+          <TouchableOpacity
+            onPress={() => this.handleContinueBtn()}
+            disabled={scannedQRdata && !loading ? false : true}>
+            <View
+              style={[
+                styles.continueBtnView,
+                {opacity: scannedQRdata && !loading ? 1 : 0.5},
+              ]}>
               <Text style={styles.continueTxt}>{C.STR_CONTINUE}</Text>
               <Image
                 source={Images.icon_up_blue}
                 style={{width: 20, height: 20, marginLeft: 20}}
               />
             </View>
-          )}
+          </TouchableOpacity>
         </View>
         <Modal
           visible={showModal}
           animationType="fade"
+          onRequestClose={() => this.setState({showModal: false})}
           presentationStyle="fullScreen">
           <SifirQrCodeCamera closeHandler={this.closeModal} />
         </Modal>
@@ -129,6 +201,21 @@ export default class SifirGetAddrScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    lnWallet: state.lnWallet,
+  };
+};
+
+const mapDispatchToProps = {
+  decodeBolt,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(SifirGetAddrScreen);
 
 const styles = StyleSheet.create({
   mainView: {
@@ -138,6 +225,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   contentView: {
+    paddingTop: 20,
     position: 'absolute',
     left: 0,
     top: 0,
@@ -226,5 +314,8 @@ const styles = StyleSheet.create({
   cameraImg: {
     height: C.SCREEN_HEIGHT - 495,
     width: (C.SCREEN_HEIGHT - 495) * 1.06,
+  },
+  spinner: {
+    marginTop: 20,
   },
 });

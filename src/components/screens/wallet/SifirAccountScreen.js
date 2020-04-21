@@ -1,62 +1,114 @@
 import React from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {connect} from 'react-redux';
-import LinearGradient from 'react-native-linear-gradient';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
-import SifirTxnList from '@elements/SifirTxnList';
-import SifirBTCAmount from '@elements/SifirBTCAmount';
-import {Alert} from 'react-native';
+import {getLnWalletDetails} from '@actions/lnWallet';
+import SifirAccountHeader from '@elements/SifirAccountHeader';
+import SifirAccountActions from '@elements/SifirAccountActions';
+import SifirAccountHistory from '@elements/SifirAccountHistory';
+import SifirSettingModal from '@elements/SifirSettingModal';
+import {ErrorScreen} from '@screens/error';
 
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
   }
   state = {
-    btnStatus: 0,
     balance: 0,
-    txnData: null,
-    btcUnit: C.STR_BTC,
+    txnData: [],
+    isVisibleSettingsModal: false,
   };
+  stopLoading = null;
+
   async _loadWalletFromProps() {
     const {label, type} = this.props.route.params.walletInfo;
-    const {balance, txnData} = await this.props.getWalletDetails({label, type});
-    this.setState({balance, txnData});
-  }
-  componentDidMount() {
-    this._loadWalletFromProps();
+    if (type === C.STR_LN_WALLET_TYPE) {
+      const {balance, txnData} = await this.props.getLnWalletDetails({label});
+      this.setState({balance, txnData});
+    } else {
+      const {balance, txnData} = await this.props.getWalletDetails({
+        label,
+        type,
+      });
+      this.setState({balance, txnData});
+    }
   }
 
+  componentDidMount() {
+    const {_loadWalletFromProps} = this;
+    this.stopLoading = this.props.navigation.addListener(
+      'focus',
+      _loadWalletFromProps.bind(this),
+    );
+  }
+
+  componentWillUnmount() {
+    this.stopLoading();
+  }
+  toggleSettingsModal() {
+    this.setState({isVisibleSettingsModal: !this.state.isVisibleSettingsModal});
+  }
+
+  handleReceiveButton = () => {
+    const {walletInfo} = this.props.route.params;
+    this.props.navigation.navigate('BtcReceiveTxn', {walletInfo});
+  };
+
+  handleSendBtn = () => {
+    const {walletInfo} = this.props.route.params;
+    const {type} = walletInfo;
+    const {balance} = this.state;
+    if (type === C.STR_LN_WALLET_TYPE) {
+      this.props.navigation.navigate('LNPayInvoiceRoute', {
+        screen: 'LnScanBolt',
+        params: {walletInfo: {...walletInfo, balance}},
+      });
+    } else {
+      this.props.navigation.navigate('GetAddress', {
+        walletInfo: {...walletInfo, balance},
+      });
+    }
+  };
+
   render() {
-    const {btnStatus, balance, txnData, btcUnit} = this.state;
+    const {balance, txnData} = this.state;
     const {navigate} = this.props.navigation;
-    const {label, type} = this.props.route.params.walletInfo;
-    const {loading, loaded, feeSettingEnabled, error} = this.props.btcWallet;
-    const BTN_WIDTH = C.SCREEN_WIDTH / 2;
-    if (error) {
-      Alert.alert(
-        C.STR_ERROR_btc_action,
-        C.STR_ERROR_account_screen,
-        [
-          {
-            text: 'Try again',
-            onPress: () => this._loadWalletFromProps(),
-          },
-        ],
-        {cancelable: false},
+    const {walletInfo} = this.props.route.params;
+    const {label, type} = walletInfo;
+    const {loading, loaded, error: errorBtc} = this.props.btcWallet;
+    const {
+      loading: loadingLN,
+      loaded: loadedLN,
+      error: errorLN,
+    } = this.props.lnWallet;
+    const btcUnit = type === C.STR_LN_WALLET_TYPE ? C.STR_MSAT : C.STR_BTC;
+    const isLoading = type === C.STR_LN_WALLET_TYPE ? loadingLN : loading;
+    const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
+    const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
+    const {toggleSettingsModal} = this;
+    if (hasError) {
+      return (
+        <ErrorScreen
+          title={C.STR_ERROR_btc_action}
+          desc={C.STR_ERROR_account_screen}
+          error={hasError}
+          actions={[
+            {
+              text: C.STR_TRY_AGAIN,
+              onPress: () => this._loadWalletFromProps(),
+            },
+            {
+              text: C.STR_GO_BACK,
+              onPress: () => navigate('AccountList'),
+            },
+          ]}
+        />
       );
     }
     return (
       <View style={styles.mainView}>
-        <View style={{flex: 0.7}}>
+        <View style={styles.navBtn}>
           <TouchableOpacity>
             <View
               style={styles.backNavView}
@@ -66,118 +118,69 @@ class SifirAccountScreen extends React.Component {
             </View>
           </TouchableOpacity>
         </View>
-        <View style={styles.headerView}>
-          <LinearGradient
-            height={BTN_WIDTH - 50}
-            width={BTN_WIDTH - 40}
-            colors={['#52d4cd', '#54a5b1', '#57658c']}
-            style={styles.gradient}>
-            <View>
-              <Image source={Images.icon_bitcoin} style={styles.boxImage} />
-              {loading === true && (
-                <ActivityIndicator size="large" color={AppStyle.mainColor} />
-              )}
-              {loaded === true && loading === false && (
-                <>
-                  <Text style={styles.boxTxt}>{label}</Text>
-                  {type === C.STR_WATCH_WALLET_TYPE && (
-                    <Text style={styles.boxTxt}>{C.STR_WATCHING}</Text>
-                  )}
-                </>
-              )}
-            </View>
-          </LinearGradient>
+        {this.state.isVisibleSettingsModal && (
           <View
-            height={BTN_WIDTH - 30}
-            width={BTN_WIDTH - 30}
-            style={styles.balanceView}>
-            {loading === true && (
-              <ActivityIndicator size="large" color={AppStyle.mainColor} />
-            )}
-            {loaded === true && loading === false && (
-              <>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.balAmountTxt}>
-                    <SifirBTCAmount amount={balance} unit={btcUnit} />
-                  </Text>
-                </View>
-                <Text style={styles.balanceTxt}>{C.STR_Cur_Balance}</Text>
-              </>
-            )}
+            style={styles.settingMenuContainer}
+            onTouchEnd={toggleSettingsModal.bind(this)}>
+            <SifirSettingModal
+              toolTipStyle={false}
+              hideModal={toggleSettingsModal.bind(this)}
+              showOpenChannel={true}
+              showTopUp={true}
+              showWithdraw={true}
+              walletInfo={{...walletInfo, balance}}
+            />
           </View>
-        </View>
-
-        <View style={styles.btnAreaView}>
-          {type === C.STR_SPEND_WALLET_TYPE && (
-            <TouchableWithoutFeedback
-              style={{flex: 1}}
-              onPressIn={() => this.setState({btnStatus: 1})}
-              onPressOut={() => {
-                this.setState({btnStatus: 0});
-                navigate('GetAddress', {
-                  walletInfo: {type, label, balance, feeSettingEnabled},
-                });
-              }}>
-              <View
-                style={[
-                  styles.txnBtnView,
-                  btnStatus === 1
-                    ? {backgroundColor: 'black', opacity: 0.7}
-                    : {},
-                ]}>
-                <Text style={{color: 'white', fontSize: 15}}>{C.STR_SEND}</Text>
-                <Image
-                  source={Images.icon_up_arrow}
-                  style={{width: 11, height: 11, marginLeft: 10}}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          )}
-          <TouchableWithoutFeedback
-            style={{flex: 1}}
-            onPressIn={() => this.setState({btnStatus: 2})}
-            onPressOut={() => {
-              this.setState({btnStatus: 0});
-              navigate('BtcReceiveTxn', {walletInfo: {type, label}});
-            }}>
-            <View
-              style={[
-                styles.txnBtnView,
-                styles.leftTxnBtnView,
-                btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
-              ]}>
-              <Text style={[{color: 'white', fontSize: 15}]}>
-                {C.STR_RECEIVE}
-              </Text>
-              <Image
-                source={Images.icon_down_arrow}
-                style={{width: 11, height: 11, marginLeft: 10}}
-              />
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
-        <View style={styles.txnSetView}>
-          <Text style={styles.txnLblTxt}>{C.TRANSACTIONS}</Text>
-          <TouchableOpacity>
-            <Image
-              source={Images.icon_setting}
-              style={{width: 20, height: 20, marginLeft: 20, marginTop: 7}}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.txnListView}>
-          {loading === true && (
-            <ActivityIndicator size="large" color={AppStyle.mainColor} />
-          )}
-          {loaded === true && loading === false && txnData !== null && (
-            <SifirTxnList
-              txnData={txnData}
-              unit={btcUnit}
-              width={BTN_WIDTH * 2 - 50}
-              height={200}
-            />
-          )}
-        </View>
+        )}
+        <SifirAccountHeader
+          accountIcon={
+            type === C.STR_LN_WALLET_TYPE
+              ? Images.icon_light
+              : Images.icon_bitcoin
+          }
+          accountIconOnPress={
+            type === C.STR_LN_WALLET_TYPE
+              ? toggleSettingsModal.bind(this)
+              : () => {}
+          }
+          loading={isLoading}
+          loaded={isLoaded}
+          type={type}
+          label={label}
+          balance={balance}
+          btcUnit={btcUnit}
+          headerText={
+            type === C.STR_LN_WALLET_TYPE
+              ? C.STR_Balance_Channels_n_Outputs
+              : C.STR_Cur_Balance
+          }
+        />
+        <SifirAccountActions
+          navigate={navigate}
+          type={type}
+          label={label}
+          walletInfo={walletInfo}
+          handleReceiveButton={
+            // TODO update this when invoices done
+            type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
+          }
+          handleSendBtn={
+            // For now only watching wallets cant send
+            type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
+          }
+        />
+        <SifirAccountHistory
+          loading={isLoading}
+          loaded={isLoaded}
+          type={type}
+          txnData={txnData}
+          btcUnit={btcUnit}
+          headerText={
+            type === C.STR_LN_WALLET_TYPE
+              ? C.STR_INVOICES_AND_PAYS
+              : C.STR_TRANSACTIONS
+          }
+        />
       </View>
     );
   }
@@ -186,10 +189,14 @@ class SifirAccountScreen extends React.Component {
 const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
+    lnWallet: state.lnWallet,
   };
 };
 
-const mapDispatchToProps = {getWalletDetails};
+const mapDispatchToProps = {
+  getWalletDetails,
+  getLnWalletDetails,
+};
 
 export default connect(
   mapStateToProps,
@@ -197,55 +204,11 @@ export default connect(
 )(SifirAccountScreen);
 
 const styles = StyleSheet.create({
+  navBtn: {flex: 0.7},
   mainView: {
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
-  },
-  leftTxnBtnView: {
-    borderRightColor: 'transparent',
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-    borderBottomLeftRadius: 0,
-    borderTopLeftRadius: 0,
-  },
-  headerView: {
-    flex: 3,
-    marginTop: 0,
-    marginLeft: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  btnAreaView: {
-    flex: 1,
-    flexDirection: 'row',
-    borderColor: AppStyle.mainColor,
-    borderWidth: 1,
-    borderRadius: 7,
-    height: 55,
-    marginLeft: 26,
-    marginRight: 26,
-    marginTop: 30,
-  },
-  txnListView: {
-    flex: 3,
-    height: '100%',
-    marginBottom: 20,
-    marginLeft: 25,
-  },
-  boxTxt: {
-    color: 'white',
-    fontFamily: AppStyle.mainFont,
-    fontSize: 24,
-    marginLeft: 13,
-    marginBottom: -10,
-  },
-  boxImage: {
-    marginBottom: 10,
-    marginTop: 15,
-    marginLeft: 13,
-    width: 43,
-    height: 43,
-    opacity: 0.6,
+    paddingTop: 10,
   },
   backNavView: {
     display: 'flex',
@@ -266,25 +229,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginTop: 2,
   },
-  gradient: {
-    flex: 4.6,
-    borderWidth: 1,
-    borderRadius: 15,
-  },
-  txnBtnView: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    borderRightColor: AppStyle.mainColor,
-    borderTopColor: 'transparent',
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    height: '100%',
-    borderWidth: 1,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-    alignItems: 'center',
-  },
+
   satTxt: {
     color: 'white',
     fontSize: 26,
@@ -293,34 +238,13 @@ const styles = StyleSheet.create({
     marginBottom: 7,
     marginLeft: 5,
   },
-  balanceTxt: {
-    color: AppStyle.mainColor,
-    fontFamily: AppStyle.mainFont,
-    fontSize: 16,
-    textAlignVertical: 'bottom',
-    marginBottom: -5,
-    marginLeft: 5,
-  },
-  balanceView: {
-    flex: 5,
-    flexDirection: 'column-reverse',
-    marginLeft: 25,
-    paddingBottom: 15,
-  },
-  txnLblTxt: {
-    color: 'white',
-    fontSize: 23,
-    fontWeight: 'bold',
-  },
-  txnSetView: {
-    flex: 1,
-    flexDirection: 'row',
-    marginLeft: 26,
-    marginTop: 30,
-  },
-  balAmountTxt: {
-    color: 'white',
-    fontFamily: AppStyle.mainFont,
-    fontSize: 50,
+  settingMenuContainer: {
+    position: 'absolute',
+    paddingTop: 80,
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    height: '100%',
+    elevation: 10,
+    zIndex: 10,
   },
 });

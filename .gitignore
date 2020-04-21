@@ -21,12 +21,14 @@ DerivedData
 *.ipa
 *.xcuserstate
 
+
 # Android/IntelliJ
 #
 build/
 .idea
 .gradle
 local.properties
+package-lock.json
 *.iml
 
 # node.js
@@ -35,13 +37,13 @@ node_modules/
 npm-debug.log
 yarn-error.log
 yarn.lock
-
+.vscode
 # BUCK
 buck-out/
 \.buckd/
 *.keystore
 !debug.keystore
-
+TODO.txt
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
@@ -59,4 +61,5 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 *.swp
+**/**/*.swo
 android/gradle.properties

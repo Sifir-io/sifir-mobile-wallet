@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.sifir.TorBridgePackage;
 import com.sifir.PgpBridgePackage;
-
+import com.nozbe.watermelondb.WatermelonDBPackage;
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
@@ -30,6 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           packages.add(new TorBridgePackage());
           packages.add(new PgpBridgePackage());
+          packages.add(new RudderPackage());
+	  packages.add(new WatermelonDBPackage());
           return packages;
         }
 

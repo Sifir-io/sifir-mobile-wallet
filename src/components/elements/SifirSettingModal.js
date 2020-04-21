@@ -1,114 +1,212 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
-import {View, Image, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import Slider from 'react-native-slider';
 
 import {Images, AppStyle, C} from '@common/index';
+import {useNavigation} from '@react-navigation/native';
+const MenuListItem = ({label, icon, onPress, hideTopBorder = false}) => {
+  return (
+    <TouchableOpacity
+      style={{
+        flex: 1,
+        borderTopWidth: hideTopBorder ? 0 : 1,
+        borderColor: 'rgba(0,0,0,0.1)',
+      }}
+      onPress={onPress}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <Image
+          // TODO replace icon for Open Channels
+          resizeMode="contain"
+          source={icon}
+          style={{
+            width: 37,
+            height: 37,
+          }}
+        />
+        <Text style={styles.textStyle}>{label}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
-export default class SifirSettingModal extends Component {
+class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
 
+  // FIXME
+  // Replace legacy shit with menuItems[] based rendering`
   render() {
+    const {
+      navigation,
+      walletInfo,
+      toolTipStyle,
+      isLoading,
+      menuItems,
+    } = this.props;
     return (
-      <>
-        <View>
-          <View style={styles.mainView} onTouchEnd={this.props.hideModal}>
-            <TouchableOpacity>
+      <View style={styles.container}>
+        {toolTipStyle && (
+          <>
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={this.props.hideModal}>
               <Image source={Images.icon_close} style={styles.closeImg} />
             </TouchableOpacity>
-          </View>
-          <View style={styles.bodyStyle}>
-            {this.state.curMenu === 1 && (
-              <View style={styles.timeView}>
-                <View style={{flexDirection: 'row'}}>
-                  <View style={styles.clockImgView}>
-                    <Image source={Images.icon_clock} style={styles.clockImg} />
-                    <Text style={styles.setFeeTxt}>{C.STR_SET_FEES}</Text>
-                  </View>
-                  <View style={styles.feeTxtView}>
-                    <Text style={styles.feeTxt}>0.015 BTC</Text>
-                  </View>
+            <Image
+              source={Images.icon_dialog_arrow}
+              resizeMode="contain"
+              style={styles.upArrow}
+            />
+          </>
+        )}
+        <View style={styles.bodyStyle}>
+          {isLoading && (
+            <View style={{flex: 1}}>
+              <ActivityIndicator size="small" color={AppStyle.mainColor} />
+            </View>
+          )}
+          {!isLoading && menuItems && menuItems.length && (
+            <View style={{flex: 1}}>
+              {menuItems.map((item, index) => (
+                <MenuListItem
+                  hideTopBorder={index === 0 ? true : false}
+                  icon={Images.icon_funds}
+                  label={item.label}
+                  onPress={() => {
+                    item.onPress ? item.onPress(item) : this.props.hideModal();
+                  }}
+                />
+              ))}
+            </View>
+          )}
+          {this.state.curMenu === 1 && (
+            <View style={styles.timeView}>
+              <View style={{flexDirection: 'row'}}>
+                <View style={styles.clockImgView}>
+                  <Image source={Images.icon_clock} style={styles.clockImg} />
+                  <Text style={styles.setFeeTxt}>{C.STR_SET_FEES}</Text>
                 </View>
-                <View style={{width: '100%'}}>
-                  <Slider
-                    animationType="spring"
-                    value={this.state.value}
-                    thumbTintColor="#5595a8"
-                    onValueChange={value => this.setState({value})}
-                    minimumTrackTintColor="#25b6fa"
-                    maximumTrackTintColor="#412160"
-                    thumbStyle={styles.thumb}
-                    trackStyle={{
-                      height: 10,
-                      borderRadius: 5,
-                    }}
-                  />
-                </View>
-                <View style={styles.waitView}>
-                  <Text style={{fontSize: 20}}>{C.STR_Wait}</Text>
-                  <Text style={{fontSize: 20, color: 'blue'}}>4 Hours</Text>
+                <View style={styles.feeTxtView}>
+                  <Text style={styles.feeTxt}>0.015 BTC</Text>
                 </View>
               </View>
-            )}
-            {this.state.curMenu === 0 && (
-              <View style={{flex: 1}}>
-                <TouchableOpacity style={{flex: 1}}>
-                  <View style={styles.rowStyle}>
-                    <Image
-                      source={Images.icon_funds}
-                      style={{width: 33, height: 30}}
-                    />
-                    <Text style={styles.textStyle}>{C.STR_Manage_Fund}</Text>
-                  </View>
-                </TouchableOpacity>
-
-                {this.props.feeSettingEnabled && (
-                  <TouchableOpacity style={{flex: 1}}>
-                    <View
-                      style={styles.rowStyle}
-                      onTouchEnd={() => this.setState({curMenu: 1})}>
-                      <Image
-                        source={Images.icon_clock}
-                        style={{width: 30, height: 30}}
-                      />
-                      <Text style={styles.textStyle}>{C.STR_SET_FEES}</Text>
-                    </View>
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity style={{flex: 1}}>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <Image
-                      source={Images.icon_dollar}
-                      style={{
-                        width: 30,
-                        height: 37,
-                      }}
-                    />
-                    <Text style={styles.textStyle}>{C.STR_SETTINGS}</Text>
-                  </View>
-                </TouchableOpacity>
+              <View style={{width: '100%'}}>
+                <Slider
+                  animationType="spring"
+                  value={this.state.value}
+                  thumbTintColor="#5595a8"
+                  onValueChange={value => this.setState({value})}
+                  minimumTrackTintColor="#25b6fa"
+                  maximumTrackTintColor="#412160"
+                  thumbStyle={styles.thumb}
+                  trackStyle={{
+                    height: 10,
+                    borderRadius: 5,
+                  }}
+                />
               </View>
-            )}
-          </View>
-          <View style={styles.bottomStyle}>
-            <TouchableOpacity>
-              <Image
-                source={Images.icon_dialog_arrow}
-                style={{height: 40, width: 40, marginRight: 10}}
-              />
-            </TouchableOpacity>
-          </View>
+              <View style={styles.waitView}>
+                <Text style={{fontSize: 20}}>{C.STR_Wait}</Text>
+                <Text style={{fontSize: 20, color: 'blue'}}>4 Hours</Text>
+              </View>
+            </View>
+          )}
+          {this.state.curMenu === 0 && (
+            <View style={{flex: 1}}>
+              {this.props.showManageFunds && (
+                <MenuListItem
+                  icon={Images.icon_funds}
+                  label={C.STR_Manage_Fund}
+                  onPress={() => {
+                    this.setState({curMenu: 1});
+                  }}
+                />
+              )}
+              {this.props.feeSettingEnabled && (
+                <MenuListItem
+                  icon={Images.icon_clock}
+                  label={C.STR_SET_FEES}
+                  onPress={() => {
+                    this.setState({curMenu: 1});
+                  }}
+                />
+              )}
+              {this.props.showSettings && (
+                <MenuListItem
+                  icon={Images.icon_dollar}
+                  label={C.STR_SETTINGS}
+                  onPress={() => {
+                    this.props.hideModal();
+                  }}
+                />
+              )}
+              {this.props.showTopUp && (
+                <MenuListItem
+                  icon={Images.icon_funds}
+                  hideTopBorder={true}
+                  label={C.TOP_UP}
+                  onPress={() => {
+                    this.props.hideModal();
+                    this.props.navigation.navigate('BtcReceiveTxn', {
+                      walletInfo,
+                    });
+                  }}
+                />
+              )}
+              {this.props.showWithdraw && (
+                <MenuListItem
+                  icon={Images.icon_dollar}
+                  label={C.WITHDRAW}
+                  onPress={() => {
+                    this.props.hideModal();
+                    this.props.navigation.navigate('GetAddress', {
+                      walletInfo: {...walletInfo, type: C.STR_LN_WITHDRAW},
+                    });
+                  }}
+                />
+              )}
+              {this.props.showOpenChannel && (
+                <MenuListItem
+                  icon={Images.icon_dollar}
+                  label={C.Open_Channels}
+                  onPress={() => {
+                    this.props.hideModal();
+                    navigation.navigate('LNChannelRoute', {
+                      screen: 'LnNodeSelect',
+                      params: {walletInfo, nodeInputRequired: true},
+                    });
+                  }}
+                />
+              )}
+            </View>
+          )}
         </View>
-      </>
+      </View>
     );
   }
 }
 
+export default props => {
+  const navigation = useNavigation();
+  return <SifirSettingModal {...props} navigation={navigation} />;
+};
+
 const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: 20,
+  },
   textStyle: {
     fontFamily: AppStyle.mainFont,
     fontSize: 17,
@@ -121,10 +219,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingLeft: 20,
     paddingRight: 20,
-    paddingTop: 5,
     paddingBottom: 10,
+    paddingTop: 5,
     height: 160,
-    width: C.SCREEN_WIDTH * 0.85,
   },
   rowStyle: {
     flex: 1,
@@ -135,8 +232,6 @@ const styles = StyleSheet.create({
   },
   bottomStyle: {
     flexDirection: 'row-reverse',
-    marginBottom: 8,
-    marginTop: -21,
   },
   feeTxtView: {
     flex: 1,
@@ -147,11 +242,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 14,
   },
-  mainView: {
-    flexDirection: 'row-reverse',
-    marginBottom: 8,
+  closeBtn: {
+    top: -10,
   },
-  closeImg: {height: 30, width: 30, marginRight: 10},
+  closeImg: {
+    height: 25,
+    width: 25,
+    resizeMode: 'contain',
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
   timeView: {
     flex: 1,
     backgroundColor: 'white',
@@ -174,4 +274,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   thumb: {height: 25, width: 25, borderRadius: 12.5},
+  upArrow: {
+    height: 40,
+    width: 40,
+    transform: [{rotate: '180deg'}],
+    alignSelf: 'flex-end',
+    position: 'absolute',
+    right: 15,
+  },
 });

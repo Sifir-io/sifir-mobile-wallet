@@ -1,4 +1,5 @@
 import {
+  RESTART,
   FULFILLED,
   PENDING,
   REJECTED,
@@ -90,8 +91,6 @@ const loadDevicePgpKeys = () => async dispatch => {
   if (payload) {
     // FIXME should PGP private keys be saved in state ? or just public + finger print
     // and just return private keyu to be use in init during unlockorgenkey
-    //payload.pubkeyArmored = payload.pubkeyArmored.replace(/\\n/gim, '\r\n');
-    //payload.privkeyArmored = payload.privkeyArmored.replace(/\\n/gim, '\r\n');
     dispatch({
       type: PGP_GET_KEYS + FULFILLED,
       payload,
@@ -197,6 +196,12 @@ const clearAuthInfo = () => async dispatch => {
   });
 };
 
+const restartPairingState = () => async dispatch => {
+  dispatch({
+    type: REQUEST_PAIR + RESTART,
+    payload: {},
+  });
+};
 export {
   loadEncryptedAuthInfo,
   storeEncryptedAuthInfo,
@@ -207,4 +212,5 @@ export {
   genAndSaveDevicePgpKeys,
   deleteDevicePgpKeys,
   initAndUnlockDeviceKeys,
+  restartPairingState,
 };

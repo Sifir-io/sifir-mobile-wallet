@@ -5,6 +5,7 @@ export default {
   icon_setting: require('./../assets/images/setting.png'),
   icon_add: require('./../assets/images/add.png'),
   icon_add_clicked: require('./../assets/images/add1.png'),
+  camera_blue: require('./../assets/images/camera-small.png'),
   icon_light_clicked: require('./../assets/images/light1.png'),
   icon_light: require('./../assets/images/light.png'),
   icon_back: require('./../assets/images/back.png'),
@@ -16,6 +17,7 @@ export default {
   icon_up_blue: require('./../assets/images/uparrow_blue.png'),
   icon_down_arrow: require('./../assets/images/down_arrow.png'),
   icon_btc_cir: require('./../assets/images/bitcoin_blue.png'),
+  icon_bolt_cir: require('./../assets/images/bolt_blue.png'),
   img_camera: require('./../assets/images/camera.png'),
   icon_up_dark: require('./../assets/images/uparrow_dark.png'),
   icon_done: require('./../assets/images/check.png'),
@@ -57,4 +59,6 @@ export default {
   icon_chatRequest: require('./../assets/images/chatRequest.png'),
   icon_closeMedia: require('./../assets/images/closeMedia.png'),
   icon_chatSend: require('./../assets/images/chatSend.png'),
+  icon_yellowTxn: require('./../assets/images/yellowTxn.png'),
+  icon_thickGreenArrowTxn: require('./../assets/images/bold_arrow.png'),
 };
