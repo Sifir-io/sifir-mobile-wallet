@@ -28,8 +28,12 @@ export default class ErrorScreen extends Component {
       } else {
         try {
           // TODO refactor this to helpers
-          const cypernodeError = passedError?.err;
-          printableErrorDetails = cypernodeError;
+          const cypernodeError = passedError?.err?.err || passedError?.err;
+          if (cypernodeError) {
+            try {
+              printableErrorDetails = JSON.stringify(cypernodeError);
+            } catch {}
+          }
           // Where we able to parse the error yet ?
           if (!printableErrorDetails) {
             // try generic objec to string conversion
