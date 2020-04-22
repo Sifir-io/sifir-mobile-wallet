@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
@@ -120,29 +121,30 @@ class SifirAccountsListScreen extends React.Component {
             <ActivityIndicator size="large" color={AppStyle.mainColor} />
           </View>
         )}
-
-        <View style={styles.gridView}>
-          {btcWalletList.map((wallet, i) => (
-            <SifirWalletButton
-              key={wallet.label}
-              width={CARD_SIZE}
-              height={CARD_SIZE * 1.1}
-              walletInfo={wallet}
-              navigate={navigate}
-            />
-          ))}
-          {nodeInfo.map((info, i) => {
-            return (
+        <ScrollView>
+          <View style={styles.gridView}>
+            {btcWalletList.map((wallet, i) => (
               <SifirWalletButton
-                key={info.alias}
+                key={wallet.label}
                 width={CARD_SIZE}
                 height={CARD_SIZE * 1.1}
-                walletInfo={info}
+                walletInfo={wallet}
                 navigate={navigate}
               />
-            );
-          })}
-        </View>
+            ))}
+            {nodeInfo.map((info, i) => {
+              return (
+                <SifirWalletButton
+                  key={info.alias}
+                  width={CARD_SIZE}
+                  height={CARD_SIZE * 1.1}
+                  walletInfo={info}
+                  navigate={navigate}
+                />
+              );
+            })}
+          </View>
+        </ScrollView>
       </View>
     );
   }
