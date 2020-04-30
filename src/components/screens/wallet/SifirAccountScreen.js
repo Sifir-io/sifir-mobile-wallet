@@ -8,6 +8,8 @@ import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
+import SifirSlider from "@elements/SifirSlider";
+
 import {ErrorScreen} from '@screens/error';
 
 class SifirAccountScreen extends React.Component {
@@ -155,6 +157,9 @@ class SifirAccountScreen extends React.Component {
               : C.STR_Cur_Balance
           }
         />
+        <SifirSlider>
+
+        </SifirSlider>
         <SifirAccountActions
           navigate={navigate}
           type={type}
