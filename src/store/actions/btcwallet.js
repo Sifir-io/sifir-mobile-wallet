@@ -48,13 +48,13 @@ const getBtcWalletList = () => async dispatch => {
   dispatch({type: types.BTC_WALLET_LIST_DATA_SHOW + PENDING});
 
   let btcWalletList = [
-    {
-      label: 'ADD',
-      desc: C.STR_WALLET,
-      iconURL: Images.icon_add,
-      iconClickedURL: Images.icon_add_clicked,
-      pageURL: 'AddWallet',
-    },
+    //  {
+    //    label: 'ADD',
+    //    desc: C.STR_WALLET,
+    //    iconURL: Images.icon_add,
+    //    iconClickedURL: Images.icon_add_clicked,
+    //    pageURL: 'AddWallet',
+    //  },
   ];
 
   try {
@@ -77,6 +77,15 @@ const getBtcWalletList = () => async dispatch => {
       label: 'Spending',
       desc: C.STR_WALLET,
       type: C.STR_SPEND_WALLET_TYPE,
+      iconURL: Images.icon_btcBtn,
+      iconClickedURL: Images.icon_btcBtn_clicked,
+      pageURL: 'Account',
+    });
+
+    btcWalletList.push({
+      label: 'Wasabi',
+      desc: C.STR_WALLET,
+      type: C.STR_WASABI_WALLET_TYPE,
       iconURL: Images.icon_btcBtn,
       iconClickedURL: Images.icon_btcBtn_clicked,
       pageURL: 'Account',

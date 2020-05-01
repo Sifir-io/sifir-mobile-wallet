@@ -106,6 +106,7 @@ export const C = {
   STR_WATCH_WALLET_TYPE: 'pub32Watching',
   STR_WATCHING: 'Watching',
   STR_SPEND_WALLET_TYPE: 'btcSpending',
+  STR_WASABI_WALLET_TYPE: 'wasabiWallet',
   STR_LN_WALLET_TYPE: 'ln',
   STR_LN_WITHDRAW: 'LNwithdraw',
   STR_WATCH_ONLY: 'WATCH ONLY',

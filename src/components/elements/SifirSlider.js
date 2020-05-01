@@ -10,26 +10,19 @@ import Slider from 'react-native-slider';
 import {Images, AppStyle, C} from '@common/index';
 
 export default class SifirSlider extends Component {
-  state = {value: false};
-
+  state = {value: 20};
   render() {
     return (
       <View style={styles.timeView}>
-        <View style={{flexDirection: 'row'}}>
-          <View style={styles.clockImgView}>
-            <Image source={Images.icon_clock} style={styles.clockImg} />
-            <Text style={styles.setFeeTxt}>{C.STR_SET_FEES}</Text>
-          </View>
-          <View style={styles.feeTxtView}>
-            <Text style={styles.feeTxt}>0.015 BTC</Text>
-          </View>
-        </View>
         <View style={{width: '100%'}}>
           <Slider
+            step={1}
             animationType="spring"
             value={this.state.value}
             thumbTintColor="#5595a8"
             onValueChange={value => this.setState({value})}
+            minimumValue={1}
+            maximumValue={90}
             minimumTrackTintColor="#25b6fa"
             maximumTrackTintColor="#412160"
             thumbStyle={styles.thumb}
@@ -39,10 +32,6 @@ export default class SifirSlider extends Component {
             }}
           />
         </View>
-        <View style={styles.waitView}>
-          <Text style={{fontSize: 20}}>{C.STR_Wait}</Text>
-          <Text style={{fontSize: 20, color: 'blue'}}>4 Hours</Text>
-        </View>
       </View>
     );
   }
@@ -51,7 +40,6 @@ export default class SifirSlider extends Component {
 const styles = StyleSheet.create({
   timeView: {
     flex: 1,
-    backgroundColor: 'white',
     marginTop: 15,
   },
   clockImgView: {

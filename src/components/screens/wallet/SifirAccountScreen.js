@@ -8,7 +8,7 @@ import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
-import SifirSlider from "@elements/SifirSlider";
+import SifirSlider from '@elements/SifirSlider';
 
 import {ErrorScreen} from '@screens/error';
 
@@ -89,6 +89,39 @@ class SifirAccountScreen extends React.Component {
     const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
     const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
     const {toggleSettingsModal} = this;
+    // FIXME here or start seperateing comopnents ?
+    let accountIcon,
+      accountIconOnPress,
+      accountHeaderText,
+      accountTransactionHeaderText,
+      settingModalProps = {};
+    switch (type) {
+      case C.STR_LN_WALLET_TYPE:
+        accountIcon = Images.icon_light;
+        accountIconOnPress = toggleSettingsModal.bind(this);
+        accountHeaderText = C.STR_Balance_Channels_n_Outputs;
+        accountTransactionHeaderText = C.STR_INVOICES_AND_PAYS;
+        settingModalProps = {
+          toolTipStyle: false,
+          showOpenChannel: true,
+          showTopUp: true,
+          showWithdraw: true,
+        };
+        break;
+      case C.STR_WASABI_WALLET_TYPE:
+        accountIcon = Images.icon_light;
+        accountIconOnPress = toggleSettingsModal.bind(this);
+        accountHeaderText = 'Balance w/minimum Anonyimity set 40';
+        accountTransactionHeaderText = C.STR_TRANSACTIONS;
+        settingModalProps = {anonsetSettingEnabled: true};
+        break;
+      default:
+        accountHeaderText = C.STR_Cur_Balance;
+        accountIcon = Images.icon_bitcoin;
+        accountIconOnPress = () => {};
+        accountTransactionHeaderText = C.STR_TRANSACTIONS;
+    }
+
     if (hasError) {
       return (
         <ErrorScreen
@@ -123,43 +156,28 @@ class SifirAccountScreen extends React.Component {
         {this.state.isVisibleSettingsModal && (
           <View
             style={styles.settingMenuContainer}
-            onTouchEnd={toggleSettingsModal.bind(this)}>
+            onTouchEnd={() => {
+              // toggleSettingsModal.bind(this);
+            }}>
             <SifirSettingModal
-              toolTipStyle={false}
               hideModal={toggleSettingsModal.bind(this)}
-              showOpenChannel={true}
-              showTopUp={true}
-              showWithdraw={true}
+              {...settingModalProps}
               walletInfo={{...walletInfo, balance}}
             />
           </View>
         )}
         <SifirAccountHeader
-          accountIcon={
-            type === C.STR_LN_WALLET_TYPE
-              ? Images.icon_light
-              : Images.icon_bitcoin
-          }
-          accountIconOnPress={
-            type === C.STR_LN_WALLET_TYPE
-              ? toggleSettingsModal.bind(this)
-              : () => {}
-          }
+          accountIcon={accountIcon}
+          accountIconOnPress={accountIconOnPress}
           loading={isLoading}
           loaded={isLoaded}
           type={type}
           label={label}
           balance={balance}
           btcUnit={btcUnit}
-          headerText={
-            type === C.STR_LN_WALLET_TYPE
-              ? C.STR_Balance_Channels_n_Outputs
-              : C.STR_Cur_Balance
-          }
+          headerText={accountHeaderText}
         />
-        <SifirSlider>
 
-        </SifirSlider>
         <SifirAccountActions
           navigate={navigate}
           type={type}
@@ -180,11 +198,7 @@ class SifirAccountScreen extends React.Component {
           type={type}
           txnData={txnData}
           btcUnit={btcUnit}
-          headerText={
-            type === C.STR_LN_WALLET_TYPE
-              ? C.STR_INVOICES_AND_PAYS
-              : C.STR_TRANSACTIONS
-          }
+          headerText={accountTransactionHeaderText}
         />
       </View>
     );
