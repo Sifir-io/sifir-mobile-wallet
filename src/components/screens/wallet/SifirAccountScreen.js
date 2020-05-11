@@ -8,7 +8,6 @@ import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
-import SifirSlider from '@elements/SifirSlider';
 
 import {ErrorScreen} from '@screens/error';
 
@@ -113,7 +112,7 @@ class SifirAccountScreen extends React.Component {
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = 'Balance w/minimum Anonyimity set 40';
         accountTransactionHeaderText = C.STR_TRANSACTIONS;
-        settingModalProps = {anonsetSettingEnabled: true};
+        // settingModalProps = {anonsetSettingEnabled: true};
         break;
       default:
         accountHeaderText = C.STR_Cur_Balance;
@@ -157,7 +156,7 @@ class SifirAccountScreen extends React.Component {
           <View
             style={styles.settingMenuContainer}
             onTouchEnd={() => {
-              // toggleSettingsModal.bind(this);
+              toggleSettingsModal.bind(this);
             }}>
             <SifirSettingModal
               hideModal={toggleSettingsModal.bind(this)}
