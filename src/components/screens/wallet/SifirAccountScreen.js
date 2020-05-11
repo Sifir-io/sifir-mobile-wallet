@@ -108,6 +108,7 @@ class SifirAccountScreen extends React.Component {
         };
         break;
       case C.STR_WASABI_WALLET_TYPE:
+        // FIXME wasabi icon
         accountIcon = Images.icon_light;
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = 'Balance w/minimum Anonyimity set 40';

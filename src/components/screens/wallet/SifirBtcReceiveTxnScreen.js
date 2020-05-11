@@ -93,6 +93,7 @@ class SifirBtcReceiveTxnScreen extends Component {
     const {label, type} = walletInfo;
     const {showQRCode, enableWatchSelection} = this.state;
     let loaded, loading, address, error;
+    // FIXME this to switch
     if (type === C.STR_LN_WALLET_TYPE) {
       ({loaded, loading, address, error} = this.props.lnWallet);
     } else {
