@@ -1,10 +1,19 @@
 import React from 'react';
-import {View, Image, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+} from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import {getLnWalletDetails} from '@actions/lnWallet';
+import {getUnspentCoins} from '@actions/wasabiWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
+import SifirAccountChart from '@elements/SifirAccountChart';
 import SifirAccountActions from '@elements/SifirAccountActions';
 import SifirAccountHistory from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
@@ -27,12 +36,15 @@ class SifirAccountScreen extends React.Component {
     if (type === C.STR_LN_WALLET_TYPE) {
       const {balance, txnData} = await this.props.getLnWalletDetails({label});
       this.setState({balance, txnData});
-    } else {
+    } else if (type === C.STR_SPEND_WALLET_TYPE) {
       const {balance, txnData} = await this.props.getWalletDetails({
         label,
         type,
       });
       this.setState({balance, txnData});
+    } else if (type === C.STR_WASABI_WALLET_TYPE) {
+      // const res = await this.props.getUnspentCoins();
+      // console.log('res------', res);
     }
   }
 
@@ -73,6 +85,7 @@ class SifirAccountScreen extends React.Component {
   };
 
   render() {
+    console.log('this.props', this.props);
     const {balance, txnData} = this.state;
     const {navigate} = this.props.navigation;
     const {walletInfo} = this.props.route.params;
@@ -142,65 +155,68 @@ class SifirAccountScreen extends React.Component {
       );
     }
     return (
-      <View style={styles.mainView}>
-        <View style={styles.navBtn}>
-          <TouchableOpacity>
-            <View
-              style={styles.backNavView}
-              onTouchEnd={() => navigate('AccountList')}>
-              <Image source={Images.icon_back} style={styles.backImg} />
-              <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        {this.state.isVisibleSettingsModal && (
-          <View
-            style={styles.settingMenuContainer}
-            onTouchEnd={() => {
-              toggleSettingsModal.bind(this);
-            }}>
-            <SifirSettingModal
-              hideModal={toggleSettingsModal.bind(this)}
-              {...settingModalProps}
-              walletInfo={{...walletInfo, balance}}
-            />
+      <ScrollView style={styles.mainView}>
+        <View style={styles.mainView}>
+          <View style={styles.navBtn}>
+            <TouchableOpacity>
+              <View
+                style={styles.backNavView}
+                onTouchEnd={() => navigate('AccountList')}>
+                <Image source={Images.icon_back} style={styles.backImg} />
+                <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        )}
-        <SifirAccountHeader
-          accountIcon={accountIcon}
-          accountIconOnPress={accountIconOnPress}
-          loading={isLoading}
-          loaded={isLoaded}
-          type={type}
-          label={label}
-          balance={balance}
-          btcUnit={btcUnit}
-          headerText={accountHeaderText}
-        />
+          {this.state.isVisibleSettingsModal && (
+            <View
+              style={styles.settingMenuContainer}
+              onTouchEnd={() => {
+                toggleSettingsModal.bind(this);
+              }}>
+              <SifirSettingModal
+                hideModal={toggleSettingsModal.bind(this)}
+                {...settingModalProps}
+                walletInfo={{...walletInfo, balance}}
+              />
+            </View>
+          )}
+          <SifirAccountHeader
+            accountIcon={accountIcon}
+            accountIconOnPress={accountIconOnPress}
+            loading={isLoading}
+            loaded={isLoaded}
+            type={type}
+            label={label}
+            balance={balance}
+            btcUnit={btcUnit}
+            headerText={accountHeaderText}
+          />
+          <SifirAccountChart />
 
-        <SifirAccountActions
-          navigate={navigate}
-          type={type}
-          label={label}
-          walletInfo={walletInfo}
-          handleReceiveButton={
-            // TODO update this when invoices done
-            type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
-          }
-          handleSendBtn={
-            // For now only watching wallets cant send
-            type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
-          }
-        />
-        <SifirAccountHistory
-          loading={isLoading}
-          loaded={isLoaded}
-          type={type}
-          txnData={txnData}
-          btcUnit={btcUnit}
-          headerText={accountTransactionHeaderText}
-        />
-      </View>
+          <SifirAccountActions
+            navigate={navigate}
+            type={type}
+            label={label}
+            walletInfo={walletInfo}
+            handleReceiveButton={
+              // TODO update this when invoices done
+              type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
+            }
+            handleSendBtn={
+              // For now only watching wallets cant send
+              type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
+            }
+          />
+          <SifirAccountHistory
+            loading={isLoading}
+            loaded={isLoaded}
+            type={type}
+            txnData={txnData}
+            btcUnit={btcUnit}
+            headerText={accountTransactionHeaderText}
+          />
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -209,12 +225,14 @@ const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
     lnWallet: state.lnWallet,
+    wasabiWallet: state.wasabiWallet,
   };
 };
 
 const mapDispatchToProps = {
   getWalletDetails,
   getLnWalletDetails,
+  getUnspentCoins,
 };
 
 export default connect(
