@@ -20,7 +20,7 @@ const height = 60;
 const {width} = Dimensions.get('window');
 const verticalPadding = 5;
 const cursorRadius = 10;
-const unspentCounts = [
+const unspentCoins = [
   {
     txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
     index: 1,
@@ -93,26 +93,27 @@ const unspentCounts = [
   },
 ];
 
-const data = [];
-unspentCounts.map((item, index) => {
-  data.push({
-    x: index,
-    y: item.anonymitySet,
-  });
-});
-
+const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
+// const minAnonset = Math.min(...anonSet);
+const maxAnonset = Math.max(...anonSet);
+const data = unspentCoins.reduce((g, t) => {
+  g[Math.floor(t.anonymitySet)] =
+    (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
+  return g;
+}, {});
+const maxBalance = Math.max(...Object.values(data));
 const scaleX = scaleLinear()
-  .domain([0, data.length - 1])
+  .domain([0, maxAnonset])
   .range([0, width]);
 const scaleY = scaleLinear()
-  .domain([0, 42])
+  .domain([0, maxBalance])
   .range([height - verticalPadding, verticalPadding]);
 
 const line = d3.shape
   .line()
-  .x(d => scaleX(d.x))
-  .y(d => scaleY(d.y))
-  .curve(d3.shape.curveBasis)(data);
+  .x(([anonset]) => scaleX(Number(anonset)))
+  .y(([, balance]) => scaleY(balance))
+  .curve(d3.shape.curveBasis)(Object.entries(data));
 const properties = path.svgPathProperties(line);
 const lineLength = properties.getTotalLength();
 export default class SifirAccountChart extends React.Component {
@@ -130,8 +131,8 @@ export default class SifirAccountChart extends React.Component {
       left,
     });
     this.label.current.setNativeProps({
-      text: `${Math.ceil(value)} `,
-      top: top,
+      text: `${Math.ceil(scaleX.invert(x))} `,
+      top,
       left,
     });
   }
@@ -183,12 +184,14 @@ export default class SifirAccountChart extends React.Component {
         />
         <View style={{transform: [{scaleX: -1}], marginTop: 30}}>
           <Slider
-            minimumValue={10}
-            maximumValue={500}
+            minimumValue={0}
+            maximumValue={maxAnonset}
             step={1}
             maximumTrackTintColor="white"
             minimumTrackTintColor="white"
-            onValueChange={val => this.SV.current.getNode().scrollTo({x: val})}
+            onValueChange={val =>
+              this.SV.current.getNode().scrollTo({x: scaleX(val)})
+            }
           />
         </View>
       </View>
