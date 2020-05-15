@@ -113,7 +113,9 @@ const line = d3.shape
   .line()
   .x(([anonset]) => scaleX(Number(anonset)))
   .y(([, balance]) => scaleY(balance))
-  .curve(d3.shape.curveBasis)(Object.entries(data));
+  // TODO current data is more of a distrution than culative function
+  // maybe will add cumaltive curve later ?
+  .curve(d3.shape.curveStep)(Object.entries(data));
 const properties = path.svgPathProperties(line);
 const lineLength = properties.getTotalLength();
 export default class SifirAccountChart extends React.Component {
@@ -131,7 +133,7 @@ export default class SifirAccountChart extends React.Component {
       left,
     });
     this.label.current.setNativeProps({
-      text: `${Math.ceil(scaleX.invert(x))} `,
+      text: `${Math.ceil(scaleY.invert(y))} SATS`,
       top,
       left,
     });
