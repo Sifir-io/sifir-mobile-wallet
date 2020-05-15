@@ -16,7 +16,7 @@ const d3 = {
   shape,
 };
 
-const height = 120;
+const height = 60;
 const {width} = Dimensions.get('window');
 const verticalPadding = 5;
 const cursorRadius = 10;
@@ -186,7 +186,9 @@ export default class SifirAccountChart extends React.Component {
             minimumValue={10}
             maximumValue={500}
             step={1}
-            onValueChange={val => this.SV.current.scrollTo({x: val})}
+            maximumTrackTintColor="white"
+            minimumTrackTintColor="white"
+            onValueChange={val => this.SV.current.getNode().scrollTo({x: val})}
           />
         </View>
       </View>
@@ -201,10 +203,9 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 10,
     paddingTop: 40,
-    height: height + 120,
+    height: height + 100,
     width,
     overflow: 'hidden',
-    backgroundColor: '#091110',
   },
   cursor: {
     width: cursorRadius * 2,

@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "private": true,
   "scripts": {
-    "android": "npx react-native run-android",
+    "android": "npx react-native run-android", 
     "ios": "npx react-native run-ios",
     "start": "npx react-native start",
     "test": "jest",
@@ -48,7 +48,6 @@
     "react-native-qrcode-scanner": "^1.2.3",
     "react-native-range-slider": "^0.1.2",
     "react-native-reanimated": "^1.7.0",
-    "react-native-reanimated-slider": "^1.0.5",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.0.0",
     "react-native-sensitive-info": "^5.5.3",

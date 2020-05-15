@@ -43,6 +43,7 @@ class SifirAccountScreen extends React.Component {
       });
       this.setState({balance, txnData});
     } else if (type === C.STR_WASABI_WALLET_TYPE) {
+      // TODO HAMZA this to switch statement before PR
       // const res = await this.props.getUnspentCoins();
       // console.log('res------', res);
     }
