@@ -6,12 +6,16 @@ import {
   Dimensions,
   Animated,
   TextInput,
-  Slider,
+  Text,
 } from 'react-native';
-import Svg, {Path, Defs, LinearGradient, Stop} from 'react-native-svg';
+import Svg, {Path, Defs, Stop} from 'react-native-svg';
 import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
 import {scaleLinear} from 'd3-scale';
+import SifirSlider from './SifirSlider';
+import LinearGradient from 'react-native-linear-gradient';
+import Slider from 'react-native-slider';
+
 const d3 = {
   shape,
 };
@@ -104,7 +108,7 @@ const data = unspentCoins.reduce((g, t) => {
 const maxBalance = Math.max(...Object.values(data));
 const scaleX = scaleLinear()
   .domain([0, maxAnonset])
-  .range([0, width]);
+  .range([0, width - 25]);
 const scaleY = scaleLinear()
   .domain([0, maxBalance])
   .range([height - verticalPadding, verticalPadding]);
@@ -120,17 +124,21 @@ const properties = path.svgPathProperties(line);
 const lineLength = properties.getTotalLength();
 export default class SifirAccountChart extends React.Component {
   cursor = React.createRef();
+  slider = React.createRef();
   label = React.createRef();
   SV = React.createRef();
   x = new Animated.Value(0);
 
   moveCursor(value) {
     let {x, y} = properties.getPointAtLength(lineLength - value);
-    let top = y - cursorRadius;
-    let left = x - cursorRadius;
+    let top = y - cursorRadius - 2;
+    let left = x - (cursorRadius + 10);
     this.cursor.current.setNativeProps({
       top,
       left,
+    });
+    this.slider.current.setNativeProps({
+      transform: [{translateX: left - 10}],
     });
     this.label.current.setNativeProps({
       text: `${Math.ceil(scaleY.invert(y))} SATS`,
@@ -148,22 +156,20 @@ export default class SifirAccountChart extends React.Component {
     return (
       <View style={styles.container}>
         <Svg {...{width, height}}>
-          <Defs>
-            <LinearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="gradient">
-              <Stop stopColor="#CDE3F8" offset="0%" />
-              <Stop stopColor="#eef6fd" offset="80%" />
-              <Stop stopColor="#FEFFFF" offset="100%" />
-            </LinearGradient>
-          </Defs>
           <Path d={line} fill="transparent" stroke="#00EDE7" strokeWidth={5} />
           <Path d={`${line} L ${width} ${height} L 0 ${height}`} />
           <View ref={this.cursor}>
-            <View style={styles.verticalGradient} />
-            <View style={[styles.cursor, {position: 'absolute', left: 10}]} />
+            <LinearGradient
+              colors={['white', 'black', 'black', 'black', 'black']}
+              style={styles.verticalGradient}
+            />
+            <View style={styles.cursorContainer}>
+              <View style={styles.cursor} />
+            </View>
           </View>
         </Svg>
         <Animated.View style={[styles.label]}>
-          <TextInput ref={this.label} style={{color: 'white'}} />
+          <TextInput ref={this.label} style={styles.bubbleText} />
         </Animated.View>
         <Animated.ScrollView
           style={StyleSheet.absoluteFill}
@@ -184,16 +190,11 @@ export default class SifirAccountChart extends React.Component {
             {useNativeDriver: true},
           )}
         />
-        <View style={{transform: [{scaleX: -1}], marginTop: 30}}>
-          <Slider
-            minimumValue={0}
-            maximumValue={maxAnonset}
-            step={1}
-            maximumTrackTintColor="white"
-            minimumTrackTintColor="white"
-            onValueChange={val =>
-              this.SV.current.getNode().scrollTo({x: scaleX(val)})
-            }
+        <View style={styles.sliderContainer}>
+          <SifirSlider
+            left={this.leftProp}
+            sliderRef={this.slider}
+            onValueChangeScroll={val => this.moveCursor(val)}
           />
         </View>
       </View>
@@ -208,17 +209,26 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 10,
     paddingTop: 40,
-    height: height + 100,
     width,
     overflow: 'hidden',
   },
   cursor: {
-    width: cursorRadius * 2,
-    height: cursorRadius * 2,
+    width: cursorRadius * 1.4,
+    height: cursorRadius * 1.4,
     borderRadius: cursorRadius,
-    borderColor: '#367be2',
-    borderWidth: 3,
-    backgroundColor: 'white',
+    borderColor: '#fff',
+    borderWidth: 2,
+    backgroundColor: '#00EDE7',
+  },
+  cursorContainer: {
+    width: cursorRadius * 2.3,
+    height: cursorRadius * 2.3,
+    borderRadius: cursorRadius + 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    position: 'absolute',
+    left: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   label: {
     position: 'absolute',
@@ -232,4 +242,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     top: -30,
   },
+  sliderContainer: {
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  bubbleText: {color: 'white'},
 });

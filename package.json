@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "android": "npx react-native run-android",
-    "ios": "npx react-native run-ios",
-    "start": "npx react-native start",
+    "ios": "./node_modules/react-native/cli.js run-ios",
+    "start": "./node_modules/react-native/cli.js run-android",
     "test": "jest",
     "lint": "eslint . --fix",
     "clean": "rm -rf node_modules/ package-lock.json /tmp/metro-cache",
