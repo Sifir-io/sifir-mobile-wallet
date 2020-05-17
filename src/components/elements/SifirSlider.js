@@ -1,71 +1,55 @@
-import React, {Component, useRef} from 'react';
-import {View, StyleSheet, PanResponder, Animated, Text} from 'react-native';
+import React, {Component} from 'react';
+import {View, StyleSheet} from 'react-native';
+import Slider from 'react-native-slider';
+import {Images, AppStyle, C} from '@common/index';
 
-const SifirSlider = props => {
-  const {onValueChangeScroll, sliderRef} = props;
-  const pan = useRef(new Animated.ValueXY()).current;
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        onValueChangeScroll(gestureState.moveX);
-      },
-      onPanResponderGrant: () => {
-        pan.setOffset({
-          x: pan.x._value,
-        });
-      },
-      onPanResponderMove: Animated.event([null, {dx: pan.x}], {}),
-      onPanResponderRelease: () => {
-        pan.flattenOffset();
-      },
-    }),
-  ).current;
-
-  return (
-    <View>
-      {/* <Slider
-        step={1}
-        value={props.left * 0.285}
-        thumbTintColor="#5595a8"
-        onValueChange={value => {
-          // onValueChangeScroll(value);
-        }}
-        inverted={true}
-        minimumValue={1}
-        maximumValue={90}
-        minimumTrackTintColor="#2B2B2B"
-        maximumTrackTintColor="#2B2B2B"
-        thumbStyle={styles.thumb}
-        style={{height: 16}}
-        trackStyle={{
-          height: 16,
-          borderRadius: 5,
-        }}
-      /> */}
-      <View style={styles.container}>
-        <View style={styles.sliderTrack}>
-          <Animated.View
-            ref={sliderRef}
-            style={styles.thumb}
-            {...panResponder.panHandlers}
+export default class SifirSlider extends Component {
+  state = {value: 20};
+  render() {
+    return (
+      <View style={styles.timeView}>
+        <View style={{width: '100%'}}>
+          <Slider
+            step={1}
+            animationType="spring"
+            value={this.state.value}
+            thumbTintColor="#5595a8"
+            onValueChange={value => this.setState({value})}
+            minimumValue={1}
+            maximumValue={90}
+            minimumTrackTintColor="#25b6fa"
+            maximumTrackTintColor="#412160"
+            thumbStyle={styles.thumb}
+            trackStyle={{
+              height: 10,
+              borderRadius: 5,
+            }}
           />
         </View>
       </View>
-    </View>
-  );
-};
-export default SifirSlider;
+    );
+  }
+}
+
 const styles = StyleSheet.create({
-  thumb: {
-    backgroundColor: '#00EDE7',
-    width: 40,
-    borderRadius: 5,
-    elevation: 3,
-    height: 16,
+  timeView: {
+    flex: 1,
+    marginTop: 15,
   },
-  sliderTrack: {
-    backgroundColor: '#2B2B2B',
-    borderRadius: 5,
+  clockImgView: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  clockImg: {width: 25, height: 25},
+  setFeeTxt: {fontSize: 18, marginLeft: 5},
+  feeTxt: {
+    fontSize: 25,
+    marginVertical: 10,
+    marginHorizontal: 4,
+  },
+  waitView: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
   },
 });

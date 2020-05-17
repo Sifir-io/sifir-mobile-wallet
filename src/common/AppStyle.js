@@ -4,7 +4,8 @@ export default {
   listViewSep: '#0a1922',
   mainFontBold: 'RobotoCondensed-Bold',
   mainFont: 'RobotoCondensed-Regular',
-  secondaryColor: '#4B53FF',
+  secondaryColor: '#122C3A',
   errorColor: '#D0021B',
   orange: 'orange',
+  grayColor: '#ABA8A8',
 };

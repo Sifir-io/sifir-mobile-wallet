@@ -12,9 +12,7 @@ import Svg, {Path, Defs, Stop} from 'react-native-svg';
 import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
 import {scaleLinear} from 'd3-scale';
-import SifirSlider from './SifirSlider';
 import LinearGradient from 'react-native-linear-gradient';
-import Slider from 'react-native-slider';
 
 const d3 = {
   shape,
@@ -138,7 +136,7 @@ export default class SifirAccountChart extends React.Component {
       left,
     });
     this.slider.current.setNativeProps({
-      transform: [{translateX: left - 10}],
+      left: left - 10,
     });
     this.label.current.setNativeProps({
       text: `${Math.ceil(scaleY.invert(y))} SATS`,
@@ -168,12 +166,19 @@ export default class SifirAccountChart extends React.Component {
             </View>
           </View>
         </Svg>
+        <View style={styles.sliderContainer}>
+          <View style={styles.sliderTrack}>
+            <Animated.View ref={this.slider} style={styles.thumb} />
+          </View>
+        </View>
         <Animated.View style={[styles.label]}>
           <TextInput ref={this.label} style={styles.bubbleText} />
         </Animated.View>
         <Animated.ScrollView
           style={StyleSheet.absoluteFill}
-          contentContainerStyle={{width: lineLength * 2}}
+          contentContainerStyle={{
+            width: lineLength * 2,
+          }}
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
           bounces={false}
@@ -190,13 +195,6 @@ export default class SifirAccountChart extends React.Component {
             {useNativeDriver: true},
           )}
         />
-        <View style={styles.sliderContainer}>
-          <SifirSlider
-            left={this.leftProp}
-            sliderRef={this.slider}
-            onValueChangeScroll={val => this.moveCursor(val)}
-          />
-        </View>
       </View>
     );
   }
@@ -247,4 +245,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   bubbleText: {color: 'white'},
+  thumb: {
+    backgroundColor: '#00EDE7',
+    width: 40,
+    borderRadius: 5,
+    elevation: 3,
+    height: 16,
+  },
+  sliderTrack: {
+    backgroundColor: '#2B2B2B',
+    borderRadius: 5,
+  },
 });
