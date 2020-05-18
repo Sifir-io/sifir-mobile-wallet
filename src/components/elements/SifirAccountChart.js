@@ -138,11 +138,13 @@ export default class SifirAccountChart extends React.Component {
     this.slider.current.setNativeProps({
       left: left - 10,
     });
+    const text = `${Math.ceil(scaleY.invert(y))} SATS`;
     this.label.current.setNativeProps({
-      text: `${Math.ceil(scaleY.invert(y))} SATS`,
+      text,
       top,
       left,
     });
+    this.props.handleChartSlider(text);
   }
 
   componentDidMount() {

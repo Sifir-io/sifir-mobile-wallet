@@ -19,6 +19,7 @@ import SifirAccountHistory from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
 import {ErrorScreen} from '@screens/error';
+import debounce from '../../../helpers/debounce';
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -27,6 +28,7 @@ class SifirAccountScreen extends React.Component {
     balance: 0,
     txnData: [],
     isVisibleSettingsModal: false,
+    anonset: 0,
   };
   stopLoading = null;
 
@@ -84,8 +86,10 @@ class SifirAccountScreen extends React.Component {
     }
   };
 
+  handleChartSlider = anonset =>
+    debounce(anonset => this.setState({anonset}), 700);
   render() {
-    const {balance, txnData} = this.state;
+    const {balance, txnData, anonset} = this.state;
     const {navigate} = this.props.navigation;
     const {walletInfo} = this.props.route.params;
     const {label, type} = walletInfo;
@@ -123,7 +127,7 @@ class SifirAccountScreen extends React.Component {
         // FIXME wasabi icon
         accountIcon = Images.icon_light;
         accountIconOnPress = toggleSettingsModal.bind(this);
-        accountHeaderText = 'Balance w/minimum Anonyimity set 40';
+        accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_TRANSACTIONS;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
@@ -154,74 +158,70 @@ class SifirAccountScreen extends React.Component {
       );
     }
     return (
-      <>
-        <ScrollView
-          contentContainerStyle={{
-            backgroundColor: AppStyle.backgroundColor,
-            flexGrow: 1,
-          }}>
-          <View style={styles.mainView}>
-            <View style={styles.navBtn}>
-              <TouchableOpacity>
-                <View
-                  style={styles.backNavView}
-                  onTouchEnd={() => navigate('AccountList')}>
-                  <Image source={Images.icon_back} style={styles.backImg} />
-                  <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-            {this.state.isVisibleSettingsModal && (
+      <ScrollView contentContainerStyle={styles.SVcontainer}>
+        <View style={styles.mainView}>
+          <View style={styles.navBtn}>
+            <TouchableOpacity>
               <View
-                style={styles.settingMenuContainer}
-                onTouchEnd={() => {
-                  toggleSettingsModal.bind(this);
-                }}>
-                <SifirSettingModal
-                  hideModal={toggleSettingsModal.bind(this)}
-                  {...settingModalProps}
-                  walletInfo={{...walletInfo, balance}}
-                />
+                style={styles.backNavView}
+                onTouchEnd={() => navigate('AccountList')}>
+                <Image source={Images.icon_back} style={styles.backImg} />
+                <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
               </View>
-            )}
-            <SifirAccountHeader
-              accountIcon={accountIcon}
-              accountIconOnPress={accountIconOnPress}
-              loading={isLoading}
-              loaded={isLoaded}
-              type={type}
-              label={label}
-              balance={balance}
-              btcUnit={btcUnit}
-              headerText={accountHeaderText}
-            />
-            {type === C.STR_WASABI_WALLET_TYPE && <SifirAccountChart />}
-
-            <SifirAccountActions
-              navigate={navigate}
-              type={type}
-              label={label}
-              walletInfo={walletInfo}
-              handleReceiveButton={
-                // TODO update this when invoices done
-                type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
-              }
-              handleSendBtn={
-                // For now only watching wallets cant send
-                type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
-              }
-            />
-            <SifirAccountHistory
-              loading={isLoading}
-              loaded={isLoaded}
-              type={type}
-              txnData={txnData}
-              btcUnit={btcUnit}
-              headerText={accountTransactionHeaderText}
-            />
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-      </>
+          {this.state.isVisibleSettingsModal && (
+            <View
+              style={styles.settingMenuContainer}
+              onTouchEnd={() => {
+                toggleSettingsModal.bind(this);
+              }}>
+              <SifirSettingModal
+                hideModal={toggleSettingsModal.bind(this)}
+                {...settingModalProps}
+                walletInfo={{...walletInfo, balance}}
+              />
+            </View>
+          )}
+          <SifirAccountHeader
+            accountIcon={accountIcon}
+            accountIconOnPress={accountIconOnPress}
+            loading={isLoading}
+            loaded={isLoaded}
+            type={type}
+            label={label}
+            balance={balance}
+            btcUnit={btcUnit}
+            headerText={accountHeaderText}
+          />
+          {type === C.STR_WASABI_WALLET_TYPE && (
+            <SifirAccountChart handleChartSlider={this.handleChartSlider()} />
+          )}
+
+          <SifirAccountActions
+            navigate={navigate}
+            type={type}
+            label={label}
+            walletInfo={walletInfo}
+            handleReceiveButton={
+              // TODO update this when invoices done
+              type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
+            }
+            handleSendBtn={
+              // For now only watching wallets cant send
+              type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
+            }
+          />
+          <SifirAccountHistory
+            loading={isLoading}
+            loaded={isLoaded}
+            type={type}
+            txnData={txnData}
+            btcUnit={btcUnit}
+            headerText={accountTransactionHeaderText}
+          />
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -247,6 +247,10 @@ export default connect(
 
 const styles = StyleSheet.create({
   navBtn: {flex: 0.7},
+  SVcontainer: {
+    backgroundColor: AppStyle.backgroundColor,
+    flexGrow: 1,
+  },
   mainView: {
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,

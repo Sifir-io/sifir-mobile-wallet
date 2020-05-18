@@ -15,6 +15,7 @@ export const C = {
   STR_SHOP: 'SHOP',
   STR_SETTINGS: 'SETTINGS',
   STR_Cur_Balance: 'Current Balance',
+  STR_Wasabi_Header: 'Balance w/minimum Anonyimity set ',
   STR_Balance_Channels_n_Outputs: 'Channels & Outputs Balance',
   STR_Balance_Outputs: 'Balance (Outputs)',
   STR_Balance_Channels: 'Balance (Channels)',
