@@ -119,46 +119,49 @@ const SifirAccountHistory = ({
     [txnData.length],
   );
   return (
-    <BottomSheet
-      snapPoints={[sheetHeight, C.SCREEN_HEIGHT * 0.16]}
-      initialSnap={1}
-      enabledInnerScrolling={true}
-      enabledGestureInteraction={true}
-      renderHeader={() => (
-        <View style={styles.headerContainer}>
-          {!loading && (
-            <Image source={Images.arrowupArrow} style={styles.settingIcon} />
-          )}
-          {loading && (
-            <ActivityIndicator
-              style={styles.spinner}
-              color={AppStyle.mainColor}
+    <View style={styles.container}>
+      <BottomSheet
+        snapPoints={[sheetHeight, C.SCREEN_HEIGHT * 0.3]}
+        initialSnap={1}
+        enabledInnerScrolling={true}
+        enabledGestureInteraction={true}
+        renderHeader={() => (
+          <View style={styles.headerContainer}>
+            {!loading && (
+              <Image source={Images.arrowupArrow} style={styles.settingIcon} />
+            )}
+            {loading && (
+              <ActivityIndicator
+                style={styles.spinner}
+                color={AppStyle.mainColor}
+              />
+            )}
+          </View>
+        )}
+        renderContent={() => (
+          <View
+            style={{
+              height: sheetHeight - 40,
+              backgroundColor: AppStyle.mainColor,
+            }}>
+            <TabView
+              navigationState={{index, routes}}
+              renderScene={renderScene}
+              onIndexChange={setIndex}
+              initialLayout={initialLayout}
+              renderTabBar={renderTabBar}
+              lazy={false}
+              sceneContainerStyle={styles.sceneContainer}
             />
-          )}
-        </View>
-      )}
-      renderContent={() => (
-        <View
-          style={{
-            height: sheetHeight - 40,
-            backgroundColor: AppStyle.mainColor,
-          }}>
-          <TabView
-            navigationState={{index, routes}}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={initialLayout}
-            renderTabBar={renderTabBar}
-            lazy={false}
-            sceneContainerStyle={styles.sceneContainer}
-          />
-        </View>
-      )}
-    />
+          </View>
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {height: C.SCREEN_HEIGHT * 0.3, bottom: -25},
   txnLblTxt: {
     color: 'white',
     fontSize: 20,

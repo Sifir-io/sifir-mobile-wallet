@@ -19,7 +19,6 @@ import SifirAccountHistory from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
 
 import {ErrorScreen} from '@screens/error';
-console.disableYellowBox = true;
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -156,7 +155,11 @@ class SifirAccountScreen extends React.Component {
     }
     return (
       <>
-        <ScrollView style={styles.mainView}>
+        <ScrollView
+          contentContainerStyle={{
+            backgroundColor: AppStyle.backgroundColor,
+            flexGrow: 1,
+          }}>
           <View style={styles.mainView}>
             <View style={styles.navBtn}>
               <TouchableOpacity>
@@ -208,16 +211,16 @@ class SifirAccountScreen extends React.Component {
                 type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
               }
             />
+            <SifirAccountHistory
+              loading={isLoading}
+              loaded={isLoaded}
+              type={type}
+              txnData={txnData}
+              btcUnit={btcUnit}
+              headerText={accountTransactionHeaderText}
+            />
           </View>
         </ScrollView>
-        <SifirAccountHistory
-          loading={isLoading}
-          loaded={isLoaded}
-          type={type}
-          txnData={txnData}
-          btcUnit={btcUnit}
-          headerText={accountTransactionHeaderText}
-        />
       </>
     );
   }
@@ -248,7 +251,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: AppStyle.backgroundColor,
     paddingTop: 10,
-    paddingBottom: C.SCREEN_HEIGHT * 0.17,
   },
   backNavView: {
     display: 'flex',

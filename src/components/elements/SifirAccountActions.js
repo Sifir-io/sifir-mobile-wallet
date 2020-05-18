@@ -63,7 +63,6 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
 
 const styles = StyleSheet.create({
   btnAreaView: {
-    flex: 1,
     flexDirection: 'row',
     borderColor: AppStyle.mainColor,
     borderWidth: 1,

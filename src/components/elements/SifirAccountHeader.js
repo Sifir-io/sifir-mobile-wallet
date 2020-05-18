@@ -73,7 +73,6 @@ const SifirAccountHeader = ({
 
 const styles = StyleSheet.create({
   headerView: {
-    flex: 3,
     marginTop: 0,
     marginLeft: 20,
     flexDirection: 'row',
