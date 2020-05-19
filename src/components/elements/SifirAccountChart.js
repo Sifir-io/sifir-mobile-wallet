@@ -13,6 +13,7 @@ import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
 import {scaleLinear} from 'd3-scale';
 import LinearGradient from 'react-native-linear-gradient';
+import Androw from 'react-native-androw';
 
 const d3 = {
   shape,
@@ -131,7 +132,7 @@ export default class SifirAccountChart extends React.Component {
     let {x, y} = properties.getPointAtLength(lineLength - value);
     let top = y - cursorRadius - 2;
     let left = x - (cursorRadius + 10);
-    this.cursor.current.setNativeProps({
+    this.cursor?.current?.setNativeProps({
       top,
       left,
     });
@@ -139,7 +140,7 @@ export default class SifirAccountChart extends React.Component {
       left: left - 10,
     });
     const text = `${Math.ceil(scaleY.invert(y))} SATS`;
-    this.label.current.setNativeProps({
+    this.label?.current?.setNativeProps({
       text,
       top,
       left,
@@ -155,9 +156,19 @@ export default class SifirAccountChart extends React.Component {
     const {x} = this;
     return (
       <View style={styles.container}>
-        <Svg {...{width, height}}>
-          <Path d={line} fill="transparent" stroke="#00EDE7" strokeWidth={5} />
-          <Path d={`${line} L ${width} ${height} L 0 ${height}`} />
+        <Androw style={styles.shadow}>
+          <Svg {...{width, height}}>
+            <Path
+              d={line}
+              fill="transparent"
+              stroke="#00EDE7"
+              strokeWidth={5}
+            />
+
+            <Path d={`${line} L ${width} ${height} L 0 ${height}`} />
+          </Svg>
+        </Androw>
+        <View style={styles.cursorParent}>
           <View ref={this.cursor}>
             <LinearGradient
               colors={['white', 'black', 'black', 'black', 'black']}
@@ -167,7 +178,7 @@ export default class SifirAccountChart extends React.Component {
               <View style={styles.cursor} />
             </View>
           </View>
-        </Svg>
+        </View>
         <View style={styles.sliderContainer}>
           <View style={styles.sliderTrack}>
             <Animated.View ref={this.slider} style={styles.thumb} />
@@ -257,5 +268,17 @@ const styles = StyleSheet.create({
   sliderTrack: {
     backgroundColor: '#2B2B2B',
     borderRadius: 5,
+  },
+  shadow: {
+    shadowColor: '#00EDE7',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+  },
+  cursorParent: {
+    width,
+    height: height,
+    position: 'absolute',
+    top: height - height * 0.33,
   },
 });
