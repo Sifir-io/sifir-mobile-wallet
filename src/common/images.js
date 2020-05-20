@@ -14,7 +14,7 @@ export default {
   icon_receive: require('./../assets/images/down_cir.png'),
   icon_chanel: require('./../assets/images/light_cir.png'),
   icon_up_arrow: require('./../assets/images/up_arrow.png'),
-  arrowupArrow: require('./../assets/images/arrowupArrow.png'),
+  upArrow: require('./../assets/images/arrowupArrow.png'),
   icon_up_blue: require('./../assets/images/uparrow_blue.png'),
   icon_down_arrow: require('./../assets/images/down_arrow.png'),
   icon_btc_cir: require('./../assets/images/bitcoin_blue.png'),

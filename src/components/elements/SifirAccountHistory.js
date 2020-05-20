@@ -234,7 +234,7 @@ const SifirAccountHistory = ({
         renderHeader={() => (
           <View style={styles.headerContainer}>
             {!loading && (
-              <Image source={Images.arrowupArrow} style={styles.settingIcon} />
+              <Image source={Images.upArrow} style={styles.settingIcon} />
             )}
             {loading && (
               <ActivityIndicator
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   },
   tabTitleLabel: {fontWeight: 'bold'},
   sceneContainer: {
-    backgroundColor: AppStyle.secondaryColor,
+    backgroundColor: AppStyle.tertiaryColor,
     paddingHorizontal: 20,
   },
   tabIndicatorContainerStyle: {
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     bottom: -2,
   },
   tabBar: {
-    backgroundColor: AppStyle.secondaryColor,
+    backgroundColor: AppStyle.tertiaryColor,
   },
   headerRow: {
     flexDirection: 'row',
