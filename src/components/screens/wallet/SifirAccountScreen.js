@@ -128,7 +128,7 @@ class SifirAccountScreen extends React.Component {
         accountIcon = Images.icon_light;
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = C.STR_Wasabi_Header + anonset;
-        accountTransactionHeaderText = C.STR_TRANSACTIONS;
+        accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
       default:

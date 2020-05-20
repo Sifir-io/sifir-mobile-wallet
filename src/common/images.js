@@ -62,4 +62,5 @@ export default {
   icon_chatSend: require('./../assets/images/chatSend.png'),
   icon_yellowTxn: require('./../assets/images/yellowTxn.png'),
   icon_thickGreenArrowTxn: require('./../assets/images/bold_arrow.png'),
+  filter_icon: require('./../assets/images/filter.png'),
 };

@@ -145,7 +145,7 @@ const getLnWalletDetails = ({label}) => async dispatch => {
                 type: cachedBolt.type,
                 meta: cachedBolt.meta,
               };
-              log('cached bolt', payload);
+              // log('cached bolt', payload);
             } else {
               // decode and insert it
               const decodedBolt11 = bolt11Lib.decode(inv.bolt11);

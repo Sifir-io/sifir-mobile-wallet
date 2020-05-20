@@ -22,6 +22,7 @@ export const C = {
   STR_Hops_to_route: 'hop to payee',
   STR_INVOICES_AND_PAYS: 'Invoices & Pays',
   STR_TRANSACTIONS: 'Transactions',
+  STR_ALL_TRANSACTIONS: 'All Transactions',
   STR_SEND: 'SEND',
   STR_Send: 'Send',
   STR_TxID: 'TxID',

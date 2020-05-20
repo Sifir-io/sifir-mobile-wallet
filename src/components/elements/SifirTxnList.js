@@ -118,6 +118,22 @@ const SifirInvEntry = React.memo(({inv, unit}) => {
     return null;
   }
 });
+const SifirWasabiTxn = ({txn, unit}) => {
+  try {
+    const {amount, datetime, label} = txn;
+    return (
+      <ListItem
+        title={label}
+        description={datetime}
+        amount={amount}
+        unit={unit}
+        imgURL={'imgURL'}
+      />
+    );
+  } catch (err) {
+    return null;
+  }
+};
 
 /**
  * Takes equal slices of invoices and payments decodes them and sorts them
@@ -128,6 +144,12 @@ const processLnTxnList = (txnData, start = 0, length = 20) =>
     .sort((a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp)
     .slice(start, length);
 
+const processWasabiTxnList = (txnData, start = 0, length = 20) =>
+  [...(txnData?.transactions || [])]
+    .filter(txn => txn.label !== '')
+    .sort((a, b) => b.datetime - a.datetime)
+    .slice(start, length);
+
 const SifirTxnList = ({width, height, unit, txnData, type}) => {
   const [txnDataCached, setTxnDataCached] = useState([]);
   // FIXME proper array compare
@@ -135,7 +157,9 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
     setTxnDataCached(txnData);
   }
   const txnListToRender = React.useMemo(() => {
-    if (type === C.STR_LN_WALLET_TYPE) {
+    if (type === C.STR_WASABI_WALLET_TYPE) {
+      return processWasabiTxnList(txnData, 0, 20);
+    } else if (type === C.STR_LN_WALLET_TYPE) {
       return processLnTxnList(txnData, 0, 20);
     } else {
       return txnData;
@@ -146,9 +170,14 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
       data={txnListToRender}
       style={height}
       width={width}
-      keyExtractor={(item, index) => item?.bolt11 + item?.txid + index}
+      extraData={txnListToRender}
+      keyExtractor={(item, index) =>
+        item?.bolt11 + item?.txid + index + item.tx
+      }
       renderItem={({item}) => {
-        if (type === C.STR_LN_WALLET_TYPE) {
+        if (type === C.STR_WASABI_WALLET_TYPE) {
+          return <SifirWasabiTxn txn={item} unit={unit} />;
+        } else if (type === C.STR_LN_WALLET_TYPE) {
           return <SifirInvEntry inv={item} unit={unit} />;
         } else {
           return <SifirTxnEntry txn={item} unit={unit} />;
