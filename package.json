@@ -69,6 +69,7 @@
     "redux-thunk": "^2.3.0",
     "sifir-js-sdk": "git+https://github.com/Sifir-io/sifir-js-sdk.git#feature/rn",
     "svg-path-properties": "^1.0.4",
+    "underscore": "^1.10.2",
     "uuid": "^3.4.0",
     "vm-browserify": "^1.1.2"
   },

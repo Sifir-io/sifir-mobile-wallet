@@ -15,24 +15,27 @@ const makeInvoiceRenderData = ({
   decodedBolt11,
   meta: {description: desc, status},
 }) => {
-  let amount, imgURL, description, timeStr;
+  let amount, imgURL, description, timeStr, isSentTxn;
   const {millisatoshis, timestamp} = decodedBolt11;
   amount = millisatoshis;
   description = desc;
   switch (status) {
     case 'unpaid':
       imgURL = Images.icon_yellowTxn;
+      isSentTxn = false;
       break;
     case 'paid':
       imgURL = Images.icon_thickGreenArrowTxn;
+      isSentTxn = true;
       break;
   }
   timeStr = moment(timestamp * 1000).fromNow();
-  return {amount, description, imgURL, timeStr};
+  return {amount, description, imgURL, timeStr, isSentTxn};
 };
 
 const makePaysRenderData = ({decodedBolt11, meta: {preimage}}) => {
   let amount, imgURL, description, timeStr;
+  const isSentTxn = true;
   const {millisatoshis, complete, timestamp} = decodedBolt11;
   if (complete) {
     imgURL = Images.icon_send;
@@ -41,7 +44,7 @@ const makePaysRenderData = ({decodedBolt11, meta: {preimage}}) => {
     amount = millisatoshis;
     timeStr = moment(timestamp * 1000).fromNow();
   }
-  return {amount, description, imgURL, timeStr};
+  return {amount, description, imgURL, timeStr, isSentTxn};
 };
 
 const makeTxnRenderData = ({category, txid, amount, timereceived}) => {
@@ -84,7 +87,7 @@ const SifirTxnEntry = ({txn, unit}) => {
   );
 };
 
-const ListItem = ({title, description, imgURL, amount, unit}) => {
+const ListItem = ({title, description, imgURL, amount, unit, isSentTxn}) => {
   return (
     <TouchableOpacity>
       <View style={styles.listItme}>
@@ -93,7 +96,8 @@ const ListItem = ({title, description, imgURL, amount, unit}) => {
           <Text style={{color: AppStyle.mainColor}}>{title}</Text>
           <Text style={styles.txIDstr}>{description}</Text>
         </View>
-        <Text style={styles.amount}>
+        <Text
+          style={[styles.amount, {color: isSentTxn ? '#6FB253' : '#DD9030'}]}>
           <SifirBTCAmount amount={amount} unit={unit} />
         </Text>
       </View>
@@ -103,7 +107,7 @@ const ListItem = ({title, description, imgURL, amount, unit}) => {
 const SifirInvEntry = React.memo(({inv, unit}) => {
   const {type} = inv;
   try {
-    const {amount, imgURL, timeStr, description} =
+    const {amount, imgURL, timeStr, description, isSentTxn} =
       type === 'invoice' ? makeInvoiceRenderData(inv) : makePaysRenderData(inv);
     return (
       <ListItem
@@ -112,6 +116,7 @@ const SifirInvEntry = React.memo(({inv, unit}) => {
         amount={amount}
         unit={unit}
         imgURL={imgURL}
+        isSentTxn={isSentTxn}
       />
     );
   } catch (err) {
@@ -121,13 +126,16 @@ const SifirInvEntry = React.memo(({inv, unit}) => {
 const SifirWasabiTxn = ({txn, unit}) => {
   try {
     const {amount, datetime, label} = txn;
+    const imgURL = amount > 0 ? Images.icon_yellowTxn : Images.icon_send;
+    const isSentTxn = amount > 0 ? false : true;
     return (
       <ListItem
         title={label}
         description={datetime}
         amount={amount}
         unit={unit}
-        imgURL={'imgURL'}
+        imgURL={imgURL}
+        isSentTxn={isSentTxn}
       />
     );
   } catch (err) {
@@ -206,6 +214,7 @@ const styles = StyleSheet.create({
   amount: {
     flex: 2,
     color: AppStyle.mainColor,
+    textAlign: 'right',
   },
   arrowIcon: {width: 30, height: 30},
   timeStrContainer: {flex: 5, marginLeft: 20},
