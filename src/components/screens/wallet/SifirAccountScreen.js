@@ -144,8 +144,12 @@ class SifirAccountScreen extends React.Component {
     }
   };
 
-  handleChartSlider = anonset =>
-    debounce(anonset => this.setState({anonset}), 700);
+  handleChartSlider = data =>
+    debounce(
+      ({anonset, value}) =>
+        this.setState({anonset: Math.floor(anonset), balance: value}),
+      3,
+    );
   render() {
     const {balance, txnData, anonset} = this.state;
     const {navigate} = this.props.navigation;
@@ -157,7 +161,6 @@ class SifirAccountScreen extends React.Component {
       loaded: loadedLN,
       error: errorLN,
     } = this.props.lnWallet;
-    const btcUnit = type === C.STR_LN_WALLET_TYPE ? C.STR_MSAT : C.STR_BTC;
     const isLoading = type === C.STR_LN_WALLET_TYPE ? loadingLN : loading;
     const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
     const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
@@ -167,6 +170,7 @@ class SifirAccountScreen extends React.Component {
       accountIconOnPress,
       accountHeaderText,
       accountTransactionHeaderText,
+      btcUnit,
       settingModalProps = {};
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
@@ -180,6 +184,7 @@ class SifirAccountScreen extends React.Component {
           showTopUp: true,
           showWithdraw: true,
         };
+        btcUnit = C.STR_MSAT;
         break;
       case C.STR_WASABI_WALLET_TYPE:
         // FIXME wasabi icon
@@ -187,6 +192,7 @@ class SifirAccountScreen extends React.Component {
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
+        btcUnit = C.STR_SAT;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
       default:
@@ -194,6 +200,7 @@ class SifirAccountScreen extends React.Component {
         accountIcon = Images.icon_bitcoin;
         accountIconOnPress = () => {};
         accountTransactionHeaderText = C.STR_TRANSACTIONS;
+        btcUnit = C.STR_BTC;
     }
 
     if (hasError) {

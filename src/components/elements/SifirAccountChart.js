@@ -96,29 +96,62 @@ const unspentCoins = [
   },
 ];
 
-const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
-// const minAnonset = Math.min(...anonSet);
-const maxAnonset = Math.max(...anonSet);
-const data = unspentCoins.reduce((g, t) => {
-  g[Math.floor(t.anonymitySet)] =
-    (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
-  return g;
-}, {});
-const maxBalance = Math.max(...Object.values(data));
+const makeChartData = unspentcoins => {
+  // group balances by anonset
+  const data = unspentCoins.reduce((g, t) => {
+    g[Math.floor(t.anonymitySet)] =
+      (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
+    return g;
+  }, {});
+  // -- series
+  // Sort by anon set descending
+  const sortedAnonsetTotalPairs = Object.entries(data).sort(
+    ([anonset1], [anonset2]) => anonset1 - anonset2,
+  );
+  const chartStats = sortedAnonsetTotalPairs.reduce(
+    (stats, [anonset, total], i) => {
+      // data sorted descending, so anything after current index is a balance avalible below that anon set
+      const cumTotal = sortedAnonsetTotalPairs
+        .slice(i)
+        .reduce((totalToIndex, [, t1]) => totalToIndex + t1, 0);
+      stats.series.push([Number(anonset), cumTotal]);
+      stats.maxY =
+        cumTotal > stats.maxY || stats.maxY === null ? cumTotal : stats.maxY;
+      stats.maxX =
+        anonset > stats.maxX || stats.maxX === null ? anonset : stats.maxX;
+      stats.minY =
+        cumTotal < stats.minY || stats.minY === null ? cumTotal : stats.minY;
+      stats.minX =
+        anonset < stats.minX || stats.minX === null ? anonset : stats.minX;
+      return stats;
+    },
+    {series: [], minX: null, maxX: null, minY: null, maxY: null},
+  );
+  console.log(chartStats);
+  return chartStats;
+  // calculate max y axis value
+  //const [[, maxY]] = cumSum[0];
+  //// const maxY = Math.max(...Object.values(data));
+  ////
+  //// calculate max x-axis value
+  //const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
+  //const maxX = Math.max(...anonSet);
+  //return {cumSum, maxX, maxY};
+};
+//FIXME here flipping x,y for slider ?
+const {series, minX, maxX, minY, maxY} = makeChartData(unspentCoins);
 const scaleX = scaleLinear()
-  .domain([0, maxAnonset])
+  .domain([0, maxX])
   .range([0, width - 25]);
 const scaleY = scaleLinear()
-  .domain([0, maxBalance])
+  .domain([minY, maxY])
   .range([height - verticalPadding, verticalPadding]);
 
 const line = d3.shape
   .line()
   .x(([anonset]) => scaleX(Number(anonset)))
   .y(([, balance]) => scaleY(balance))
-  // TODO current data is more of a distrution than culative function
-  // maybe will add cumaltive curve later ?
-  .curve(d3.shape.curveStep)(Object.entries(data));
+  .curve(d3.shape.curveStep)(series);
 const properties = path.svgPathProperties(line);
 const lineLength = properties.getTotalLength();
 export default class SifirAccountChart extends React.Component {
@@ -139,13 +172,18 @@ export default class SifirAccountChart extends React.Component {
     this.slider.current.setNativeProps({
       left: left - 10,
     });
-    const text = `${Math.ceil(scaleY.invert(y))} SATS`;
+    const anonSetValue = scaleX.invert(x);
+    const cumSumBalanceValue = scaleY.invert(y);
+    const text = `${Math.floor(anonSetValue)}`;
     this.label?.current?.setNativeProps({
       text,
       top,
       left,
     });
-    this.props.handleChartSlider(text);
+    this.props.handleChartSlider({
+      anonset: anonSetValue,
+      value: cumSumBalanceValue,
+    });
   }
 
   componentDidMount() {
