@@ -11,7 +11,7 @@ import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
 import {getWalletDetails} from '@actions/btcwallet';
 import {getLnWalletDetails} from '@actions/lnWallet';
-import {getUnspentCoins} from '@actions/wasabiWallet';
+import {getUnspentCoins, getTxns as wasabiGetTxns} from '@actions/wasabiWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountChart from '@elements/SifirAccountChart';
 import SifirAccountActions from '@elements/SifirAccountActions';
@@ -26,6 +26,7 @@ class SifirAccountScreen extends React.Component {
   state = {
     balance: 0,
     txnData: [],
+    unspentCoins: [],
     isVisibleSettingsModal: false,
     anonset: 0,
   };
@@ -49,61 +50,66 @@ class SifirAccountScreen extends React.Component {
         this.setState({balance: walletBalance, txnData: walletTxnData});
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        this.setState({
-          txnData: {
-            instanceId: null,
-            transactions: [
-              {
-                datetime: '2020-04-23T18:10:36+00:00',
-                height: 1721643,
-                amount: 340000,
-                label: 'mytest',
-                tx:
-                  '220850ec4d8a8daf6ebe9e74f4ab29ffca3392ff03a081c4915a83cb56b9e0e5',
-              },
-              {
-                datetime: '2020-04-23T18:19:15+00:00',
-                height: 1721644,
-                amount: 69,
-                label: '',
-                tx:
-                  'cbef19761d3cb0289219558546b9780daf014b4ccaa514b1899f3078b0e9041c',
-              },
-              {
-                datetime: '2020-04-23T19:34:11+00:00',
-                height: 1721652,
-                amount: 1000000,
-                label: 'unknown',
-                tx:
-                  '555d8c8113a7c279e2187e6d9dbd68d37068dee33107423e4c633861aefd1d4d',
-              },
-              {
-                datetime: '2020-04-23T19:41:43+00:00',
-                height: 1721654,
-                amount: -258,
-                label: 'Test label',
-                tx:
-                  '2774f213412284720b0f91055aa6e7f605dacd60ead2feb2ff61dd47f90a71b7',
-              },
-              {
-                datetime: '2020-04-23T19:41:43+00:00',
-                height: 1721654,
-                amount: -236,
-                label: 'BY hamza',
-                tx:
-                  '2e8b72cbc82b54e2610e3dd8a720257dfab1a42df80c883cb54041519446dfc8',
-              },
-              {
-                datetime: '2020-04-23T19:41:43+00:00',
-                height: 1721654,
-                amount: -267,
-                label: '',
-                tx:
-                  '90cb834af185e3d926e9c91b9ac3f7d6a72bb0a2099d3b8a7e86de9c6020e174',
-              },
-            ],
-          },
-        });
+        let [unspentCoins, wasabiTxns] = await Promise.all([
+          this.props.getUnspentCoins(),
+          this.props.wasabiGetTxns(),
+        ]);
+        this.setState({txnData: {txnData: wasabiTxns, unspentCoins}});
+        //this.setState({
+        //  txnData: {
+        //    instanceId: null,
+        //    transactions: [
+        //      {
+        //        datetime: '2020-04-23T18:10:36+00:00',
+        //        height: 1721643,
+        //        amount: 340000,
+        //        label: 'mytest',
+        //        tx:
+        //          '220850ec4d8a8daf6ebe9e74f4ab29ffca3392ff03a081c4915a83cb56b9e0e5',
+        //      },
+        //      {
+        //        datetime: '2020-04-23T18:19:15+00:00',
+        //        height: 1721644,
+        //        amount: 69,
+        //        label: '',
+        //        tx:
+        //          'cbef19761d3cb0289219558546b9780daf014b4ccaa514b1899f3078b0e9041c',
+        //      },
+        //      {
+        //        datetime: '2020-04-23T19:34:11+00:00',
+        //        height: 1721652,
+        //        amount: 1000000,
+        //        label: 'unknown',
+        //        tx:
+        //          '555d8c8113a7c279e2187e6d9dbd68d37068dee33107423e4c633861aefd1d4d',
+        //      },
+        //      {
+        //        datetime: '2020-04-23T19:41:43+00:00',
+        //        height: 1721654,
+        //        amount: -258,
+        //        label: 'Test label',
+        //        tx:
+        //          '2774f213412284720b0f91055aa6e7f605dacd60ead2feb2ff61dd47f90a71b7',
+        //      },
+        //      {
+        //        datetime: '2020-04-23T19:41:43+00:00',
+        //        height: 1721654,
+        //        amount: -236,
+        //        label: 'BY hamza',
+        //        tx:
+        //          '2e8b72cbc82b54e2610e3dd8a720257dfab1a42df80c883cb54041519446dfc8',
+        //      },
+        //      {
+        //        datetime: '2020-04-23T19:41:43+00:00',
+        //        height: 1721654,
+        //        amount: -267,
+        //        label: '',
+        //        tx:
+        //          '90cb834af185e3d926e9c91b9ac3f7d6a72bb0a2099d3b8a7e86de9c6020e174',
+        //      },
+        //    ],
+        //  },
+        //});
         break;
     }
   }
@@ -171,6 +177,7 @@ class SifirAccountScreen extends React.Component {
       accountHeaderText,
       accountTransactionHeaderText,
       btcUnit,
+      chartData = null,
       settingModalProps = {};
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
@@ -193,6 +200,7 @@ class SifirAccountScreen extends React.Component {
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
+        chartData = this.unspentCoins;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
       default:
@@ -259,8 +267,11 @@ class SifirAccountScreen extends React.Component {
             btcUnit={btcUnit}
             headerText={accountHeaderText}
           />
-          {type === C.STR_WASABI_WALLET_TYPE && (
-            <SifirAccountChart handleChartSlider={this.handleChartSlider()} />
+          {chartData && (
+            <SifirAccountChart
+              chartData={chartData}
+              handleChartSlider={this.handleChartSlider()}
+            />
           )}
 
           <SifirAccountActions
@@ -303,6 +314,7 @@ const mapDispatchToProps = {
   getWalletDetails,
   getLnWalletDetails,
   getUnspentCoins,
+  wasabiGetTxns,
 };
 
 export default connect(

@@ -23,82 +23,9 @@ const height = 60;
 const {width} = Dimensions.get('window');
 const verticalPadding = 5;
 const cursorRadius = 10;
-const unspentCoins = [
-  {
-    txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 42,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9p87a683z759l5tsllpkazlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 42,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9p87a683z759l5tsllpkazlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 30,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-];
-
-const makeChartData = unspentcoins => {
+const makeChartData = chartData => {
   // group balances by anonset
-  const data = unspentCoins.reduce((g, t) => {
+  const data = chartData.reduce((g, t) => {
     g[Math.floor(t.anonymitySet)] =
       (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
     return g;
@@ -139,21 +66,6 @@ const makeChartData = unspentcoins => {
   //return {cumSum, maxX, maxY};
 };
 //FIXME here flipping x,y for slider ?
-const {series, minX, maxX, minY, maxY} = makeChartData(unspentCoins);
-const scaleX = scaleLinear()
-  .domain([0, maxX])
-  .range([0, width - 25]);
-const scaleY = scaleLinear()
-  .domain([minY, maxY])
-  .range([height - verticalPadding, verticalPadding]);
-
-const line = d3.shape
-  .line()
-  .x(([anonset]) => scaleX(Number(anonset)))
-  .y(([, balance]) => scaleY(balance))
-  .curve(d3.shape.curveStep)(series);
-const properties = path.svgPathProperties(line);
-const lineLength = properties.getTotalLength();
 export default class SifirAccountChart extends React.Component {
   cursor = React.createRef();
   slider = React.createRef();
