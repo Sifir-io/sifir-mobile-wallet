@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -96,65 +96,69 @@ const unspentCoins = [
   },
 ];
 
-const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
-// const minAnonset = Math.min(...anonSet);
-const maxAnonset = Math.max(...anonSet);
-const data = unspentCoins.reduce((g, t) => {
-  g[Math.floor(t.anonymitySet)] =
-    (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
-  return g;
-}, {});
-const maxBalance = Math.max(...Object.values(data));
-const scaleX = scaleLinear()
-  .domain([0, maxAnonset])
-  .range([0, width - 25]);
-const scaleY = scaleLinear()
-  .domain([0, maxBalance])
-  .range([height - verticalPadding, verticalPadding]);
+const cursor = React.createRef();
+const slider = React.createRef();
+const label = React.createRef();
+const SV = React.createRef();
+const x = new Animated.Value(0);
 
-const line = d3.shape
-  .line()
-  .x(([anonset]) => scaleX(Number(anonset)))
-  .y(([, balance]) => scaleY(balance))
-  // TODO current data is more of a distrution than culative function
-  // maybe will add cumaltive curve later ?
-  .curve(d3.shape.curveStep)(Object.entries(data));
-const properties = path.svgPathProperties(line);
-const lineLength = properties.getTotalLength();
-export default class SifirAccountChart extends React.Component {
-  cursor = React.createRef();
-  slider = React.createRef();
-  label = React.createRef();
-  SV = React.createRef();
-  x = new Animated.Value(0);
+const SifirAccountChart = props => {
+  const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
+  // const minAnonset = Math.min(...anonSet);
+  const maxAnonset = Math.max(...anonSet);
+  const data = unspentCoins.reduce((g, t) => {
+    g[Math.floor(t.anonymitySet)] =
+      (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
+    return g;
+  }, {});
+  const maxBalance = Math.max(...Object.values(data));
+  const scaleX = scaleLinear()
+    .domain([0, maxAnonset])
+    .range([0, width - 25]);
+  const scaleY = scaleLinear()
+    .domain([0, maxBalance])
+    .range([height - verticalPadding, verticalPadding]);
 
-  moveCursor(value) {
+  const line = d3.shape
+    .line()
+    .x(([anonset]) => scaleX(Number(anonset)))
+    .y(([, balance]) => scaleY(balance))
+    // TODO current data is more of a distrution than culative function
+    // maybe will add cumaltive curve later ?
+    .curve(d3.shape.curveStep)(Object.entries(data));
+  const properties = path.svgPathProperties(line);
+  const lineLength = properties.getTotalLength();
+
+  useEffect(() => {
+    _init();
+  }, []);
+
+  const _init = () => {
+    x.addListener(({value}) => moveCursor(value));
+  };
+
+  const moveCursor = value => {
     let {x, y} = properties.getPointAtLength(lineLength - value);
     let top = y - cursorRadius - 2;
     let left = x - (cursorRadius + 10);
-    this.cursor?.current?.setNativeProps({
+    cursor?.current?.setNativeProps({
       top,
       left,
     });
-    this.slider.current.setNativeProps({
+    slider.current.setNativeProps({
       left: left - 10,
     });
     const text = `${Math.ceil(scaleY.invert(y))} SATS`;
-    this.label?.current?.setNativeProps({
+    label?.current?.setNativeProps({
       text,
       top,
       left,
     });
-    this.props.handleChartSlider(text);
-  }
+    props.handleChartSlider(text);
+  };
 
-  componentDidMount() {
-    this.x.addListener(({value}) => this.moveCursor(value));
-  }
-
-  render() {
-    const {x} = this;
-    return (
+  return (
+    <>
       <View style={styles.container}>
         <Androw style={styles.shadow}>
           <Svg {...{width, height}}>
@@ -169,7 +173,7 @@ export default class SifirAccountChart extends React.Component {
           </Svg>
         </Androw>
         <View style={styles.cursorParent}>
-          <View ref={this.cursor}>
+          <View ref={cursor}>
             <LinearGradient
               colors={['white', 'black', 'black', 'black', 'black']}
               style={styles.verticalGradient}
@@ -181,11 +185,11 @@ export default class SifirAccountChart extends React.Component {
         </View>
         <View style={styles.sliderContainer}>
           <View style={styles.sliderTrack}>
-            <Animated.View ref={this.slider} style={styles.thumb} />
+            <Animated.View ref={slider} style={styles.thumb} />
           </View>
         </View>
         <Animated.View style={[styles.label]}>
-          <TextInput ref={this.label} style={styles.bubbleText} />
+          <TextInput ref={label} style={styles.bubbleText} />
         </Animated.View>
         <Animated.ScrollView
           style={StyleSheet.absoluteFill}
@@ -196,7 +200,7 @@ export default class SifirAccountChart extends React.Component {
           scrollEventThrottle={16}
           bounces={false}
           horizontal
-          ref={this.SV}
+          ref={SV}
           onScroll={Animated.event(
             [
               {
@@ -209,10 +213,16 @@ export default class SifirAccountChart extends React.Component {
           )}
         />
       </View>
-    );
-  }
-}
+      <View style={styles.sliderLabelContainer}>
+        <Text style={styles.sliderLabel}>0</Text>
+        <Text style={styles.sliderLabel}>Anonimity Level</Text>
+        <Text style={styles.sliderLabel}>90</Text>
+      </View>
+    </>
+  );
+};
 
+export default SifirAccountChart;
 const styles = StyleSheet.create({
   root: {
     height,
@@ -280,5 +290,16 @@ const styles = StyleSheet.create({
     height: height,
     position: 'absolute',
     top: height - height * 0.33,
+  },
+  sliderLabel: {
+    color: 'gray',
+  },
+  sliderLabelContainer: {
+    width: '100%',
+    height: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    alignItems: 'center',
   },
 });

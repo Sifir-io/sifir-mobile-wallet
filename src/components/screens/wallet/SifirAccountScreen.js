@@ -182,8 +182,7 @@ class SifirAccountScreen extends React.Component {
         };
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        // FIXME wasabi icon
-        accountIcon = Images.icon_light;
+        accountIcon = Images.icon_wasabi;
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
@@ -311,7 +310,7 @@ const styles = StyleSheet.create({
   },
   mainView: {
     flex: 1,
-    backgroundColor: AppStyle.backgroundColor,
+    backgroundColor: '#091110',
     paddingTop: 10,
   },
   backNavView: {

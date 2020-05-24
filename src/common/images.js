@@ -63,4 +63,5 @@ export default {
   icon_yellowTxn: require('./../assets/images/yellowTxn.png'),
   icon_thickGreenArrowTxn: require('./../assets/images/bold_arrow.png'),
   filter_icon: require('./../assets/images/filter.png'),
+  icon_wasabi: require('./../assets/images/wasabiLogo.png'),
 };
