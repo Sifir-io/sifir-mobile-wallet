@@ -1,9 +1,9 @@
 import * as types from '@types/';
 import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
-import _wasabi from '@io/wasabiClient';
+import {wasabiClient as _wasabi} from '@io/wasabiClient';
 import {C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
-import {log, error} from '@io/events/';
+import {log, error} from '@io/events';
 let wasabiClient;
 
 const initWasabiClient = () => async (dispatch, getState) => {
@@ -66,7 +66,7 @@ const spend = ({
     if (isNaN(amount)) {
       throw C.STR_AMOUNT_BENUMBER;
     }
-    const btcSendResult = await wasabiClient.spend({
+    const spendResult = await wasabiClient.spend({
       address,
       amount,
       instanceId,
@@ -76,7 +76,7 @@ const spend = ({
     dispatch({
       type: types.WASABI_WALLET_SPEND + FULFILLED,
     });
-    return btcSendResult;
+    return spendResult;
   } catch (err) {
     error(err);
     dispatch({
@@ -85,7 +85,7 @@ const spend = ({
     });
   }
 };
-const getUnspentCoins = ({instanceId = 0}) => async dispatch => {
+const getUnspentCoins = ({instanceId = 0} = {}) => async dispatch => {
   dispatch({type: types.WASABI_WALLET_GET_UNSPENTCOINS + PENDING});
   try {
     await dispatch(initWasabiClient());
@@ -105,7 +105,7 @@ const getUnspentCoins = ({instanceId = 0}) => async dispatch => {
   }
 };
 
-const getTxns = ({instanceId = 0}) => async dispatch => {
+const getTxns = ({instanceId = 0} = {}) => async dispatch => {
   dispatch({type: types.WASABI_WALLET_GET_TXNS + PENDING});
   try {
     await dispatch(initWasabiClient());

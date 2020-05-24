@@ -1,1 +1,1 @@
-export lnClient from './clientFactory';
+export wasabiClient from './clientFactory';

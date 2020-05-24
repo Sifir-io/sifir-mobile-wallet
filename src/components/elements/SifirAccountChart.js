@@ -1,5 +1,5 @@
 // @flow
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -18,11 +18,6 @@ import Androw from 'react-native-androw';
 const d3 = {
   shape,
 };
-
-const height = 60;
-const {width} = Dimensions.get('window');
-const verticalPadding = 5;
-const cursorRadius = 10;
 const unspentCoins = [
   {
     txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
@@ -96,6 +91,10 @@ const unspentCoins = [
   },
 ];
 
+const height = 60;
+const {width} = Dimensions.get('window');
+const verticalPadding = 5;
+const cursorRadius = 10;
 const cursor = React.createRef();
 const slider = React.createRef();
 const label = React.createRef();
@@ -103,32 +102,6 @@ const SV = React.createRef();
 const x = new Animated.Value(0);
 
 const SifirAccountChart = props => {
-  const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
-  // const minAnonset = Math.min(...anonSet);
-  const maxAnonset = Math.max(...anonSet);
-  const data = unspentCoins.reduce((g, t) => {
-    g[Math.floor(t.anonymitySet)] =
-      (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
-    return g;
-  }, {});
-  const maxBalance = Math.max(...Object.values(data));
-  const scaleX = scaleLinear()
-    .domain([0, maxAnonset])
-    .range([0, width - 25]);
-  const scaleY = scaleLinear()
-    .domain([0, maxBalance])
-    .range([height - verticalPadding, verticalPadding]);
-
-  const line = d3.shape
-    .line()
-    .x(([anonset]) => scaleX(Number(anonset)))
-    .y(([, balance]) => scaleY(balance))
-    // TODO current data is more of a distrution than culative function
-    // maybe will add cumaltive curve later ?
-    .curve(d3.shape.curveStep)(Object.entries(data));
-  const properties = path.svgPathProperties(line);
-  const lineLength = properties.getTotalLength();
-
   useEffect(() => {
     _init();
   }, []);
@@ -136,6 +109,65 @@ const SifirAccountChart = props => {
   const _init = () => {
     x.addListener(({value}) => moveCursor(value));
   };
+
+  const makeChartData = unspentcoins => {
+    // group balances by anonset
+    const data = unspentCoins.reduce((g, t) => {
+      g[Math.floor(t.anonymitySet)] =
+        (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
+      return g;
+    }, {});
+    // -- series
+    // Sort by anon set descending
+    const sortedAnonsetTotalPairs = Object.entries(data).sort(
+      ([anonset1], [anonset2]) => anonset1 - anonset2,
+    );
+    const chartStats = sortedAnonsetTotalPairs.reduce(
+      (stats, [anonset, total], i) => {
+        // data sorted descending, so anything after current index is a balance avalible below that anon set
+        const cumTotal = sortedAnonsetTotalPairs
+          .slice(i)
+          .reduce((totalToIndex, [, t1]) => totalToIndex + t1, 0);
+        stats.series.push([Number(anonset), cumTotal]);
+        stats.maxY =
+          cumTotal > stats.maxY || stats.maxY === null ? cumTotal : stats.maxY;
+        stats.maxX =
+          anonset > stats.maxX || stats.maxX === null ? anonset : stats.maxX;
+        stats.minY =
+          cumTotal < stats.minY || stats.minY === null ? cumTotal : stats.minY;
+        stats.minX =
+          anonset < stats.minX || stats.minX === null ? anonset : stats.minX;
+        return stats;
+      },
+      {series: [], minX: null, maxX: null, minY: null, maxY: null},
+    );
+    console.log(chartStats);
+    return chartStats;
+    // calculate max y axis value
+    //const [[, maxY]] = cumSum[0];
+    //// const maxY = Math.max(...Object.values(data));
+    ////
+    //// calculate max x-axis value
+    //const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
+    //const maxX = Math.max(...anonSet);
+    //return {cumSum, maxX, maxY};
+  };
+  //FIXME here flipping x,y for slider ?
+  const {series, minX, maxX, minY, maxY} = makeChartData(unspentCoins);
+  const scaleX = scaleLinear()
+    .domain([0, maxX])
+    .range([0, width - 25]);
+  const scaleY = scaleLinear()
+    .domain([minY, maxY])
+    .range([height - verticalPadding, verticalPadding]);
+
+  const line = d3.shape
+    .line()
+    .x(([anonset]) => scaleX(Number(anonset)))
+    .y(([, balance]) => scaleY(balance))
+    .curve(d3.shape.curveStep)(series);
+  const properties = path.svgPathProperties(line);
+  const lineLength = properties.getTotalLength();
 
   const moveCursor = value => {
     let {x, y} = properties.getPointAtLength(lineLength - value);
@@ -148,13 +180,18 @@ const SifirAccountChart = props => {
     slider.current.setNativeProps({
       left: left - 10,
     });
-    const text = `${Math.ceil(scaleY.invert(y))} SATS`;
+    const anonSetValue = scaleX.invert(x);
+    const cumSumBalanceValue = scaleY.invert(y);
+    const text = `${Math.floor(anonSetValue)}`;
     label?.current?.setNativeProps({
       text,
       top,
       left,
     });
-    props.handleChartSlider(text);
+    props.handleChartSlider({
+      anonset: anonSetValue,
+      value: cumSumBalanceValue,
+    });
   };
 
   return (
@@ -223,6 +260,7 @@ const SifirAccountChart = props => {
 };
 
 export default SifirAccountChart;
+
 const styles = StyleSheet.create({
   root: {
     height,
@@ -290,16 +328,5 @@ const styles = StyleSheet.create({
     height: height,
     position: 'absolute',
     top: height - height * 0.33,
-  },
-  sliderLabel: {
-    color: 'gray',
-  },
-  sliderLabelContainer: {
-    width: '100%',
-    height: 30,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    alignItems: 'center',
   },
 });
