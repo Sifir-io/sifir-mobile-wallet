@@ -1,5 +1,5 @@
 // @flow
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -109,10 +109,9 @@ const SifirAccountChart = props => {
   const _init = () => {
     x.addListener(({value}) => moveCursor(value));
   };
-
-  const makeChartData = unspentcoins => {
+  const makeChartData = chartData => {
     // group balances by anonset
-    const data = unspentCoins.reduce((g, t) => {
+    const data = chartData.reduce((g, t) => {
       g[Math.floor(t.anonymitySet)] =
         (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
       return g;
@@ -328,5 +327,16 @@ const styles = StyleSheet.create({
     height: height,
     position: 'absolute',
     top: height - height * 0.33,
+  },
+  sliderLabel: {
+    color: 'gray',
+  },
+  sliderLabelContainer: {
+    width: '100%',
+    height: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    alignItems: 'center',
   },
 });
