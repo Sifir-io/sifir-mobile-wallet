@@ -18,78 +18,6 @@ import Androw from 'react-native-androw';
 const d3 = {
   shape,
 };
-const unspentCoins = [
-  {
-    txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 42,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9p87a683z759l5tsllpkazlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 42,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9p87a683z759l5tsllpkazlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 30,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-  {
-    txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-    index: 1,
-    amount: 10872,
-    anonymitySet: 3,
-    confirmed: true,
-    label: '',
-    keyPath: "84'/0'/0'/1/13420",
-    address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-  },
-];
 
 const height = 60;
 const {width} = Dimensions.get('window');
@@ -102,13 +30,11 @@ const SV = React.createRef();
 const x = new Animated.Value(0);
 
 const SifirAccountChart = props => {
+  const {unspentcoins} = props.chartData;
   useEffect(() => {
     _init();
   }, []);
 
-  const _init = () => {
-    x.addListener(({value}) => moveCursor(value));
-  };
   const makeChartData = chartData => {
     // group balances by anonset
     const data = chartData.reduce((g, t) => {
@@ -138,9 +64,8 @@ const SifirAccountChart = props => {
           anonset < stats.minX || stats.minX === null ? anonset : stats.minX;
         return stats;
       },
-      {series: [], minX: null, maxX: null, minY: null, maxY: null},
+      {series: [[1, 0]], minX: null, maxX: null, minY: null, maxY: null},
     );
-    console.log(chartStats);
     return chartStats;
     // calculate max y axis value
     //const [[, maxY]] = cumSum[0];
@@ -152,10 +77,10 @@ const SifirAccountChart = props => {
     //return {cumSum, maxX, maxY};
   };
   //FIXME here flipping x,y for slider ?
-  const {series, minX, maxX, minY, maxY} = makeChartData(unspentCoins);
+  const {series, minX, maxX, minY, maxY} = makeChartData(unspentcoins);
   const scaleX = scaleLinear()
-    .domain([0, maxX])
-    .range([0, width - 25]);
+    .domain([1, maxX])
+    .range([20, width - 20]);
   const scaleY = scaleLinear()
     .domain([minY, maxY])
     .range([height - verticalPadding, verticalPadding]);
@@ -167,6 +92,20 @@ const SifirAccountChart = props => {
     .curve(d3.shape.curveStep)(series);
   const properties = path.svgPathProperties(line);
   const lineLength = properties.getTotalLength();
+
+  const _init = () => {
+    x.addListener(({value}) => moveCursor(value));
+    let {x: X, y} = properties.getPointAtLength(lineLength);
+    let top = y - cursorRadius - 2;
+    let left = X - (cursorRadius + 10);
+    cursor?.current?.setNativeProps({
+      top,
+      left,
+    });
+    slider.current.setNativeProps({
+      left: left - 10,
+    });
+  };
 
   const moveCursor = value => {
     let {x, y} = properties.getPointAtLength(lineLength - value);
@@ -196,18 +135,19 @@ const SifirAccountChart = props => {
   return (
     <>
       <View style={styles.container}>
-        <Androw style={styles.shadow}>
-          <Svg {...{width, height}}>
-            <Path
-              d={line}
-              fill="transparent"
-              stroke="#00EDE7"
-              strokeWidth={5}
-            />
-
-            <Path d={`${line} L ${width} ${height} L 0 ${height}`} />
-          </Svg>
-        </Androw>
+        <View style={styles.chartContainer}>
+          <Androw style={styles.shadow}>
+            <Svg {...{width: width, height}}>
+              <Path
+                d={line}
+                fill="transparent"
+                stroke="#00EDE7"
+                strokeWidth={5}
+              />
+              <Path d={`${line} L ${width} ${height} L 0 ${height}`} />
+            </Svg>
+          </Androw>
+        </View>
         <View style={styles.cursorParent}>
           <View ref={cursor}>
             <LinearGradient
@@ -230,7 +170,7 @@ const SifirAccountChart = props => {
         <Animated.ScrollView
           style={StyleSheet.absoluteFill}
           contentContainerStyle={{
-            width: lineLength * 2,
+            width: lineLength * 2 + 50,
           }}
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
@@ -250,9 +190,9 @@ const SifirAccountChart = props => {
         />
       </View>
       <View style={styles.sliderLabelContainer}>
-        <Text style={styles.sliderLabel}>0</Text>
+        <Text style={styles.sliderLabel}>1</Text>
         <Text style={styles.sliderLabel}>Anonimity Level</Text>
-        <Text style={styles.sliderLabel}>90</Text>
+        <Text style={styles.sliderLabel}>{maxX}</Text>
       </View>
     </>
   );
@@ -337,6 +277,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  chartContainer: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
 });
