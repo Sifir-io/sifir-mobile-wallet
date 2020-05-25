@@ -122,7 +122,7 @@ const SifirAccountChart = props => {
     // const cumSumBalanceValue = scaleY.invert(y);
     // find first anonset pair in acending array where value < array
     const [, cumSumBalanceValue] = series.find(
-      ([anonset], i) => anonSetValue <= anonset,
+      ([anonset]) => anonSetValue <= anonset,
     );
     const text = `${Math.floor(anonSetValue)}`;
     label?.current?.setNativeProps({
