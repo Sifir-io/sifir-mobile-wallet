@@ -64,7 +64,7 @@ const SifirAccountChart = props => {
           anonset < stats.minX || stats.minX === null ? anonset : stats.minX;
         return stats;
       },
-      {series: [[1, 0]], minX: null, maxX: null, minY: null, maxY: null},
+      {series: [], minX: null, maxX: null, minY: null, maxY: null},
     );
     return chartStats;
     // calculate max y axis value
@@ -89,7 +89,7 @@ const SifirAccountChart = props => {
     .line()
     .x(([anonset]) => scaleX(Number(anonset)))
     .y(([, balance]) => scaleY(balance))
-    .curve(d3.shape.curveStep)(series);
+    .curve(d3.shape.curveStepBefore)(series);
   const properties = path.svgPathProperties(line);
   const lineLength = properties.getTotalLength();
 
