@@ -143,7 +143,7 @@ class SifirAccountScreen extends React.Component {
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
-        chartData = txnData?.unspentCoins;
+        chartData = txnData?.unspentCoins?.length > 1 && txnData?.unspentCoins;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
       default:
