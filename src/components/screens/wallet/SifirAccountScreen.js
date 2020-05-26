@@ -231,6 +231,7 @@ class SifirAccountScreen extends React.Component {
               type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
             }
           />
+          <View style={styles.margin} />
           <SifirAccountHistory
             loading={isLoading}
             loaded={isLoaded}
@@ -266,7 +267,12 @@ export default connect(
 )(SifirAccountScreen);
 
 const styles = StyleSheet.create({
-  navBtn: {flex: 0.7},
+  navBtn: {
+    marginBottom: 10,
+  },
+  margin: {
+    marginTop: 10,
+  },
   SVcontainer: {
     backgroundColor: AppStyle.backgroundColor,
     flexGrow: 1,

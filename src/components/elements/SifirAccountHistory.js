@@ -54,7 +54,7 @@ const SifirAccountHistory = ({
   }, [txnData]);
 
   const filterWasabiTxnData = filter => {
-    if (type === C.STR_WASABI_WALLET_TYPE) {
+    if (type === C.STR_WASABI_WALLET_TYPE && txnData?.transactions?.length) {
       const tempTxnData = {...txnData};
       if (filter === 'received') {
         const receivedTxns = tempTxnData.transactions.filter(txn => {
@@ -184,7 +184,9 @@ const SifirAccountHistory = ({
 };
 
 const styles = StyleSheet.create({
-  container: {height: C.SCREEN_HEIGHT * 0.3, bottom: -25},
+  container: {
+    height: C.SCREEN_HEIGHT * 0.3,
+  },
   settingIcon: {width: 20, height: 20, marginLeft: 20, marginTop: 7},
   spinner: {alignSelf: 'center'},
   headerContainer: {
