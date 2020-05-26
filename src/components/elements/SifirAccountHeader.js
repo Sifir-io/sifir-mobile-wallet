@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,9 @@ const SifirAccountHeader = ({
   accountIconOnPress,
   accountIcon,
 }) => {
+  const [balanceViewDimensions, setDimensions] = useState({});
+  const {width} = balanceViewDimensions;
+  const balanceTxtFontSize = width / 5 || 25;
   return (
     <View style={styles.headerView}>
       <TouchableOpacity onPress={accountIconOnPress}>
@@ -52,14 +55,20 @@ const SifirAccountHeader = ({
       <View
         height={BTN_WIDTH - 30}
         width={BTN_WIDTH - 30}
+        onLayout={event => {
+          const {width, height} = event.nativeEvent.layout;
+          setDimensions({width, height});
+        }}
         style={styles.balanceView}>
         {loading === true && (
           <ActivityIndicator size="large" color={AppStyle.mainColor} />
         )}
         {loaded === true && loading === false && (
           <>
-            <View style={{flexDirection: 'row'}}>
-              <Text style={styles.balAmountTxt}>
+            <View>
+              <Text
+                textBreakStrategy="simple"
+                style={[styles.balAmountTxt, {fontSize: balanceTxtFontSize}]}>
                 <SifirBTCAmount amount={balance} unit={btcUnit} />
               </Text>
             </View>
@@ -103,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 5,
     flexDirection: 'column-reverse',
     marginLeft: 25,
-    paddingBottom: 15,
+    justifyContent: 'center',
   },
   balAmountTxt: {
     color: 'white',
