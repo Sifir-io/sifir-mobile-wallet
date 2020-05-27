@@ -30,7 +30,8 @@ const getNewAddress = ({label}) => async dispatch => {
   dispatch({type: types.WASABI_WALLET_ADDRESS + PENDING});
   try {
     await dispatch(initWasabiClient());
-    const address = await wasabiClient.getNewAddress({label});
+    const address = await wasabiClient.getNewAddress(label);
+    console.log('wasabi', address);
     // TODO store address
     dispatch({
       type: types.WASABI_WALLET_ADDRESS + FULFILLED,

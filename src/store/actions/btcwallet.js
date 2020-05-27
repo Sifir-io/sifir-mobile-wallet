@@ -69,6 +69,9 @@ const getBtcWalletList = () => async dispatch => {
         iconURL: Images.icon_btcBtn,
         iconClickedURL: Images.icon_btcBtn_clicked,
         pageURL: 'Account',
+        meta: {
+          enableAddressTypeSelection: false,
+        },
       }),
     );
 
@@ -80,6 +83,10 @@ const getBtcWalletList = () => async dispatch => {
       iconURL: Images.icon_btcBtn,
       iconClickedURL: Images.icon_btcBtn_clicked,
       pageURL: 'Account',
+      meta: {
+        enableAddressTypeSelection: true,
+        showAddressTypeSelector: true,
+      },
     });
 
     btcWalletList.push({
@@ -89,6 +96,9 @@ const getBtcWalletList = () => async dispatch => {
       iconURL: Images.icon_btcBtn,
       iconClickedURL: Images.icon_btcBtn_clicked,
       pageURL: 'Account',
+      meta: {
+        enableLabelInput: true,
+      },
     });
 
     dispatch({
@@ -147,7 +157,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
 const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
   dispatch({type: types.BTC_WALLET_ADDRESS + PENDING});
   let address = null;
-
   try {
     await dispatch(initBtcClient());
     switch (type) {
@@ -165,6 +174,7 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
       type: types.BTC_WALLET_ADDRESS + FULFILLED,
       payload: {address},
     });
+    return address;
   } catch (err) {
     error(err);
     dispatch({
