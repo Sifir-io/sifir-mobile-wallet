@@ -64,4 +64,5 @@ export default {
   icon_thickGreenArrowTxn: require('./../assets/images/bold_arrow.png'),
   filter_icon: require('./../assets/images/filter.png'),
   icon_wasabi: require('./../assets/images/wasabiLogo.png'),
+  icon_wasabi_clicked: require('./../assets/images/wasabiLogo1.png'),
 };
