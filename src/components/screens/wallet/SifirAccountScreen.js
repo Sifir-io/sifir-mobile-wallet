@@ -49,11 +49,8 @@ class SifirAccountScreen extends React.Component {
         this.setState({balance: walletBalance, txnData: walletTxnData});
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        let [unspentCoins, wasabiTxns] = await Promise.all([
-          this.props.getUnspentCoins(),
-          // this.props.wasabiGetTxns(), // Commenting because it's throwing timeout exception
-        ]);
-        this.setState({txnData: {txnData: wasabiTxns, unspentCoins}});
+        const {unspentcoins: unspentCoins} = await this.props.getUnspentCoins();
+        this.setState({txnData: {unspentCoins}});
         break;
     }
   }
@@ -143,7 +140,8 @@ class SifirAccountScreen extends React.Component {
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
-        chartData = txnData?.unspentCoins?.length > 1 && txnData?.unspentCoins;
+        console.log('eeeeeeeee', txnData?.unspentCoins);
+        chartData = txnData?.unspentCoins;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
       default:
@@ -210,7 +208,7 @@ class SifirAccountScreen extends React.Component {
             btcUnit={btcUnit}
             headerText={accountHeaderText}
           />
-          {chartData && (
+          {!!chartData && (
             <SifirAccountChart
               chartData={chartData}
               handleChartSlider={this.handleChartSlider()}

@@ -30,7 +30,7 @@ const SV = React.createRef();
 const x = new Animated.Value(0);
 
 const SifirAccountChart = props => {
-  const {unspentcoins} = props.chartData;
+  const plotData = props.chartData;
   useEffect(() => {
     _init();
   }, []);
@@ -67,17 +67,8 @@ const SifirAccountChart = props => {
       {series: [], minX: null, maxX: null, minY: null, maxY: null},
     );
     return chartStats;
-    // calculate max y axis value
-    //const [[, maxY]] = cumSum[0];
-    //// const maxY = Math.max(...Object.values(data));
-    ////
-    //// calculate max x-axis value
-    //const anonSet = unspentCoins.map(({anonymitySet}) => anonymitySet);
-    //const maxX = Math.max(...anonSet);
-    //return {cumSum, maxX, maxY};
   };
-  //FIXME here flipping x,y for slider ?
-  const {series, minX, maxX, minY, maxY} = makeChartData(unspentcoins);
+  const {series, minX, maxX, minY, maxY} = makeChartData(plotData);
   const scaleX = scaleLinear()
     .domain([1, maxX])
     .range([20, width - 20]);

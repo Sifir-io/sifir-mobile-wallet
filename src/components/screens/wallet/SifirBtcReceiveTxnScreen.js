@@ -30,7 +30,7 @@ const SifirBtcReceiveTxnScreen = props => {
   ];
   // const [getBtnStatus, setBtnStatus] = useState(0);
   const [enableLabelInput, setEnableLabelInput] = useState(
-    cfg?.enableLabelInput || false,
+    cfg?.enableAddressLabelInput || false,
   );
   const [enableAddressTypeSelection, setEnableAddressTypeSelection] = useState(
     cfg?.enableAddressTypeSelection || false,
@@ -463,6 +463,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: AppStyle.mainColor,
     borderWidth: 2,
+  },
+  inputTxtStyle: {
+    flex: 1,
+    marginLeft: 10,
+    color: 'white',
+    textAlign: 'left',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
   },
   selectBtnView: {
     flexDirection: 'row',

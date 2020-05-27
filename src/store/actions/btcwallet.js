@@ -93,11 +93,11 @@ const getBtcWalletList = () => async dispatch => {
       label: 'Wasabi',
       desc: C.STR_WALLET,
       type: C.STR_WASABI_WALLET_TYPE,
-      iconURL: Images.icon_btcBtn,
-      iconClickedURL: Images.icon_btcBtn_clicked,
+      iconURL: Images.icon_wasabi,
+      iconClickedURL: Images.icon_wasabi_clicked,
       pageURL: 'Account',
       meta: {
-        enableLabelInput: true,
+        enableAddressLabelInput: true,
       },
     });
 
