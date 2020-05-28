@@ -22,7 +22,6 @@ import {log} from '@io/events/';
 import {ErrorScreen} from '@screens/error';
 const SifirBtcReceiveTxnScreen = props => {
   const {label, type, meta: cfg} = props.route.params.walletInfo;
-  let qrCode = '';
   const spendingAddressTypes = [
     {title: C.STR_LEGACY, value: 'legacy'},
     {title: C.STR_Segwit_Compatible, value: 'p2sh-segwit'},
@@ -51,6 +50,7 @@ const SifirBtcReceiveTxnScreen = props => {
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const [qrCodeURI, setQrCodeURI] = useState(null);
   useEffect(() => {
     loadWalletAddress();
   }, [labelInputDone, addrType]);
@@ -61,14 +61,15 @@ const SifirBtcReceiveTxnScreen = props => {
   };
 
   const onShare = (sharedAddress, isQRCode) => {
+    console.log('onsahre called', sharedAddress, isQRCode, qrCodeURI);
     setShowShareSelector(false);
-    if (qrCode) {
+    if (qrCodeURI) {
       let shareOptions;
       if (isQRCode) {
         shareOptions = {
-          type: 'image/jpg',
+          type: 'image/png',
           title: C.STR_ADDR_QR_SHARE,
-          url: qrCode,
+          url: qrCodeURI,
         };
       } else {
         shareOptions = {
@@ -238,9 +239,7 @@ const SifirBtcReceiveTxnScreen = props => {
         <>
           <View style={styles.qrCodeView}>
             <SifirQRCode
-              getBase64={base64 => {
-                qrCode = base64;
-              }}
+              setQrCodeURI={setQrCodeURI}
               value={address}
               size={C.SCREEN_HEIGHT * 0.25}
               bgColor="#FFFFFF"

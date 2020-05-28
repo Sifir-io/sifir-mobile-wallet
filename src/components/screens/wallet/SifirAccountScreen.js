@@ -97,6 +97,7 @@ class SifirAccountScreen extends React.Component {
         this.setState({anonset: Math.floor(anonset), balance: value}),
       3,
     );
+  // FIXME change this component to function and move all this crap out render
   render() {
     const {balance, txnData, anonset} = this.state;
     const {navigate} = this.props.navigation;
@@ -112,7 +113,6 @@ class SifirAccountScreen extends React.Component {
     const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
     const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
     const {toggleSettingsModal} = this;
-    // FIXME here or start seperateing comopnents ?
     let accountIcon,
       accountIconOnPress,
       accountHeaderText,
@@ -140,7 +140,6 @@ class SifirAccountScreen extends React.Component {
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
-        console.log('eeeeeeeee', txnData?.unspentCoins);
         chartData = txnData?.unspentCoins;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;
