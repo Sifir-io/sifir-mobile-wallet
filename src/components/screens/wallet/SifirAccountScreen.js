@@ -15,7 +15,7 @@ import {getUnspentCoins, getTxns as wasabiGetTxns} from '@actions/wasabiWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountChart from '@elements/SifirAccountChart';
 import SifirAccountActions from '@elements/SifirAccountActions';
-import SifirAccountHistory from '@elements/SifirAccountHistory';
+import SifirAccountHistory, {sheetHeight} from '@elements/SifirAccountHistory';
 import SifirSettingModal from '@elements/SifirSettingModal';
 import {ErrorScreen} from '@screens/error';
 import debounce from '../../../helpers/debounce';
@@ -28,6 +28,8 @@ class SifirAccountScreen extends React.Component {
     txnData: [],
     isVisibleSettingsModal: false,
     anonset: 0,
+    bottomExtraSpace: sheetHeight,
+    showAccountHistory: false,
   };
   stopLoading = null;
 
@@ -97,9 +99,15 @@ class SifirAccountScreen extends React.Component {
         this.setState({anonset: Math.floor(anonset), balance: value}),
       3,
     );
-  // FIXME change this component to function and move all this crap out render
+  onExtraSpaceLayout = event => {
+    // Toggle SifirAccountHistory visibility to force reRender it to reposition at the bottom.
+    this.setState({showAccountHistory: false});
+    const {height} = event.nativeEvent.layout;
+    this.setState({bottomExtraSpace: height, showAccountHistory: true});
+  };
+
   render() {
-    const {balance, txnData, anonset} = this.state;
+    const {balance, txnData, anonset, bottomExtraSpace} = this.state;
     const {navigate} = this.props.navigation;
     const {walletInfo} = this.props.route.params;
     const {label, type} = walletInfo;
@@ -172,63 +180,73 @@ class SifirAccountScreen extends React.Component {
     }
     return (
       <ScrollView contentContainerStyle={styles.SVcontainer}>
-        <View style={styles.mainView}>
-          <View style={styles.navBtn}>
-            <TouchableOpacity>
-              <View
-                style={styles.backNavView}
-                onTouchEnd={() => navigate('AccountList')}>
-                <Image source={Images.icon_back} style={styles.backImg} />
-                <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          {this.state.isVisibleSettingsModal && (
-            <View
-              style={styles.settingMenuContainer}
-              onTouchEnd={() => {
-                toggleSettingsModal.bind(this);
-              }}>
-              <SifirSettingModal
-                hideModal={toggleSettingsModal.bind(this)}
-                {...settingModalProps}
-                walletInfo={{...walletInfo, balance}}
-              />
+        <View
+          style={[
+            styles.mainView,
+            // eslint-disable-next-line react-native/no-inline-styles
+            {
+              paddingBottom: bottomExtraSpace < 100 ? sheetHeight / 1.9 : 0,
+            },
+          ]}>
+          <View>
+            <View style={styles.navBtn}>
+              <TouchableOpacity>
+                <View
+                  style={styles.backNavView}
+                  onTouchEnd={() => navigate('AccountList')}>
+                  <Image source={Images.icon_back} style={styles.backImg} />
+                  <Text style={styles.backNavTxt}>{C.STR_My_Wallets}</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          )}
-          <SifirAccountHeader
-            accountIcon={accountIcon}
-            accountIconOnPress={accountIconOnPress}
-            loading={isLoading}
-            loaded={isLoaded}
-            type={type}
-            label={label}
-            balance={balance}
-            btcUnit={btcUnit}
-            headerText={accountHeaderText}
-          />
-          {!!chartData && (
-            <SifirAccountChart
-              chartData={chartData}
-              handleChartSlider={this.handleChartSlider()}
+            {this.state.isVisibleSettingsModal && (
+              <View
+                style={styles.settingMenuContainer}
+                onTouchEnd={() => {
+                  toggleSettingsModal.bind(this);
+                }}>
+                <SifirSettingModal
+                  hideModal={toggleSettingsModal.bind(this)}
+                  {...settingModalProps}
+                  walletInfo={{...walletInfo, balance}}
+                />
+              </View>
+            )}
+            <SifirAccountHeader
+              accountIcon={accountIcon}
+              accountIconOnPress={accountIconOnPress}
+              loading={isLoading}
+              loaded={isLoaded}
+              type={type}
+              label={label}
+              balance={balance}
+              btcUnit={btcUnit}
+              headerText={accountHeaderText}
             />
-          )}
-
-          <SifirAccountActions
-            navigate={navigate}
-            type={type}
-            label={label}
-            walletInfo={walletInfo}
-            handleReceiveButton={
-              // TODO update this when invoices done
-              type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
-            }
-            handleSendBtn={
-              // For now only watching wallets cant send
-              type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
-            }
-          />
-          <View style={styles.margin} />
+            {!!chartData && (
+              <SifirAccountChart
+                chartData={chartData}
+                handleChartSlider={this.handleChartSlider()}
+              />
+            )}
+            <SifirAccountActions
+              navigate={navigate}
+              type={type}
+              label={label}
+              walletInfo={walletInfo}
+              handleReceiveButton={
+                // TODO update this when invoices done
+                type === C.STR_LN_WALLET_TYPE ? null : this.handleReceiveButton
+              }
+              handleSendBtn={
+                // For now only watching wallets cant send
+                type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
+              }
+            />
+          </View>
+          <View style={styles.extraSpace} onLayout={this.onExtraSpaceLayout} />
+        </View>
+        {this.state.showAccountHistory && (
           <SifirAccountHistory
             loading={isLoading}
             loaded={isLoaded}
@@ -236,8 +254,9 @@ class SifirAccountScreen extends React.Component {
             txnData={txnData}
             btcUnit={btcUnit}
             headerText={accountTransactionHeaderText}
+            bottomExtraSpace={bottomExtraSpace}
           />
-        </View>
+        )}
       </ScrollView>
     );
   }
@@ -267,8 +286,8 @@ const styles = StyleSheet.create({
   navBtn: {
     marginBottom: 10,
   },
-  margin: {
-    marginTop: 10,
+  extraSpace: {
+    flexGrow: 1,
   },
   SVcontainer: {
     backgroundColor: AppStyle.backgroundColor,
@@ -278,6 +297,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#091110',
     paddingTop: 10,
+    justifyContent: 'space-between',
   },
   backNavView: {
     display: 'flex',

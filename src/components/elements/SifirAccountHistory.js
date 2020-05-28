@@ -8,9 +8,11 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {ScrollView} from 'react-native-gesture-handler';
 
+export const sheetHeight = C.SCREEN_HEIGHT - 150;
 const BTN_WIDTH = C.SCREEN_WIDTH / 2;
-const sheetHeight = C.SCREEN_HEIGHT - 150;
+const initialSnap = C.SCREEN_HEIGHT * 0.35;
 const initialLayout = {width: C.SCREEN_WIDTH};
+
 const renderTabBar = props => (
   <TabBar
     {...props}
@@ -41,6 +43,7 @@ const SifirAccountHistory = ({
   btcUnit,
   type,
   headerText,
+  bottomExtraSpace,
 }) => {
   const [index, setIndex] = useState(0);
   const [filteredTxns, setFilteredTxns] = useState(txnData);
@@ -142,51 +145,49 @@ const SifirAccountHistory = ({
     [filteredTxns],
   );
   return (
-    <View style={styles.container}>
-      <BottomSheet
-        snapPoints={[sheetHeight, C.SCREEN_HEIGHT * 0.3]}
-        initialSnap={1}
-        enabledInnerScrolling={true}
-        enabledGestureInteraction={true}
-        renderHeader={() => (
-          <View style={styles.headerContainer}>
-            {!loading && (
-              <Image source={Images.upArrow} style={styles.settingIcon} />
-            )}
-            {loading && (
-              <ActivityIndicator
-                style={styles.spinner}
-                color={AppStyle.mainColor}
-              />
-            )}
-          </View>
-        )}
-        renderContent={() => (
-          <View
-            style={{
-              height: sheetHeight - 40,
-              backgroundColor: AppStyle.mainColor,
-            }}>
-            <TabView
-              navigationState={{index, routes}}
-              renderScene={renderScene}
-              onIndexChange={setIndex}
-              initialLayout={initialLayout}
-              renderTabBar={renderTabBar}
-              lazy={false}
-              sceneContainerStyle={styles.sceneContainer}
+    <BottomSheet
+      snapPoints={[
+        sheetHeight,
+        bottomExtraSpace > 100 ? bottomExtraSpace - 20 : initialSnap,
+      ]}
+      initialSnap={1}
+      enabledInnerScrolling={true}
+      enabledGestureInteraction={true}
+      renderHeader={() => (
+        <View style={styles.headerContainer}>
+          {!loading && (
+            <Image source={Images.upArrow} style={styles.settingIcon} />
+          )}
+          {loading && (
+            <ActivityIndicator
+              style={styles.spinner}
+              color={AppStyle.mainColor}
             />
-          </View>
-        )}
-      />
-    </View>
+          )}
+        </View>
+      )}
+      renderContent={() => (
+        <View
+          style={{
+            height: sheetHeight,
+            backgroundColor: AppStyle.mainColor,
+          }}>
+          <TabView
+            navigationState={{index, routes}}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={initialLayout}
+            renderTabBar={renderTabBar}
+            lazy={false}
+            sceneContainerStyle={styles.sceneContainer}
+          />
+        </View>
+      )}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    height: C.SCREEN_HEIGHT * 0.3,
-  },
   settingIcon: {width: 20, height: 20, marginLeft: 20, marginTop: 7},
   spinner: {alignSelf: 'center'},
   headerContainer: {
