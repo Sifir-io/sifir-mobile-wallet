@@ -105,12 +105,10 @@ const SifirBtcReceiveTxnScreen = props => {
     }
     // FIXME add gesture to swipe left to load new
     if (!!address?.length && !loadNew) {
-      console.log('already have one', address, typeof address);
       return;
     }
     let walletAddress;
     setLoading(true);
-    console.log('----------', addrType, label, type, hasAllReqs);
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
         walletAddress = await props.getNewLnAddress();
@@ -128,7 +126,6 @@ const SifirBtcReceiveTxnScreen = props => {
         });
         break;
     }
-    console.log('----------', walletAddress, addrType, label, type);
     if (walletAddress?.length) {
       setAddress(walletAddress);
       setLoaded(true);
@@ -170,33 +167,63 @@ const SifirBtcReceiveTxnScreen = props => {
           />
         </TouchableOpacity>
       </View>
-      {enableLabelInput === true && (
+      {!loading && enableLabelInput === true && (
         <>
-          <View style={styles.inputView}>
+          <View
+            style={
+              labelInputDone ? styles.inputWrapperDone : styles.inputWrapper
+            }>
             <TextInput
-              placeholder="Enter a label"
+              editable={!labelInputDone}
+              placeholder="Enter a label for this address"
               placeholderTextColor="white"
-              style={styles.inputTxtStyle}
+              style={[styles.input]}
+              selectionColor="white"
               value={labelInput}
               onChangeText={input => inputLabel(input)}
             />
+            {labelInputDone && (
+              <View style={[styles.space_around]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (labelInputDone) {
+                      setAddress(null);
+                      setLabelInput('');
+                      setLabelInputDone(false);
+                    } else {
+                      setLabelInputDone(true);
+                    }
+                  }}>
+                  <Image
+                    source={Images.icon_failure}
+                    style={styles.burger_icon}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-          <TouchableOpacity
-            onPressOut={() => {
-              setLabelInputDone(true);
-            }}
-            style={styles.shareBtnOpa}>
-            <View
-              shadowColor="black"
-              shadowOffset="30"
-              style={styles.shareBtnView}>
-              <Text style={styles.shareBtnTxt}>{'Save'}</Text>
-              <Image
-                source={Images.icon_network}
-                style={{width: 28, height: 30}}
-              />
-            </View>
-          </TouchableOpacity>
+          {!labelInputDone && (
+            <TouchableOpacity
+              onPressOut={() => {
+                if (labelInputDone) {
+                  setAddress(null);
+                  setLabelInput('');
+                  setLabelInputDone(false);
+                } else {
+                  setLabelInputDone(true);
+                }
+              }}
+              style={styles.labelButtonCTA}>
+              <View
+                shadowColor="black"
+                shadowOffset="30"
+                style={styles.shareBtnView}>
+                <Text style={styles.shareBtnTxt}>
+                  {labelInputDone ? 'Generate another' : 'Save and Generate'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </>
       )}
       {enableAddressTypeSelection === true && (
@@ -455,7 +482,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 10,
     width: C.SCREEN_WIDTH * 0.8,
     height: 70,
     borderRadius: 10,
@@ -547,6 +574,10 @@ const styles = StyleSheet.create({
     width: 27 * C.vh,
     backgroundColor: 'white',
   },
+  labelButtonCTA: {
+    marginTop: C.vh,
+    alignItems: 'center',
+  },
   shareBtnOpa: {
     marginTop: 2 * C.vh,
     alignItems: 'center',
@@ -573,4 +604,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
   },
+  /* Label input */
+  inputWrapperDone: {
+    flexDirection: 'row',
+    borderColor: AppStyle.mainColor,
+    borderRadius: 0,
+    borderWidth: 0,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    borderColor: AppStyle.mainColor,
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+  input: {
+    width: '70%',
+    color: 'white',
+    // height: Platform.OS === 'android' ? u30 : 25,
+    fontSize: 16,
+  },
+  space_around: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-around',
+    marginLeft: 10,
+  },
+  burger_icon: {width: 25, height: 20},
 });
