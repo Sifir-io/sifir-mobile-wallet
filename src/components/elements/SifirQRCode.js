@@ -13,7 +13,6 @@ const SifirQRCode = props => {
   } = props;
   const [svgRef, setSvgRef] = useState(null);
   useEffect(() => {
-    console.log('Generating bitmap', svgRef);
     if (!svgRef) return;
     svgRef.toDataURL(d => setQrCodeURI(`data:image/bmp;base64,${d}`));
   }, [svgRef]);

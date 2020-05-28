@@ -61,7 +61,6 @@ const SifirBtcReceiveTxnScreen = props => {
   };
 
   const onShare = (sharedAddress, isQRCode) => {
-    console.log('onsahre called', sharedAddress, isQRCode, qrCodeURI);
     setShowShareSelector(false);
     if (qrCodeURI) {
       let shareOptions;
