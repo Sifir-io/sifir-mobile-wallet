@@ -12,6 +12,7 @@ import {
 import {Images, AppStyle, C} from '@common/index';
 import {sendBitcoin} from '@actions/btcwallet';
 import {withdrawFunds} from '@actions/lnWallet';
+import {spend as wasabiSpend} from '@actions/wasabiWallet';
 import Overlay from 'react-native-modal-overlay';
 import SifirSettingModal from '@elements/SifirSettingModal';
 import {ErrorScreen} from '@screens/error';
@@ -59,15 +60,31 @@ class SifirBtcSendTxnConfirmScreen extends Component {
       walletInfo,
     });
   };
+  sendWasabi = async () => {
+    const {txnInfo, walletInfo, anonset} = this.props.route.params;
+    const {address, amount} = txnInfo;
+    await this.props.wasabiSpend({address, amount, minanonset: anonset});
+    this.props.navigation.navigate('BtcTxnConfirmed', {
+      txnInfo: {...txnInfo, isSendTxn: true},
+      walletInfo,
+    });
+  };
 
   handleSendBtn = () => {
     const {
       walletInfo: {type},
     } = this.props.route.params;
-    if (type === C.STR_LN_WITHDRAW) {
-      this.withdrawFunds();
-    } else {
-      this.sendBitcoin();
+    switch (type) {
+      case C.STR_LN_WITHDRAW:
+        this.withdrawFunds();
+        break;
+      case C.STR_WASABI_WALLET_TYPE:
+        this.sendWasabi();
+        break;
+
+      default:
+        this.sendBitcoin();
+        break;
     }
   };
 
@@ -167,10 +184,11 @@ const mapStateToProps = state => {
   return {
     btcWallet: state.btcWallet,
     lnWallet: state.lnWallet,
+    wasabiWallet: state.wasabiWallet,
   };
 };
 
-const mapDispatchToProps = {sendBitcoin, withdrawFunds};
+const mapDispatchToProps = {sendBitcoin, withdrawFunds, wasabiSpend};
 
 export default connect(
   mapStateToProps,

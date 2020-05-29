@@ -58,7 +58,7 @@ const spend = ({
   amount,
   minanonset,
   instanceId = 0,
-  privateOnly = 0,
+  privateOnly = true,
 }) => async dispatch => {
   dispatch({type: types.WASABI_WALLET_SPEND + PENDING});
   try {
@@ -68,7 +68,7 @@ const spend = ({
     }
     const spendResult = await wasabiClient.spend({
       address,
-      amount,
+      amount: Number(amount),
       instanceId,
       private: privateOnly,
       minanonset,

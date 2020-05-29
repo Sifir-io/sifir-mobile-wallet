@@ -81,15 +81,23 @@ class SifirAccountScreen extends React.Component {
     const {walletInfo} = this.props.route.params;
     const {type} = walletInfo;
     const {balance} = this.state;
-    if (type === C.STR_LN_WALLET_TYPE) {
-      this.props.navigation.navigate('LNPayInvoiceRoute', {
-        screen: 'LnScanBolt',
-        params: {walletInfo: {...walletInfo, balance}},
-      });
-    } else {
-      this.props.navigation.navigate('GetAddress', {
-        walletInfo: {...walletInfo, balance},
-      });
+    switch (type) {
+      case C.STR_LN_WALLET_TYPE:
+        this.props.navigation.navigate('LNPayInvoiceRoute', {
+          screen: 'LnScanBolt',
+          params: {walletInfo: {...walletInfo, balance}},
+        });
+        break;
+      case C.STR_WASABI_WALLET_TYPE:
+        this.props.navigation.navigate('GetAddress', {
+          walletInfo: {...walletInfo, balance, anonset: this.state.anonset},
+        });
+        break;
+      default:
+        this.props.navigation.navigate('GetAddress', {
+          walletInfo: {...walletInfo, balance},
+        });
+        break;
     }
   };
 
