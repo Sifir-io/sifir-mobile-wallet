@@ -139,6 +139,7 @@ const SifirBtcReceiveTxnScreen = props => {
         desc={C.STR_ERROR_generating_address}
         actions={[
           {
+            // FIXME error handling
             text: C.STR_TRY_AGAIN,
             onPress: () => _bootStrap(),
           },
