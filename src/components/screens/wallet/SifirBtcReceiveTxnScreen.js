@@ -22,7 +22,6 @@ import {log} from '@io/events/';
 import {ErrorScreen} from '@screens/error';
 const SifirBtcReceiveTxnScreen = props => {
   const {label, type, meta: cfg} = props.route.params.walletInfo;
-  let qrCode = '';
   const spendingAddressTypes = [
     {title: C.STR_LEGACY, value: 'legacy'},
     {title: C.STR_Segwit_Compatible, value: 'p2sh-segwit'},
@@ -51,6 +50,7 @@ const SifirBtcReceiveTxnScreen = props => {
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const [qrCodeURI, setQrCodeURI] = useState(null);
   useEffect(() => {
     loadWalletAddress();
   }, [labelInputDone, addrType]);
@@ -62,13 +62,13 @@ const SifirBtcReceiveTxnScreen = props => {
 
   const onShare = (sharedAddress, isQRCode) => {
     setShowShareSelector(false);
-    if (qrCode) {
+    if (qrCodeURI) {
       let shareOptions;
       if (isQRCode) {
         shareOptions = {
-          type: 'image/jpg',
+          type: 'image/png',
           title: C.STR_ADDR_QR_SHARE,
-          url: qrCode,
+          url: qrCodeURI,
         };
       } else {
         shareOptions = {
@@ -105,12 +105,10 @@ const SifirBtcReceiveTxnScreen = props => {
     }
     // FIXME add gesture to swipe left to load new
     if (!!address?.length && !loadNew) {
-      console.log('already have one', address, typeof address);
       return;
     }
     let walletAddress;
     setLoading(true);
-    console.log('----------', addrType, label, type, hasAllReqs);
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
         walletAddress = await props.getNewLnAddress();
@@ -128,7 +126,6 @@ const SifirBtcReceiveTxnScreen = props => {
         });
         break;
     }
-    console.log('----------', walletAddress, addrType, label, type);
     if (walletAddress?.length) {
       setAddress(walletAddress);
       setLoaded(true);
@@ -142,6 +139,7 @@ const SifirBtcReceiveTxnScreen = props => {
         desc={C.STR_ERROR_generating_address}
         actions={[
           {
+            // FIXME error handling
             text: C.STR_TRY_AGAIN,
             onPress: () => _bootStrap(),
           },
@@ -170,33 +168,63 @@ const SifirBtcReceiveTxnScreen = props => {
           />
         </TouchableOpacity>
       </View>
-      {enableLabelInput === true && (
+      {!loading && enableLabelInput === true && (
         <>
-          <View style={styles.inputView}>
+          <View
+            style={
+              labelInputDone ? styles.inputWrapperDone : styles.inputWrapper
+            }>
             <TextInput
-              placeholder="Enter a label"
+              editable={!labelInputDone}
+              placeholder="Enter a label for this address"
               placeholderTextColor="white"
-              style={styles.inputTxtStyle}
+              style={[styles.input]}
+              selectionColor="white"
               value={labelInput}
               onChangeText={input => inputLabel(input)}
             />
+            {labelInputDone && (
+              <View style={[styles.space_around]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (labelInputDone) {
+                      setAddress(null);
+                      setLabelInput('');
+                      setLabelInputDone(false);
+                    } else {
+                      setLabelInputDone(true);
+                    }
+                  }}>
+                  <Image
+                    source={Images.icon_failure}
+                    style={styles.burger_icon}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-          <TouchableOpacity
-            onPressOut={() => {
-              setLabelInputDone(true);
-            }}
-            style={styles.shareBtnOpa}>
-            <View
-              shadowColor="black"
-              shadowOffset="30"
-              style={styles.shareBtnView}>
-              <Text style={styles.shareBtnTxt}>{'Save'}</Text>
-              <Image
-                source={Images.icon_network}
-                style={{width: 28, height: 30}}
-              />
-            </View>
-          </TouchableOpacity>
+          {!labelInputDone && (
+            <TouchableOpacity
+              onPressOut={() => {
+                if (labelInputDone) {
+                  setAddress(null);
+                  setLabelInput('');
+                  setLabelInputDone(false);
+                } else {
+                  setLabelInputDone(true);
+                }
+              }}
+              style={styles.labelButtonCTA}>
+              <View
+                shadowColor="black"
+                shadowOffset="30"
+                style={styles.shareBtnView}>
+                <Text style={styles.shareBtnTxt}>
+                  {labelInputDone ? 'Generate another' : 'Save and Generate'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </>
       )}
       {enableAddressTypeSelection === true && (
@@ -238,9 +266,7 @@ const SifirBtcReceiveTxnScreen = props => {
         <>
           <View style={styles.qrCodeView}>
             <SifirQRCode
-              getBase64={base64 => {
-                qrCode = base64;
-              }}
+              setQrCodeURI={setQrCodeURI}
               value={address}
               size={C.SCREEN_HEIGHT * 0.25}
               bgColor="#FFFFFF"
@@ -457,7 +483,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 10,
     width: C.SCREEN_WIDTH * 0.8,
     height: 70,
     borderRadius: 10,
@@ -549,6 +575,10 @@ const styles = StyleSheet.create({
     width: 27 * C.vh,
     backgroundColor: 'white',
   },
+  labelButtonCTA: {
+    marginTop: C.vh,
+    alignItems: 'center',
+  },
   shareBtnOpa: {
     marginTop: 2 * C.vh,
     alignItems: 'center',
@@ -575,4 +605,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
   },
+  /* Label input */
+  inputWrapperDone: {
+    flexDirection: 'row',
+    borderColor: AppStyle.mainColor,
+    borderRadius: 0,
+    borderWidth: 0,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    borderColor: AppStyle.mainColor,
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+  input: {
+    width: '70%',
+    color: 'white',
+    // height: Platform.OS === 'android' ? u30 : 25,
+    fontSize: 16,
+  },
+  space_around: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-around',
+    marginLeft: 10,
+  },
+  burger_icon: {width: 25, height: 20},
 });

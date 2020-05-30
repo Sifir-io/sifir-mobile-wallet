@@ -1,4 +1,6 @@
 rootProject.name = 'Sifir'
+include ':react-native-svg'
+project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':watermelondb'
 project(':watermelondb').projectDir = new File(rootProject.projectDir, '../node_modules/@nozbe/watermelondb/native/android')
 include ':react-native-randombytes', ':gopenpgp'

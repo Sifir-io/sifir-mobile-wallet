@@ -94,15 +94,23 @@ class SifirAccountScreen extends React.Component {
     const {walletInfo} = this.props.route.params;
     const {type} = walletInfo;
     const {balance} = this.state;
-    if (type === C.STR_LN_WALLET_TYPE) {
-      this.props.navigation.navigate('LNPayInvoiceRoute', {
-        screen: 'LnScanBolt',
-        params: {walletInfo: {...walletInfo, balance}},
-      });
-    } else {
-      this.props.navigation.navigate('GetAddress', {
-        walletInfo: {...walletInfo, balance},
-      });
+    switch (type) {
+      case C.STR_LN_WALLET_TYPE:
+        this.props.navigation.navigate('LNPayInvoiceRoute', {
+          screen: 'LnScanBolt',
+          params: {walletInfo: {...walletInfo, balance}},
+        });
+        break;
+      case C.STR_WASABI_WALLET_TYPE:
+        this.props.navigation.navigate('GetAddress', {
+          walletInfo: {...walletInfo, balance, anonset: this.state.anonset},
+        });
+        break;
+      default:
+        this.props.navigation.navigate('GetAddress', {
+          walletInfo: {...walletInfo, balance},
+        });
+        break;
     }
   };
 
@@ -112,7 +120,6 @@ class SifirAccountScreen extends React.Component {
         this.setState({anonset: Math.floor(anonset), balance: value}),
       3,
     );
-
   onExtraSpaceLayout = event => {
     const {height} = event.nativeEvent.layout;
     this.setState({bottomExtraSpace: height});
@@ -133,7 +140,6 @@ class SifirAccountScreen extends React.Component {
     const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
     const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
     const {toggleSettingsModal} = this;
-    // FIXME here or start seperateing comopnents ?
     let accountIcon,
       accountIconOnPress,
       accountHeaderText,
@@ -161,7 +167,6 @@ class SifirAccountScreen extends React.Component {
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
-        console.log('eeeeeeeee', txnData?.unspentCoins);
         chartData = txnData?.unspentCoins;
         // settingModalProps = {anonsetSettingEnabled: true};
         break;

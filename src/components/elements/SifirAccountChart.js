@@ -1,5 +1,6 @@
 // @flow
 import React, {useEffect} from 'react';
+import {Images, AppStyle, C} from '@common/index';
 import {
   StyleSheet,
   View,
@@ -20,7 +21,7 @@ const d3 = {
 };
 
 const height = 60;
-const {width} = Dimensions.get('window');
+const width = C.SCREEN_WIDTH;
 const verticalPadding = 5;
 const cursorRadius = 10;
 const cursor = React.createRef();
@@ -28,14 +29,12 @@ const slider = React.createRef();
 const label = React.createRef();
 const SV = React.createRef();
 const x = new Animated.Value(0);
-
 const SifirAccountChart = props => {
   const plotData = props.chartData;
   useEffect(() => {
     _init();
   }, []);
-
-  const makeChartData = chartData => {
+  const makeUnspentCoinsChartData = chartData => {
     // group balances by anonset
     const data = chartData.reduce((g, t) => {
       g[Math.floor(t.anonymitySet)] =
@@ -54,21 +53,17 @@ const SifirAccountChart = props => {
           .slice(i)
           .reduce((totalToIndex, [, t1]) => totalToIndex + t1, 0);
         stats.series.push([Number(anonset), cumTotal]);
-        stats.maxY =
-          cumTotal > stats.maxY || stats.maxY === null ? cumTotal : stats.maxY;
-        stats.maxX =
-          anonset > stats.maxX || stats.maxX === null ? anonset : stats.maxX;
-        stats.minY =
-          cumTotal < stats.minY || stats.minY === null ? cumTotal : stats.minY;
-        stats.minX =
-          anonset < stats.minX || stats.minX === null ? anonset : stats.minX;
+        stats.maxY = Math.max(cumTotal, stats.maxY);
+        stats.maxX = Math.max(anonset, stats.maxX);
+        stats.minY = Math.min(cumTotal, stats.minY);
+        stats.minX = Math.min(anonset, stats.minX);
         return stats;
       },
       {series: [], minX: null, maxX: null, minY: null, maxY: null},
     );
     return chartStats;
   };
-  const {series, minX, maxX, minY, maxY} = makeChartData(plotData);
+  const {series, minX, maxX, minY, maxY} = makeUnspentCoinsChartData(plotData);
   const scaleX = scaleLinear()
     .domain([1, maxX])
     .range([20, width - 20]);
@@ -132,7 +127,7 @@ const SifirAccountChart = props => {
       <View style={styles.container}>
         <View style={styles.chartContainer}>
           <Androw style={styles.shadow}>
-            <Svg {...{width: width, height}}>
+            <Svg {...{width, height}}>
               <Path
                 d={line}
                 fill="transparent"

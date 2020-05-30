@@ -57,9 +57,20 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
     const {validAmount} = this.state;
     const {
       txnInfo: {address},
-      walletInfo: {balance, type},
+      walletInfo: {balance, type, anonset},
     } = this.props.route.params;
-    const unit = type === C.STR_LN_WITHDRAW ? C.STR_SAT : C.STR_BTC;
+    let unit;
+    switch (type) {
+      case C.STR_LN_WITHDRAW:
+        unit = C.STR_SAT;
+        break;
+      case C.STR_WASABI_WALLET_TYPE:
+        unit = C.STR_SAT;
+        break;
+      default:
+        unit = C.STR_BTC;
+        break;
+    }
     return (
       <ScrollView contentContainerStyle={{flexGrow: 1}}>
         <View style={styles.mainView}>
@@ -69,7 +80,9 @@ export default class SifirBtcSendTxnInputAmountScreen extends Component {
               <Text style={styles.recTxt}>{address}</Text>
               <Text style={styles.amountTxt}>{C.STR_PAYMENT_AMOUNT}</Text>
               <Text style={styles.smallWhiteText}>
-                {`${C.STR_Wallet_balance}: `}
+                {anonset
+                  ? `${C.STR_Wasabi_Header} ${anonset} : `
+                  : `${C.STR_Wallet_balance}: `}
                 <SifirBTCAmount amount={balance} unit={unit} />
               </Text>
             </View>
