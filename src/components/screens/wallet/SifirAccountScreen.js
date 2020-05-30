@@ -38,7 +38,7 @@ class SifirAccountScreen extends React.Component {
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
         let {balance, txnData} = await this.props.getLnWalletDetails({label});
-        this.setState({balance, txnData});
+        this.setState({balance, txnData, showAccountHistory: true});
         break;
       case C.STR_SPEND_WALLET_TYPE:
         let {
@@ -51,22 +51,22 @@ class SifirAccountScreen extends React.Component {
         this.setState({
           balance: walletBalance,
           txnData: walletTxnData,
+          showAccountHistory: true,
         });
         break;
       case C.STR_WASABI_WALLET_TYPE:
         const {unspentcoins: unspentCoins} = await this.props.getUnspentCoins();
-        const txnDataExists = this.state.txnData?.length ? true : false;
+        const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
         this.setState({
           txnData: {unspentCoins},
           showAccountHistory: txnDataExists ? true : false,
         });
-
+        if (!this.state.showAccountHistory) {
+          setTimeout(() => {
+            this.setState({showAccountHistory: true});
+          }, 100);
+        }
         break;
-    }
-    if (!this.state.showAccountHistory) {
-      setTimeout(() => {
-        this.setState({showAccountHistory: true});
-      }, 100);
     }
   }
 
