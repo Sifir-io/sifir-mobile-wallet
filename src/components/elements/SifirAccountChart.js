@@ -64,7 +64,6 @@ const SifirAccountChart = props => {
     return chartStats;
   };
   const {series, minX, maxX, minY, maxY} = makeUnspentCoinsChartData(plotData);
-  console.log('ssats', minX, maxX, minY, maxY, series);
   const scaleX = scaleLinear()
     .domain([1, maxX])
     .range([20, width - 20]);
