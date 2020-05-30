@@ -48,12 +48,25 @@ class SifirAccountScreen extends React.Component {
           label,
           type,
         });
-        this.setState({balance: walletBalance, txnData: walletTxnData});
+        this.setState({
+          balance: walletBalance,
+          txnData: walletTxnData,
+        });
         break;
       case C.STR_WASABI_WALLET_TYPE:
         const {unspentcoins: unspentCoins} = await this.props.getUnspentCoins();
-        this.setState({txnData: {unspentCoins}});
+        const txnDataExists = this.state.txnData?.length ? true : false;
+        this.setState({
+          txnData: {unspentCoins},
+          showAccountHistory: txnDataExists ? true : false,
+        });
+
         break;
+    }
+    if (!this.state.showAccountHistory) {
+      setTimeout(() => {
+        this.setState({showAccountHistory: true});
+      }, 100);
     }
   }
 
@@ -101,10 +114,8 @@ class SifirAccountScreen extends React.Component {
     );
 
   onExtraSpaceLayout = event => {
-    // Toggle SifirAccountHistory visibility to force reRender it to reposition at the bottom.
-    this.setState({showAccountHistory: false});
     const {height} = event.nativeEvent.layout;
-    this.setState({bottomExtraSpace: height, showAccountHistory: true});
+    this.setState({bottomExtraSpace: height});
   };
 
   render() {
