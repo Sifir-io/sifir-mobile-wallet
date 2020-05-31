@@ -4,7 +4,6 @@ import {Images, AppStyle, C} from '@common/index';
 import {
   StyleSheet,
   View,
-  Dimensions,
   Animated,
   TextInput,
   Text,
@@ -59,13 +58,13 @@ const SifirAccountChart = props => {
         stats.minX = Math.min(anonset, stats.minX);
         return stats;
       },
-      {series: [], minX: null, maxX: null, minY: null, maxY: null},
+      {series: [], minX: 99999, maxX: null, minY: null, maxY: null},
     );
     return chartStats;
   };
   const {series, minX, maxX, minY, maxY} = makeUnspentCoinsChartData(plotData);
   const scaleX = scaleLinear()
-    .domain([1, maxX])
+    .domain([minX, maxX])
     .range([20, width - 20]);
   const scaleY = scaleLinear()
     .domain([minY, maxY])
@@ -180,7 +179,7 @@ const SifirAccountChart = props => {
         />
       </View>
       <View style={styles.sliderLabelContainer}>
-        <Text style={styles.sliderLabel}>1</Text>
+        <Text style={styles.sliderLabel}>{minX}</Text>
         <Text style={styles.sliderLabel}>Anonimity Level</Text>
         <Text style={styles.sliderLabel}>{maxX}</Text>
       </View>
