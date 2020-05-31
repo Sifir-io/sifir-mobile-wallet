@@ -65,4 +65,7 @@ export default {
   filter_icon: require('./../assets/images/filter.png'),
   icon_wasabi: require('./../assets/images/wasabiLogo.png'),
   icon_wasabi_clicked: require('./../assets/images/wasabiLogo1.png'),
+  icon_confirmed: require('./../assets/images/confirmed.png'),
+  icon_unconfirmed: require('./../assets/images/unchecked.png'),
+  icon_bitcoinWhiteOutlined: require('./../assets/images/bitcoinWhiteOutlined.png'),
 };
