@@ -55,7 +55,14 @@ class SifirAccountScreen extends React.Component {
         });
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        const {unspentcoins: unspentCoins} = await this.props.getUnspentCoins();
+        // TODO uncomment following - (throwing exception due to backend WIP)
+        const [
+          {unspentcoins: unspentCoins},
+          // {transactions},
+        ] = await Promise.all([
+          this.props.getUnspentCoins(),
+          // this.props.wasabiGetTxns(),
+        ]);
         const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
         this.setState({
           txnData: {unspentCoins},

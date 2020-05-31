@@ -9,7 +9,6 @@ const SifirTransactions = ({
   filterWasabiTxnData,
   btcUnit,
   txnData,
-  width,
 }) => {
   const [showContextMenu, setShowContextMenu] = useState(false);
 
@@ -45,13 +44,7 @@ const SifirTransactions = ({
           </TouchableOpacity>
         </View>
       )}
-      <SifirTxnList
-        txnData={txnData}
-        type={type}
-        unit={btcUnit}
-        width={width}
-        height={200}
-      />
+      <SifirTxnList txnData={txnData} type={type} unit={btcUnit} />
     </>
   );
 };

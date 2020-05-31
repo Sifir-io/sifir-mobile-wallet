@@ -3,6 +3,7 @@ import React, {useCallback, useMemo, useState, useEffect} from 'react';
 import {View, Image, StyleSheet, Text, ActivityIndicator} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import SifirTransactions from '@elements/SifirTransactions';
+import SifirUnspentCoinsList from '@elements/SifirUnspentCoinsList';
 
 import BottomSheet from 'reanimated-bottom-sheet';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
@@ -88,7 +89,6 @@ const SifirAccountHistory = ({
           txnData={filteredTxns}
           type={type}
           unit={btcUnit}
-          width={BTN_WIDTH * 2 - 50}
           height={200}
           headerText={headerText}
           filterWasabiTxnData={filterWasabiTxnData}
@@ -99,19 +99,10 @@ const SifirAccountHistory = ({
 
   const UnspentCoins = useCallback(
     () => (
-      // TODO create SifirUnspent component like SifirTransactions
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{flexGrow: 1}}>
-        <SifirTransactions
-          txnData={filteredTxns}
-          type={type}
-          unit={btcUnit}
-          width={BTN_WIDTH * 2 - 50}
-          height={200}
-          headerText={headerText}
-          filterWasabiTxnData={filterWasabiTxnData}
-        />
+        <SifirUnspentCoinsList txnData={txnData} unit={btcUnit} />
       </ScrollView>
     ),
     [txnData],
@@ -153,25 +144,22 @@ const SifirAccountHistory = ({
       initialSnap={1}
       enabledInnerScrolling={true}
       enabledGestureInteraction={true}
-      renderHeader={() => (
-        <View style={styles.headerContainer}>
-          {!loading && (
-            <Image source={Images.upArrow} style={styles.settingIcon} />
-          )}
-          {loading && (
-            <ActivityIndicator
-              style={styles.spinner}
-              color={AppStyle.mainColor}
-            />
-          )}
-        </View>
-      )}
       renderContent={() => (
         <View
           style={{
             height: sheetHeight,
-            backgroundColor: AppStyle.mainColor,
           }}>
+          <View style={styles.headerContainer}>
+            {!loading && (
+              <Image source={Images.upArrow} style={styles.settingIcon} />
+            )}
+            {loading && (
+              <ActivityIndicator
+                style={styles.spinner}
+                color={AppStyle.mainColor}
+              />
+            )}
+          </View>
           <TabView
             navigationState={{index, routes}}
             renderScene={renderScene}
@@ -201,7 +189,6 @@ const styles = StyleSheet.create({
   tabTitleLabel: {fontWeight: 'bold'},
   sceneContainer: {
     backgroundColor: AppStyle.tertiaryColor,
-    paddingHorizontal: 20,
   },
   tabIndicatorContainerStyle: {
     borderBottomColor: AppStyle.grayColor,

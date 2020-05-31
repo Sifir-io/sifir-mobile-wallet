@@ -91,7 +91,7 @@ const ListItem = ({title, description, imgURL, amount, unit, isSentTxn}) => {
   return (
     <TouchableOpacity>
       <View style={styles.listItme}>
-        <Image source={imgURL} style={styles.arrowIcon} />
+        <Image source={imgURL} style={styles.listIcon} />
         <View style={styles.timeStrContainer}>
           <Text style={{color: AppStyle.mainColor}}>{title}</Text>
           <Text style={styles.txIDstr}>{description}</Text>
@@ -100,6 +100,47 @@ const ListItem = ({title, description, imgURL, amount, unit, isSentTxn}) => {
           style={[styles.amount, {color: isSentTxn ? '#6FB253' : '#DD9030'}]}>
           <SifirBTCAmount amount={amount} unit={unit} />
         </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const UnspentCoinListItem = ({
+  amount,
+  anonSet,
+  label,
+  txid,
+  confirmed,
+  leftIcon,
+  rightIcon,
+  unit,
+}) => {
+  return (
+    <TouchableOpacity>
+      <View style={styles.listItme}>
+        <Image source={leftIcon} resizeMode="contain" style={styles.listIcon} />
+        <View style={styles.timeStrContainer}>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.unspentAmount}>
+              <SifirBTCAmount amount={amount} unit={unit} />
+            </Text>
+            <Text style={styles.annonSet}>
+              {'  '} Anonset: {anonSet}
+            </Text>
+          </View>
+          <Text style={styles.label}>{'label'}</Text>
+          <Text
+            style={[styles.txid, {width: '80%'}]}
+            numberOfLines={1}
+            ellipsizeMode="middle">
+            TX ID <Text style={styles.bold}>{txid}</Text>
+          </Text>
+        </View>
+        <Image
+          source={rightIcon}
+          resizeMode="contain"
+          style={styles.listIcon}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -142,6 +183,28 @@ const SifirWasabiTxn = ({txn, unit}) => {
     return null;
   }
 };
+const SifirUnspentCoin = ({txn, unit}) => {
+  try {
+    const {amount, address, confirmed, label, anonymitySet, txid} = txn;
+    // TODO add multiSelect list and use following icon
+    const imgURL = confirmed ? Images.icon_confirmed : Images.icon_unconfirmed;
+    return (
+      <UnspentCoinListItem
+        amount={amount}
+        anonSet={anonymitySet}
+        label={label}
+        txid={txid}
+        confirmed={confirmed}
+        leftIcon={Images.icon_bitcoinWhiteOutlined}
+        rightIcon={imgURL}
+        address={address}
+        unit={unit}
+      />
+    );
+  } catch (err) {
+    return null;
+  }
+};
 
 /**
  * Takes equal slices of invoices and payments decodes them and sorts them
@@ -158,14 +221,19 @@ const processWasabiTxnList = (txnData, start = 0, length = 20) =>
     .sort((a, b) => b.datetime - a.datetime)
     .slice(start, length);
 
-const SifirTxnList = ({width, height, unit, txnData, type}) => {
+const processUnspentCoinsList = (txnData, start = 0, length = 20) =>
+  [...(txnData?.unspentCoins || [])].slice(start, length);
+
+const SifirTxnList = ({unit, txnData, type}) => {
   const [txnDataCached, setTxnDataCached] = useState([]);
   // FIXME proper array compare
   if (txnData.length !== txnDataCached.length) {
     setTxnDataCached(txnData);
   }
   const txnListToRender = React.useMemo(() => {
-    if (type === C.STR_WASABI_WALLET_TYPE) {
+    if (type === C.STR_UNSPENT_COINS) {
+      return processUnspentCoinsList(txnData, 0, 20);
+    } else if (type === C.STR_WASABI_WALLET_TYPE) {
       return processWasabiTxnList(txnData, 0, 20);
     } else if (type === C.STR_LN_WALLET_TYPE) {
       return processLnTxnList(txnData, 0, 20);
@@ -176,14 +244,15 @@ const SifirTxnList = ({width, height, unit, txnData, type}) => {
   return (
     <FlatList
       data={txnListToRender}
-      style={height}
-      width={width}
       extraData={txnListToRender}
+      contentContainerStyle={styles.listContentContainer}
       keyExtractor={(item, index) =>
         item?.bolt11 + item?.txid + index + item.tx
       }
       renderItem={({item}) => {
-        if (type === C.STR_WASABI_WALLET_TYPE) {
+        if (type === C.STR_UNSPENT_COINS) {
+          return <SifirUnspentCoin txn={item} unit={unit} />;
+        } else if (type === C.STR_WASABI_WALLET_TYPE) {
           return <SifirWasabiTxn txn={item} unit={unit} />;
         } else if (type === C.STR_LN_WALLET_TYPE) {
           return <SifirInvEntry inv={item} unit={unit} />;
@@ -202,9 +271,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     width: '100%',
-    height: 50,
-    borderBottomColor: AppStyle.listViewSep,
-    borderBottomWidth: 2,
+    paddingVertical: 5,
+    // height: 50,
+    borderBottomColor: '#6B6B6B',
+    borderBottomWidth: 1,
     alignItems: 'center',
   },
   txIDstr: {
@@ -216,6 +286,27 @@ const styles = StyleSheet.create({
     color: AppStyle.mainColor,
     textAlign: 'right',
   },
-  arrowIcon: {width: 30, height: 30},
+  listIcon: {width: 40, height: 40},
   timeStrContainer: {flex: 5, marginLeft: 20},
+  annonSet: {
+    color: '#82C9C6',
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+  unspentAmount: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  label: {
+    color: '#fff',
+    fontSize: 13,
+  },
+  txid: {
+    marginTop: 5,
+    color: AppStyle.mainColor,
+  },
+  bold: {fontWeight: 'bold'},
+  listContentContainer: {
+    paddingHorizontal: 20,
+  },
 });
