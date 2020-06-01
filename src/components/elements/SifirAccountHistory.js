@@ -3,8 +3,6 @@ import React, {useCallback, useMemo, useState, useEffect} from 'react';
 import {View, Image, StyleSheet, Text, ActivityIndicator} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import SifirTransactions from '@elements/SifirTransactions';
-import SifirUnspentCoinsList from '@elements/SifirUnspentCoinsList';
-
 import BottomSheet from 'reanimated-bottom-sheet';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -89,7 +87,6 @@ const SifirAccountHistory = ({
           txnData={filteredTxns}
           type={type}
           unit={btcUnit}
-          height={200}
           headerText={headerText}
           filterWasabiTxnData={filterWasabiTxnData}
         />
@@ -102,7 +99,11 @@ const SifirAccountHistory = ({
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{flexGrow: 1}}>
-        <SifirUnspentCoinsList txnData={txnData} unit={btcUnit} />
+        <SifirTransactions
+          txnData={txnData}
+          unit={btcUnit}
+          type={C.STR_UNSPENT_COINS}
+        />
       </ScrollView>
     ),
     [txnData],

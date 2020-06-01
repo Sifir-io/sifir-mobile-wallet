@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
-import {Images, C} from '@common/index';
 import SifirTxnList from '@elements/SifirTxnList';
+import BtcTxnListItem from '@elements/TxnListItems/BtcTxnListItem';
+import UnspentCoinListItem from '@elements/TxnListItems/UnspentCoinListItem';
+import {Images, AppStyle, C} from '@common/index';
 
 const SifirTransactions = ({
   type,
@@ -11,6 +13,75 @@ const SifirTransactions = ({
   txnData,
 }) => {
   const [showContextMenu, setShowContextMenu] = useState(false);
+
+  const renderItem = (txn, unit) => {
+    if (type === C.STR_WASABI_WALLET_TYPE) {
+      return <SifirWasabiTxn txn={txn} unit={unit} />;
+    } else if (type === C.STR_UNSPENT_COINS) {
+      return <SifirUnspentCoin txn={txn} unit={unit} />;
+    }
+  };
+
+  const processData = (txnData, start = 0, length = 20) => {
+    if (type === C.STR_WASABI_WALLET_TYPE) {
+      const processedData = [...(txnData?.transactions || [])]
+        .filter(txn => txn.label !== '')
+        .sort((a, b) => b.datetime - a.datetime)
+        .slice(start, length);
+      return processedData;
+    } else if (type === C.STR_UNSPENT_COINS) {
+      const processedData = [...(txnData?.unspentCoins || [])].slice(
+        start,
+        length,
+      );
+      return processedData;
+    }
+  };
+
+  const SifirWasabiTxn = ({txn, unit}) => {
+    try {
+      const {amount, datetime, label} = txn;
+      const imgURL = amount > 0 ? Images.icon_yellowTxn : Images.icon_send;
+      const isSentTxn = amount > 0 ? false : true;
+      return (
+        <BtcTxnListItem
+          title={label}
+          description={datetime}
+          amount={amount}
+          unit={unit}
+          imgURL={imgURL}
+          isSentTxn={isSentTxn}
+        />
+      );
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const SifirUnspentCoin = ({txn, unit}) => {
+    try {
+      const {amount, address, confirmed, label, anonymitySet, txid} = txn;
+      // TODO add multiSelect list and use following icon
+      const imgURL = confirmed
+        ? Images.icon_confirmed
+        : Images.icon_unconfirmed;
+      return (
+        <UnspentCoinListItem
+          amount={amount}
+          anonSet={anonymitySet}
+          label={label}
+          txid={txid}
+          confirmed={confirmed}
+          leftIcon={Images.icon_bitcoinWhiteOutlined}
+          rightIcon={imgURL}
+          address={address}
+          unit={unit}
+        />
+      );
+    } catch (err) {
+      return null;
+    }
+  };
 
   return (
     <>
@@ -44,7 +115,15 @@ const SifirTransactions = ({
           </TouchableOpacity>
         </View>
       )}
-      <SifirTxnList txnData={txnData} type={type} unit={btcUnit} />
+      <SifirTxnList
+        txnData={txnData}
+        type={type}
+        unit={btcUnit}
+        renderItem={renderItem}
+        processData={processData}
+        //onFilter
+        // ...
+      />
     </>
   );
 };
