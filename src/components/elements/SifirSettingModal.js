@@ -91,48 +91,13 @@ class SifirSettingModal extends Component {
               ))}
             </View>
           )}
-          {this.state.curMenu === 1 && (
-            <View style={styles.timeView}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={styles.clockImgView}>
-                  <Image source={Images.icon_clock} style={styles.clockImg} />
-                  <Text style={styles.setFeeTxt}>{C.STR_SET_FEES}</Text>
-                </View>
-                <View style={styles.feeTxtView}>
-                  <Text style={styles.feeTxt}>0.015 BTC</Text>
-                </View>
-              </View>
-              <View style={{width: '100%'}}>
-                <Slider
-                  animationType="spring"
-                  value={this.state.value}
-                  thumbTintColor="#5595a8"
-                  onValueChange={value => this.setState({value})}
-                  minimumTrackTintColor="#25b6fa"
-                  maximumTrackTintColor="#412160"
-                  thumbStyle={styles.thumb}
-                  trackStyle={{
-                    height: 10,
-                    borderRadius: 5,
-                  }}
-                />
-              </View>
-              <View style={styles.waitView}>
-                <Text style={{fontSize: 20}}>{C.STR_Wait}</Text>
-                <Text style={{fontSize: 20, color: 'blue'}}>4 Hours</Text>
-              </View>
-            </View>
-          )}
           {this.state.curMenu === 2 && (
             <View style={styles.timeView}>
               <View style={{flexDirection: 'row'}}>
                 <View style={styles.clockImgView}>
                   <Image source={Images.icon_clock} style={styles.clockImg} />
-                  <Text style={styles.setFeeTxt}>{'Balance avalible w/Anonset:'}</Text>
+                  <Text style={styles.setFeeTxt}>{'Autospend wallet'}</Text>
                 </View>
-              </View>
-              <View style={styles.feeTxtView}>
-                <Text style={styles.feeTxt}>0.015 BTC</Text>
               </View>
               <View style={{width: '100%'}}>
                 <Slider
@@ -153,7 +118,7 @@ class SifirSettingModal extends Component {
                 />
               </View>
               <View style={styles.waitView}>
-                <Text style={{fontSize: 20}}>{'Min Anonset Selected'}</Text>
+                <Text style={{fontSize: 20}}>{'Autospend Anonset:'}</Text>
                 <Text style={{fontSize: 20, color: 'blue'}}>
                   {this.state.value}
                 </Text>
@@ -203,7 +168,7 @@ class SifirSettingModal extends Component {
                   }}
                 />
               )}
-              {this.props.anonsetSettingEnabled && (
+              {this.props.autoSpendToWallet && (
                 <MenuListItem
                   icon={Images.icon_clock}
                   label={'Set minimum Anonset'}

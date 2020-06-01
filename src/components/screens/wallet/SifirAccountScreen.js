@@ -58,11 +58,13 @@ class SifirAccountScreen extends React.Component {
         // TODO uncomment following - (throwing exception due to backend WIP)
         const [
           {unspentcoins: unspentCoins},
+          {transactions},
           // {transactions},
         ] = await Promise.all([
           this.props.getUnspentCoins(),
-          // this.props.wasabiGetTxns(),
+          this.props.wasabiGetTxns(),
         ]);
+        console.log('got txns', transactions);
         const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
         this.setState({
           txnData: {unspentCoins},
@@ -175,7 +177,7 @@ class SifirAccountScreen extends React.Component {
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
         chartData = txnData?.unspentCoins;
-        // settingModalProps = {anonsetSettingEnabled: true};
+        settingModalProps = {autoSpendToWallet: true};
         break;
       default:
         accountHeaderText = C.STR_Cur_Balance;
