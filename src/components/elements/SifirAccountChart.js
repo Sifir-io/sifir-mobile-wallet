@@ -1,13 +1,7 @@
 // @flow
 import React, {useEffect} from 'react';
 import {Images, AppStyle, C} from '@common/index';
-import {
-  StyleSheet,
-  View,
-  Animated,
-  TextInput,
-  Text,
-} from 'react-native';
+import {StyleSheet, View, Animated, TextInput, Text} from 'react-native';
 import Svg, {Path, Defs, Stop} from 'react-native-svg';
 import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
@@ -90,6 +84,8 @@ const SifirAccountChart = props => {
     slider.current.setNativeProps({
       left: left - 10,
     });
+    // Initialize with intial balance to show in account header
+    moveCursor(0);
   };
 
   const moveCursor = value => {

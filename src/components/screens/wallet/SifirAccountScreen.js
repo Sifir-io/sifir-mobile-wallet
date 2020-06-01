@@ -59,7 +59,6 @@ class SifirAccountScreen extends React.Component {
         const [
           {unspentcoins: unspentCoins},
           {transactions},
-          // {transactions},
         ] = await Promise.all([
           this.props.getUnspentCoins(),
           this.props.wasabiGetTxns(),
@@ -67,7 +66,7 @@ class SifirAccountScreen extends React.Component {
         console.log('got txns', transactions);
         const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
         this.setState({
-          txnData: {unspentCoins},
+          txnData: {unspentCoins, transactions},
           showAccountHistory: txnDataExists ? true : false,
         });
         if (!this.state.showAccountHistory) {
