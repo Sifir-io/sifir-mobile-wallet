@@ -115,8 +115,6 @@ const getTxns = ({
       instanceId,
       txnFilterInternal,
     });
-    console.log('sdasdsadasdGETTXNS', txnsList);
-    // TODO cache it ?
     dispatch({
       type: types.WASABI_WALLET_GET_TXNS + FULFILLED,
       payload: {txnsList},

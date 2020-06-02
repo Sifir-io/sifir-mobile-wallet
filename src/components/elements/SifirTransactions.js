@@ -4,7 +4,7 @@ import SifirTxnList from '@elements/SifirTxnList';
 import BtcTxnListItem from '@elements/TxnListItems/BtcTxnListItem';
 import UnspentCoinListItem from '@elements/TxnListItems/UnspentCoinListItem';
 import {Images, AppStyle, C} from '@common/index';
-
+import moment from 'moment';
 const SifirTransactions = ({
   type,
   headerText,
@@ -25,8 +25,7 @@ const SifirTransactions = ({
   const processData = (txnData, start = 0, length = 20) => {
     if (type === C.STR_WASABI_WALLET_TYPE) {
       const processedData = [...(txnData?.transactions || [])]
-        .filter(txn => txn.label !== '')
-        .sort((a, b) => b.datetime - a.datetime)
+        .sort((a, b) => moment(b.datetime).diff(moment(a.datetime)))
         .slice(start, length);
       return processedData;
     } else if (type === C.STR_UNSPENT_COINS) {
@@ -46,9 +45,9 @@ const SifirTransactions = ({
       return (
         <BtcTxnListItem
           title={label}
-          description={datetime}
+          description={moment(datetime).fromNow()}
           amount={amount}
-          unit={unit}
+          unit={'SATS'}
           imgURL={imgURL}
           isSentTxn={isSentTxn}
         />

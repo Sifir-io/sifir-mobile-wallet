@@ -20,13 +20,13 @@ const UnspentCoinListItem = ({
         <View style={styles.timeStrContainer}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.unspentAmount}>
-              <SifirBTCAmount amount={amount} unit={unit} />
+              <SifirBTCAmount amount={amount} unit={'SATS'} />
             </Text>
             <Text style={styles.annonSet}>
-              {'  '} Anonset: {anonSet}
+              {'  '} AnonimitySet: {anonSet}
             </Text>
           </View>
-          <Text style={styles.label}>{'label'}</Text>
+          <Text style={styles.label}>{label}</Text>
           <Text
             style={[styles.txid, {width: '80%'}]}
             numberOfLines={1}
