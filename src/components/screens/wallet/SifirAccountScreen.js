@@ -55,7 +55,7 @@ class SifirAccountScreen extends React.Component {
         });
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        // TODO uncomment following - (throwing exception due to backend WIP)
+        // TODO move loading txns to tab change
         const [
           {unspentcoins: unspentCoins},
           {transactions},
@@ -63,7 +63,6 @@ class SifirAccountScreen extends React.Component {
           this.props.getUnspentCoins(),
           this.props.wasabiGetTxns(),
         ]);
-        console.log('got txns', transactions);
         const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
         this.setState({
           txnData: {unspentCoins, transactions},
@@ -126,7 +125,7 @@ class SifirAccountScreen extends React.Component {
     debounce(
       ({anonset, value}) =>
         this.setState({anonset: Math.floor(anonset), balance: value}),
-      3,
+      1,
     );
   onExtraSpaceLayout = event => {
     const {height} = event.nativeEvent.layout;
@@ -138,16 +137,8 @@ class SifirAccountScreen extends React.Component {
     const {navigate} = this.props.navigation;
     const {walletInfo} = this.props.route.params;
     const {label, type} = walletInfo;
-    const {loading, loaded, error: errorBtc} = this.props.btcWallet;
-    const {
-      loading: loadingLN,
-      loaded: loadedLN,
-      error: errorLN,
-    } = this.props.lnWallet;
-    const isLoading = type === C.STR_LN_WALLET_TYPE ? loadingLN : loading;
-    const isLoaded = type === C.STR_LN_WALLET_TYPE ? loadedLN : loaded;
-    const hasError = type === C.STR_LN_WALLET_TYPE ? errorLN : errorBtc;
     const {toggleSettingsModal} = this;
+    let isLoading, isLoaded, hasError;
     let accountIcon,
       accountIconOnPress,
       accountHeaderText,
@@ -157,6 +148,11 @@ class SifirAccountScreen extends React.Component {
       settingModalProps = {};
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
+        ({
+          loading: isLoading,
+          loaded: isLoaded,
+          error: hasError,
+        } = this.props.lnWallet);
         accountIcon = Images.icon_light;
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = C.STR_Balance_Channels_n_Outputs;
@@ -170,6 +166,11 @@ class SifirAccountScreen extends React.Component {
         btcUnit = C.STR_MSAT;
         break;
       case C.STR_WASABI_WALLET_TYPE:
+        ({
+          loading: isLoading,
+          loaded: isLoaded,
+          error: hasError,
+        } = this.props.wasabiWallet);
         accountIcon = Images.icon_wasabi;
         accountIconOnPress = toggleSettingsModal.bind(this);
         accountHeaderText = C.STR_Wasabi_Header + anonset;
@@ -179,6 +180,11 @@ class SifirAccountScreen extends React.Component {
         settingModalProps = {autoSpendToWallet: true};
         break;
       default:
+        ({
+          loading: isLoading,
+          loaded: isLoaded,
+          error: hasError,
+        } = this.props.btcWallet);
         accountHeaderText = C.STR_Cur_Balance;
         accountIcon = Images.icon_bitcoin;
         accountIconOnPress = () => {};

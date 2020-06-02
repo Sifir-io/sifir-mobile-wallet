@@ -1,5 +1,5 @@
 // @flow
-import React, {useEffect} from 'react';
+import React, {useMemo, useEffect} from 'react';
 import {Images, AppStyle, C} from '@common/index';
 import {StyleSheet, View, Animated, TextInput, Text} from 'react-native';
 import Svg, {Path, Defs, Stop} from 'react-native-svg';
@@ -22,56 +22,66 @@ const slider = React.createRef();
 const label = React.createRef();
 const SV = React.createRef();
 const x = new Animated.Value(0);
+const makeUnspentCoinsChartData = chartData => {
+  console.log('i fired');
+  // group balances by anonset
+  const data = chartData.reduce((g, t) => {
+    g[Math.floor(t.anonymitySet)] =
+      (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
+    return g;
+  }, {});
+  // -- series
+  // Sort by anon set descending
+  const sortedAnonsetTotalPairs = Object.entries(data).sort(
+    ([anonset1], [anonset2]) => anonset1 - anonset2,
+  );
+  const chartStats = sortedAnonsetTotalPairs.reduce(
+    (stats, [anonset, total], i) => {
+      // data sorted descending, so anything after current index is a balance avalible below that anon set
+      const cumTotal = sortedAnonsetTotalPairs
+        .slice(i)
+        .reduce((totalToIndex, [, t1]) => totalToIndex + t1, 0);
+      stats.series.push([Number(anonset), cumTotal]);
+      stats.maxY = Math.max(cumTotal, stats.maxY);
+      stats.maxX = Math.max(anonset, stats.maxX);
+      stats.minY = Math.min(cumTotal, stats.minY);
+      stats.minX = Math.min(anonset, stats.minX);
+      return stats;
+    },
+    {series: [], minX: 99999, maxX: null, minY: null, maxY: null},
+  );
+  return chartStats;
+};
 const SifirAccountChart = props => {
   const plotData = props.chartData;
   useEffect(() => {
     _init();
   }, []);
-  const makeUnspentCoinsChartData = chartData => {
-    // group balances by anonset
-    const data = chartData.reduce((g, t) => {
-      g[Math.floor(t.anonymitySet)] =
-        (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
-      return g;
-    }, {});
-    // -- series
-    // Sort by anon set descending
-    const sortedAnonsetTotalPairs = Object.entries(data).sort(
-      ([anonset1], [anonset2]) => anonset1 - anonset2,
-    );
-    const chartStats = sortedAnonsetTotalPairs.reduce(
-      (stats, [anonset, total], i) => {
-        // data sorted descending, so anything after current index is a balance avalible below that anon set
-        const cumTotal = sortedAnonsetTotalPairs
-          .slice(i)
-          .reduce((totalToIndex, [, t1]) => totalToIndex + t1, 0);
-        stats.series.push([Number(anonset), cumTotal]);
-        stats.maxY = Math.max(cumTotal, stats.maxY);
-        stats.maxX = Math.max(anonset, stats.maxX);
-        stats.minY = Math.min(cumTotal, stats.minY);
-        stats.minX = Math.min(anonset, stats.minX);
-        return stats;
-      },
-      {series: [], minX: 99999, maxX: null, minY: null, maxY: null},
-    );
-    return chartStats;
-  };
-  const {series, minX, maxX, minY, maxY} = makeUnspentCoinsChartData(plotData);
-  const scaleX = scaleLinear()
-    .domain([minX, maxX])
-    .range([20, width - 20]);
-  const scaleY = scaleLinear()
-    .domain([minY, maxY])
-    .range([height - verticalPadding, verticalPadding]);
-
-  const line = d3.shape
-    .line()
-    .x(([anonset]) => scaleX(Number(anonset)))
-    .y(([, balance]) => scaleY(balance))
-    .curve(d3.shape.curveStepBefore)(series);
-  const properties = path.svgPathProperties(line);
-  const lineLength = properties.getTotalLength();
-
+  const {series, minX, maxX, minY, maxY} = useMemo(
+    () => makeUnspentCoinsChartData(plotData),
+    [plotData],
+  );
+  const {scaleX, scaleY, line, properties, lineLength} = useMemo(() => {
+    const scaleX = scaleLinear()
+      .domain([minX, maxX])
+      .range([20, width - 20]);
+    const scaleY = scaleLinear()
+      .domain([minY, maxY])
+      .range([height - verticalPadding, verticalPadding]);
+    const line = d3.shape
+      .line()
+      .x(([anonset]) => scaleX(Number(anonset)))
+      .y(([, balance]) => scaleY(balance))
+      .curve(d3.shape.curveStepBefore)(series);
+    const properties = path.svgPathProperties(line);
+    return {
+      scaleX,
+      scaleY,
+      line,
+      properties,
+      lineLength: properties.getTotalLength(),
+    };
+  }, [plotData]);
   const _init = () => {
     x.addListener(({value}) => moveCursor(value));
     let {x: X, y} = properties.getPointAtLength(lineLength);

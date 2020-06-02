@@ -6,7 +6,7 @@ import SifirTxnEntry from '@elements/SifirTxnEntry';
 import SifirUnspentCoinEntry from '@elements/SifirUnspentCoinEntry';
 import SifirWasabiTxnEntry from '@elements/SifirWasabiTxnEntry';
 import {Images, AppStyle, C} from '@common/index';
-
+import moment from 'moment';
 const SifirTransactions = props => {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const {type, headerText, filterWasabiTxnData, btcUnit, txnData} = props;
@@ -26,8 +26,7 @@ const SifirTransactions = props => {
   const processData = (txnData, start = 0, length = 20) => {
     if (type === C.STR_WASABI_WALLET_TYPE) {
       return [...(txnData?.transactions || [])]
-        .filter(txn => txn.label !== '')
-        .sort((a, b) => b.datetime - a.datetime)
+        .sort((a, b) => moment(b.datetime).diff(moment(a.datetime)))
         .slice(start, length);
     } else if (type === C.STR_UNSPENT_COINS) {
       return [...(txnData?.unspentCoins || [])].slice(start, length);
