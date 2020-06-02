@@ -8,7 +8,6 @@ import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {ScrollView} from 'react-native-gesture-handler';
 
 export const sheetHeight = C.SCREEN_HEIGHT - 150;
-const BTN_WIDTH = C.SCREEN_WIDTH / 2;
 const initialSnap = C.SCREEN_HEIGHT * 0.35;
 const initialLayout = {width: C.SCREEN_WIDTH};
 
@@ -110,20 +109,10 @@ const SifirAccountHistory = ({
   );
   const LabeledAddresses = useCallback(
     () => (
-      // TODO create SifirLabeledAddresses component like SifirTransactions
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{flexGrow: 1}}>
-        <SifirTransactions
-          txnData={filteredTxns}
-          type={type}
-          unit={btcUnit}
-          width={BTN_WIDTH * 2 - 50}
-          height={200}
-          headerText={headerText}
-          filterWasabiTxnData={filterWasabiTxnData}
-        />
-      </ScrollView>
+        contentContainerStyle={{flexGrow: 1}}
+      />
     ),
     [txnData],
   );
@@ -152,6 +141,7 @@ const SifirAccountHistory = ({
           }}>
           <View style={styles.headerContainer}>
             {!loading && (
+              // TODO change upArrow to down arrow when slider is opened.
               <Image source={Images.upArrow} style={styles.settingIcon} />
             )}
             {loading && (

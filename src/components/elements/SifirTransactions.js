@@ -1,91 +1,50 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import SifirTxnList from '@elements/SifirTxnList';
-import BtcTxnListItem from '@elements/TxnListItems/BtcTxnListItem';
-import UnspentCoinListItem from '@elements/TxnListItems/UnspentCoinListItem';
+import SifirInvEntry from '@elements/SifirInvEntry';
+import SifirTxnEntry from '@elements/SifirTxnEntry';
+import SifirUnspentCoinEntry from '@elements/SifirUnspentCoinEntry';
+import SifirWasabiTxnEntry from '@elements/SifirWasabiTxnEntry';
 import {Images, AppStyle, C} from '@common/index';
 import moment from 'moment';
-const SifirTransactions = ({
-  type,
-  headerText,
-  filterWasabiTxnData,
-  btcUnit,
-  txnData,
-}) => {
+const SifirTransactions = props => {
   const [showContextMenu, setShowContextMenu] = useState(false);
+  const {type, headerText, filterWasabiTxnData, btcUnit, txnData} = props;
 
   const renderItem = (txn, unit) => {
     if (type === C.STR_WASABI_WALLET_TYPE) {
-      return <SifirWasabiTxn txn={txn} unit={unit} />;
+      return <SifirWasabiTxnEntry txn={txn} unit={unit} />;
     } else if (type === C.STR_UNSPENT_COINS) {
-      return <SifirUnspentCoin txn={txn} unit={unit} />;
+      return <SifirUnspentCoinEntry txn={txn} unit={unit} />;
+    } else if (type === C.STR_LN_WALLET_TYPE) {
+      return <SifirInvEntry inv={txn} unit={unit} />;
+    } else if (type === C.STR_SPEND_WALLET_TYPE) {
+      return <SifirTxnEntry txn={txn} unit={unit} />;
     }
   };
 
   const processData = (txnData, start = 0, length = 20) => {
     if (type === C.STR_WASABI_WALLET_TYPE) {
-      const processedData = [...(txnData?.transactions || [])]
+      return [...(txnData?.transactions || [])]
         .sort((a, b) => moment(b.datetime).diff(moment(a.datetime)))
         .slice(start, length);
-      return processedData;
     } else if (type === C.STR_UNSPENT_COINS) {
-      const processedData = [...(txnData?.unspentCoins || [])].slice(
-        start,
-        length,
-      );
-      return processedData;
-    }
-  };
-
-  const SifirWasabiTxn = ({txn, unit}) => {
-    try {
-      const {amount, datetime, label} = txn;
-      const imgURL = amount > 0 ? Images.icon_yellowTxn : Images.icon_send;
-      const isSentTxn = amount > 0 ? false : true;
-      return (
-        <BtcTxnListItem
-          title={label}
-          description={moment(datetime).fromNow()}
-          amount={amount}
-          unit={'SATS'}
-          imgURL={imgURL}
-          isSentTxn={isSentTxn}
-        />
-      );
-    } catch (err) {
-      return null;
-    }
-  };
-
-  const SifirUnspentCoin = ({txn, unit}) => {
-    try {
-      const {amount, address, confirmed, label, anonymitySet, txid} = txn;
-      // TODO add multiSelect list and use following icon
-      const imgURL = confirmed
-        ? Images.icon_confirmed
-        : Images.icon_unconfirmed;
-      return (
-        <UnspentCoinListItem
-          amount={amount}
-          anonSet={anonymitySet}
-          label={label}
-          txid={txid}
-          confirmed={confirmed}
-          leftIcon={Images.icon_bitcoinWhiteOutlined}
-          rightIcon={imgURL}
-          address={address}
-          unit={unit}
-        />
-      );
-    } catch (err) {
-      return null;
+      return [...(txnData?.unspentCoins || [])].slice(start, length);
+    } else if (type === C.STR_LN_WALLET_TYPE) {
+      return [...(txnData?.invoices || []), ...(txnData?.pays || [])]
+        .filter(txn => txn && txn?.decodedBolt11?.timestamp > 1)
+        .sort((a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp)
+        .slice(start, length);
+    } else if (type === C.STR_SPEND_WALLET_TYPE) {
+      return txnData;
     }
   };
 
   return (
-    <>
+    <View style={styles.container}>
       {type === C.STR_WASABI_WALLET_TYPE && (
         <View style={styles.headerRow}>
+          {/* TODO Set header text according to filter - RECEIVED, SENT or All TRANSACTIONS */}
           <Text style={styles.txnLblTxt}>{headerText}</Text>
           <TouchableOpacity
             onPress={() => setShowContextMenu(!showContextMenu)}>
@@ -120,14 +79,16 @@ const SifirTransactions = ({
         unit={btcUnit}
         renderItem={renderItem}
         processData={processData}
-        //onFilter
-        // ...
+        //TODO onFilter
       />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+  },
   txnLblTxt: {
     color: 'white',
     fontSize: 20,
@@ -139,6 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 10,
+    marginBottom: 10,
   },
   filterPopupContainer: {
     width: 165,
