@@ -1,6 +1,7 @@
 import React from 'react';
 import BtcTxnListItem from '@elements/TxnListItems/BtcTxnListItem';
-import {Images} from '@common/index';
+import {Images, C} from '@common/index';
+import moment from 'moment';
 
 const SifirWasabiTxnEntry = ({txn, unit}) => {
   try {
@@ -10,9 +11,9 @@ const SifirWasabiTxnEntry = ({txn, unit}) => {
     return (
       <BtcTxnListItem
         title={label}
-        description={datetime}
+        description={moment(datetime).fromNow()}
         amount={amount}
-        unit={unit}
+        unit={C.STR_SAT}
         imgURL={imgURL}
         isSentTxn={isSentTxn}
       />
