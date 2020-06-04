@@ -18,7 +18,7 @@ const SifirTxnList = ({unit, txnData, type, renderItem, processData}) => {
         item?.bolt11 + item?.txid + index + item.tx
       }
       renderItem={({item}) => {
-        return renderItem(item, type);
+        return renderItem(item, unit);
       }}
     />
   );
