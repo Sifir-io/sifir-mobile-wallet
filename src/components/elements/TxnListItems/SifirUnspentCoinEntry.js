@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import UnspentCoinListItem from '@elements/TxnListItems/UnspentCoinListItem';
+import UnspentCoinListItem from '@elements/TxnListItems/SifirUnspentCoinListItem';
 import {Images} from '@common/index';
 
 const SifirUnspentCoinEntry = ({txn, unit}) => {

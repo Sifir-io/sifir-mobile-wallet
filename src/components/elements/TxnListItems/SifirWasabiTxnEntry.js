@@ -1,5 +1,5 @@
 import React from 'react';
-import BtcTxnListItem from '@elements/TxnListItems/BtcTxnListItem';
+import BtcTxnListItem from '@elements/TxnListItems/SifirBtcTxnListItem';
 import {Images, C} from '@common/index';
 import moment from 'moment';
 
