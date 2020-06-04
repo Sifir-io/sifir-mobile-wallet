@@ -113,7 +113,7 @@ class SifirGetAddrScreen extends Component {
     const {showModal, scannedQRdata} = this.state;
     const {loading, error} = this.props.lnWallet;
     const {
-      walletInfo: {type, label},
+      walletInfo: {type, label, backIcon},
     } = this.props.route.params;
     const placeHolder =
       type === C.STR_LN_WALLET_TYPE ? C.STR_Enter_bolt : C.STR_Enter_addr;
@@ -139,14 +139,7 @@ class SifirGetAddrScreen extends Component {
             style={styles.backNavView}
             onPress={() => this.handleBackButton()}>
             <Image source={Images.icon_back} style={styles.backImg} />
-            <Image
-              source={
-                type === C.STR_LN_WALLET_TYPE
-                  ? Images.icon_bolt_cir
-                  : Images.icon_btc_cir
-              }
-              style={styles.btcImg}
-            />
+            <Image source={backIcon} style={styles.btcImg} />
             <Text style={styles.backNavTxt}>{label}</Text>
           </TouchableOpacity>
 

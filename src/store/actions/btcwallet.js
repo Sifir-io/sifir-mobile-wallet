@@ -82,6 +82,7 @@ const getBtcWalletList = () => async dispatch => {
       type: C.STR_SPEND_WALLET_TYPE,
       iconURL: Images.icon_btcBtn,
       iconClickedURL: Images.icon_btcBtn_clicked,
+      backIcon: Images.icon_btc_cir,
       pageURL: 'Account',
       meta: {
         enableAddressTypeSelection: true,
@@ -95,6 +96,7 @@ const getBtcWalletList = () => async dispatch => {
       type: C.STR_WASABI_WALLET_TYPE,
       iconURL: Images.icon_wasabi,
       iconClickedURL: Images.icon_wasabi_clicked,
+      backIcon: Images.icon_wasabi,
       pageURL: 'Account',
       meta: {
         enableAddressLabelInput: true,

@@ -87,6 +87,7 @@ const getLnNodeInfo = label => async dispatch => {
     nodeInfo.label = nodeInfo.alias;
     nodeInfo.iconURL = Images.icon_light;
     nodeInfo.iconClickedURL = Images.icon_light_clicked;
+    nodeInfo.backIcon = Images.icon_bolt_cir;
     // nodeInfo.balance = balance;
     dispatch({
       type: types.LN_WALLET_NODEINFO + FULFILLED,
