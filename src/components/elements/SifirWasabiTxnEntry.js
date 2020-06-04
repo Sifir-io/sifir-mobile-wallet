@@ -13,7 +13,7 @@ const SifirWasabiTxnEntry = ({txn, unit}) => {
         title={label}
         description={moment(datetime).fromNow()}
         amount={amount}
-        unit={C.STR_SAT}
+        unit={unit}
         imgURL={imgURL}
         isSentTxn={isSentTxn}
       />
