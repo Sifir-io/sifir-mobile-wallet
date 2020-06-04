@@ -170,39 +170,22 @@ const SifirBtcReceiveTxnScreen = props => {
       </View>
       {!loading && enableLabelInput === true && (
         <>
-          <View
-            style={
-              labelInputDone ? styles.inputWrapperDone : styles.inputWrapper
-            }>
-            <TextInput
-              editable={!labelInputDone}
-              placeholder="Enter a label for this address"
-              placeholderTextColor="white"
-              style={[styles.input]}
-              selectionColor="white"
-              value={labelInput}
-              onChangeText={input => inputLabel(input)}
-            />
-            {labelInputDone && (
-              <View style={[styles.space_around]}>
-                <TouchableOpacity
-                  onPress={() => {
-                    if (labelInputDone) {
-                      setAddress(null);
-                      setLabelInput('');
-                      setLabelInputDone(false);
-                    } else {
-                      setLabelInputDone(true);
-                    }
-                  }}>
-                  <Image
-                    source={Images.icon_failure}
-                    style={styles.burger_icon}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+          {!labelInputDone && (
+            <View
+              style={
+                labelInputDone ? styles.inputWrapperDone : styles.inputWrapper
+              }>
+              <TextInput
+                editable={!labelInputDone}
+                placeholder="Enter a label for this address"
+                placeholderTextColor="white"
+                style={[styles.input]}
+                selectionColor="white"
+                value={labelInput}
+                onChangeText={input => inputLabel(input)}
+              />
+            </View>
+          )}
           {!labelInputDone && (
             <TouchableOpacity
               onPressOut={() => {
@@ -274,6 +257,28 @@ const SifirBtcReceiveTxnScreen = props => {
             />
           </View>
           <Text style={styles.addrTxt}>{address}</Text>
+          {labelInputDone && (
+            <>
+              <View style={[styles.space_around]}>
+                <Text style={styles.addrTxt}>{`Label: ${labelInput}`}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (labelInputDone) {
+                      setAddress(null);
+                      setLabelInput('');
+                      setLabelInputDone(false);
+                    } else {
+                      setLabelInputDone(true);
+                    }
+                  }}>
+                  <Image
+                    source={Images.icon_failure}
+                    style={styles.burger_icon}
+                  />
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </>
       )}
       {!!address && (
@@ -602,8 +607,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   addrTxt: {
+    fontFamily: AppStyle.mainFontBold,
     fontSize: 16,
-    color: 'white',
+    marginTop: 10,
+    color: AppStyle.mainColor,
   },
   /* Label input */
   inputWrapperDone: {
