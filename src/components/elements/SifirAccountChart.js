@@ -8,6 +8,7 @@ import * as shape from 'd3-shape';
 import {scaleLinear} from 'd3-scale';
 import LinearGradient from 'react-native-linear-gradient';
 import Androw from 'react-native-androw';
+import {log} from '@io/events';
 
 const d3 = {
   shape,
@@ -23,7 +24,6 @@ const label = React.createRef();
 const SV = React.createRef();
 const x = new Animated.Value(0);
 const makeUnspentCoinsChartData = chartData => {
-  console.log('i fired');
   // group balances by anonset
   const data = chartData.reduce((g, t) => {
     g[Math.floor(t.anonymitySet)] =
@@ -35,6 +35,10 @@ const makeUnspentCoinsChartData = chartData => {
   const sortedAnonsetTotalPairs = Object.entries(data).sort(
     ([anonset1], [anonset2]) => anonset1 - anonset2,
   );
+  // FIXME brute stuff here, 1 point of data breaks chart because of line length =0 in _init() so add one to render a straight line from anonset 1 to current max in sex. Kosher ?
+  if (sortedAnonsetTotalPairs.length < 2) {
+    sortedAnonsetTotalPairs.unshift(sortedAnonsetTotalPairs[0]);
+  }
   const chartStats = sortedAnonsetTotalPairs.reduce(
     (stats, [anonset, total], i) => {
       // data sorted descending, so anything after current index is a balance avalible below that anon set
@@ -73,29 +77,34 @@ const SifirAccountChart = props => {
       .x(([anonset]) => scaleX(Number(anonset)))
       .y(([, balance]) => scaleY(balance))
       .curve(d3.shape.curveStepBefore)(series);
-    const properties = path.svgPathProperties(line);
+    const p = path.svgPathProperties(line);
     return {
       scaleX,
       scaleY,
       line,
-      properties,
-      lineLength: properties.getTotalLength(),
+      properties: p,
+      lineLength: p.getTotalLength(),
     };
-  }, [plotData]);
+  }, [series]);
   const _init = () => {
-    x.addListener(({value}) => moveCursor(value));
-    let {x: X, y} = properties.getPointAtLength(lineLength);
-    let top = y - cursorRadius - 2;
-    let left = X - (cursorRadius + 10);
-    cursor?.current?.setNativeProps({
-      top,
-      left,
-    });
-    slider.current.setNativeProps({
-      left: left - 10,
-    });
-    // Initialize with intial balance to show in account header
-    moveCursor(0);
+    try {
+      x.addListener(({value}) => moveCursor(value));
+      log('Chart data lineLength', lineLength);
+      let {x: X, y} = properties.getPointAtLength(lineLength);
+      let top = y - cursorRadius - 2;
+      let left = X - (cursorRadius + 10);
+      cursor?.current?.setNativeProps({
+        top,
+        left,
+      });
+      slider.current.setNativeProps({
+        left: left - 10,
+      });
+      // Initialize with intial balance to show in account header
+      moveCursor(0);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const moveCursor = value => {

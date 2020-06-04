@@ -20,6 +20,8 @@ const SifirTransactions = props => {
       return <SifirInvEntry inv={txn} unit={unit} />;
     } else if (type === C.STR_SPEND_WALLET_TYPE) {
       return <SifirTxnEntry txn={txn} unit={unit} />;
+    } else if (type === C.STR_WATCH_WALLET_TYPE) {
+      return <SifirTxnEntry txn={txn} unit={unit} />;
     }
   };
 
@@ -36,6 +38,8 @@ const SifirTransactions = props => {
         .sort((a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp)
         .slice(start, length);
     } else if (type === C.STR_SPEND_WALLET_TYPE) {
+      return txnData;
+    } else if (type === C.STR_WATCH_WALLET_TYPE) {
       return txnData;
     }
   };

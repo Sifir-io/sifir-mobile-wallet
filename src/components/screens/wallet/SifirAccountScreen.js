@@ -41,6 +41,7 @@ class SifirAccountScreen extends React.Component {
         this.setState({balance, txnData, showAccountHistory: true});
         break;
       case C.STR_SPEND_WALLET_TYPE:
+      case C.STR_WATCH_WALLET_TYPE:
         let {
           balance: walletBalance,
           txnData: walletTxnData,

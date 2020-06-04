@@ -118,7 +118,6 @@ const getBtcWalletList = () => async dispatch => {
 
 const getWalletDetails = ({label, type}) => async dispatch => {
   dispatch({type: types.BTC_WALLET_DETAILS + PENDING});
-
   let balance = 0,
     txnData = [];
   try {
