@@ -25,21 +25,19 @@ class SifirBtcTxnConfirmedScreen extends Component {
   render() {
     const {type} = this.props.route.params;
     const addrTxtFontSize = (C.vw * 250) / address?.length || 25;
-
     const {amount, address, isSendTxn, unit} = this.props.route.params.txnInfo;
-    const payTitleText =
-      type === C.STR_LN_WALLET_TYPE
-        ? C.STR_PAID
-        : isSendTxn
-        ? C.STR_SENT
-        : C.STR_RECEIVED;
-    const payDataTitleText = `${C.STR_PAYMENT} ${
-      type === C.STR_LN_WALLET_TYPE
-        ? C.STR_PRE_IMAGE
-        : isSendTxn
-        ? C.STR_RECEIPIENT
-        : C.STR_SENDER
-    }`;
+    let payTitleText, payDataTitleText;
+    switch (type) {
+      case C.STR_LN_WALLET_TYPE:
+        payTitleText = C.STR_PAID;
+        payDataTitleText = `${C.STR_PAYMENT} ${C.STR_PRE_IMAGE}`;
+        break;
+      default:
+        payTitleText = isSendTxn ? C.STR_SENT : C.STR_RECEIVED;
+        payDataTitleText = `${C.STR_PAYMENT} ${
+          isSendTxn ? C.STR_RECEIPIENT : C.STR_SENDER
+        }`;
+    }
     return (
       <View style={styles.mainView}>
         <ScrollView style={styles.sv}>

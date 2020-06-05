@@ -35,8 +35,8 @@ class SifirBtcSendTxnConfirmScreen extends Component {
       walletInfo: {type},
     } = this.props.route.params;
     const {address, amount} = txnInfo;
-    const withdrawDetails = await this.props.withdrawFunds(address, amount);
-    if (withdrawDetails?.tx) {
+    const sendResult = await this.props.withdrawFunds(address, amount);
+    if (sendResult?.tx) {
       this.props.navigation.navigate('BtcTxnConfirmed', {
         txnInfo: {
           ...txnInfo,
@@ -44,6 +44,7 @@ class SifirBtcSendTxnConfirmScreen extends Component {
           amount,
           address,
         },
+        sendResult,
         walletInfo,
         displayUnit: C.STR_MSAT,
         type,
@@ -54,20 +55,30 @@ class SifirBtcSendTxnConfirmScreen extends Component {
   sendBitcoin = async () => {
     const {txnInfo, walletInfo} = this.props.route.params;
     const {address, amount} = txnInfo;
-    await this.props.sendBitcoin({address, amount});
-    this.props.navigation.navigate('BtcTxnConfirmed', {
-      txnInfo: {...txnInfo, isSendTxn: true},
-      walletInfo,
-    });
+    const btcSendResult = await this.props.sendBitcoin({address, amount});
+    if (btcSendResult?.status === 'accepted') {
+      this.props.navigation.navigate('BtcTxnConfirmed', {
+        txnInfo: {...txnInfo, isSendTxn: true},
+        sendResult: btcSendResult,
+        walletInfo,
+      });
+    }
   };
   sendWasabi = async () => {
     const {txnInfo, walletInfo, anonset} = this.props.route.params;
     const {address, amount} = txnInfo;
-    await this.props.wasabiSpend({address, amount, minanonset: anonset});
-    this.props.navigation.navigate('BtcTxnConfirmed', {
-      txnInfo: {...txnInfo, isSendTxn: true},
-      walletInfo,
+    const sendResult = await this.props.wasabiSpend({
+      address,
+      amount,
+      minanonset: anonset,
     });
+    if (sendResult?.result?.txid) {
+      this.props.navigation.navigate('BtcTxnConfirmed', {
+        txnInfo: {...txnInfo, isSendTxn: true},
+        sendResult,
+        walletInfo,
+      });
+    }
   };
 
   handleSendBtn = () => {
@@ -96,15 +107,26 @@ class SifirBtcSendTxnConfirmScreen extends Component {
     const amountFontSize =
       (C.vw * 80) / (amount.length < 3 ? 5 : amount.length);
     const recTxtFontSize = (C.vw * 120) / address.length;
-    const {loading: btcLoading, error: btcError} = this.props.lnWallet;
-    const {loading: lnLoading, error: lnError} = this.props.btcWallet;
+    let isLoading, hasError;
+    switch (type) {
+      case C.STR_LN_WITHDRAW:
+        ({loading: isLoading, error: hasError} = this.props.lnWallet);
+        break;
+      case C.STR_WASABI_WALLET_TYPE:
+        ({loading: isLoading, error: hasError} = this.props.wasabiWallet);
+        break;
 
-    if (btcError || lnError) {
+      default:
+        ({loading: isLoading, error: hasError} = this.props.btcWallet);
+        break;
+    }
+
+    if (hasError) {
       return (
         <ErrorScreen
           title={C.STR_ERROR_transaction}
           desc={C.STR_ERROR_btc_txn_error}
-          error={btcError || lnError}
+          error={hasError}
           actions={[
             {
               text: C.STR_GO_BACK,
@@ -149,8 +171,9 @@ class SifirBtcSendTxnConfirmScreen extends Component {
               <Text style={styles.waitTxt}>[4 Hour Wait]</Text>
             </View>
           )}
-          {(btcLoading || lnLoading) && <ActivityIndicator size="large" />}
+          {isLoading && <ActivityIndicator size="large" />}
           <TouchableOpacity
+            disabled={!!isLoading}
             onLongPress={this.handleSendBtn}
             style={styles.sendBtnTouchable}>
             <View shadowColor="black" shadowOffset="30" style={styles.sendBtn}>
