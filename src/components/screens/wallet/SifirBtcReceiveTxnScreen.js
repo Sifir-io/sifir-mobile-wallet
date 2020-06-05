@@ -122,7 +122,7 @@ const SifirBtcReceiveTxnScreen = props => {
         walletAddress = await props.getWalletAddress({
           label,
           type,
-          addrType: addrType.value,
+          addrType: addrType?.value,
         });
         break;
     }
