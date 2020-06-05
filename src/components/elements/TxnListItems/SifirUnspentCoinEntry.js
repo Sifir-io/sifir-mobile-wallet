@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import UnspentCoinListItem from '@elements/TxnListItems/SifirUnspentCoinListItem';
 import {Images} from '@common/index';
 
-const SifirUnspentCoinEntry = ({txn, unit}) => {
+const SifirUnspentCoinEntry = ({utxo, unit}) => {
   try {
-    const {amount, address, confirmed, label, anonymitySet, txid} = txn;
+    const {amount, address, confirmed, label, anonymitySet, txid} = utxo;
     // TODO add multiSelect list and use following icon
     const imgURL = confirmed ? Images.icon_confirmed : Images.icon_unconfirmed;
     return (

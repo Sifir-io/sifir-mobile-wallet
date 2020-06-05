@@ -85,7 +85,7 @@ const SifirAccountHistory = ({
         <SifirTransactions
           txnData={filteredTxns}
           type={type}
-          unit={btcUnit}
+          btcUnit={btcUnit}
           headerText={headerText}
           filterWasabiTxnData={filterWasabiTxnData}
         />
@@ -100,7 +100,7 @@ const SifirAccountHistory = ({
         contentContainerStyle={{flexGrow: 1}}>
         <SifirTransactions
           txnData={txnData}
-          unit={btcUnit}
+          btcUnit={btcUnit}
           type={C.STR_UNSPENT_COINS}
         />
       </ScrollView>

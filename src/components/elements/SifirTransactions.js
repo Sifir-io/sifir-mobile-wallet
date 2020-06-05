@@ -11,17 +11,17 @@ const SifirTransactions = props => {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const {type, headerText, filterWasabiTxnData, btcUnit, txnData} = props;
 
-  const renderItem = (txn, unit) => {
+  const renderItem = txn => {
     if (type === C.STR_WASABI_WALLET_TYPE) {
-      return <SifirWasabiTxnEntry txn={txn} unit={unit} />;
+      return <SifirWasabiTxnEntry txn={txn} unit={btcUnit} />;
     } else if (type === C.STR_UNSPENT_COINS) {
-      return <SifirUnspentCoinEntry txn={txn} unit={unit} />;
+      return <SifirUnspentCoinEntry utxo={txn} unit={btcUnit} />;
     } else if (type === C.STR_LN_WALLET_TYPE) {
-      return <SifirInvEntry inv={txn} unit={unit} />;
+      return <SifirInvEntry inv={txn} unit={btcUnit} />;
     } else if (type === C.STR_SPEND_WALLET_TYPE) {
-      return <SifirTxnEntry txn={txn} unit={unit} />;
+      return <SifirTxnEntry txn={txn} unit={btcUnit} />;
     } else if (type === C.STR_WATCH_WALLET_TYPE) {
-      return <SifirTxnEntry txn={txn} unit={unit} />;
+      return <SifirTxnEntry txn={txn} unit={btcUnit} />;
     }
   };
 
@@ -80,7 +80,7 @@ const SifirTransactions = props => {
       <SifirTxnList
         txnData={txnData}
         type={type}
-        unit={btcUnit}
+        btcUnit={btcUnit}
         renderItem={renderItem}
         processData={processData}
         //TODO onFilter

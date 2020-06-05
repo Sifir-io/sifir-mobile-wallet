@@ -8,7 +8,12 @@ import {
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 
-const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
+const SifirAccountActions = ({
+  type,
+  sendActionButtonLabel,
+  handleReceiveButton,
+  handleSendBtn,
+}) => {
   const [btnStatus, setButtonStatus] = useState(0);
   return (
     <View style={styles.btnAreaView}>
@@ -25,7 +30,9 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
               styles.txnBtnView,
               btnStatus === 1 ? {backgroundColor: 'black', opacity: 0.7} : {},
             ]}>
-            <Text style={{color: 'white', fontSize: 15}}>{C.STR_SEND}</Text>
+            <Text style={{color: 'white', fontSize: 15}}>
+              {sendActionButtonLabel}
+            </Text>
             <Image
               source={Images.icon_up_arrow}
               style={{width: 11, height: 11, marginLeft: 10}}

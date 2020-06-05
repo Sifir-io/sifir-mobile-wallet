@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {StyleSheet, FlatList} from 'react-native';
 
-const SifirTxnList = ({unit, txnData, type, renderItem, processData}) => {
+const SifirTxnList = ({txnData, type, renderItem, processData}) => {
   const [txnDataCached, setTxnDataCached] = useState([]);
   // FIXME proper array compare
   if (txnData.length !== txnDataCached.length) {
@@ -18,7 +18,7 @@ const SifirTxnList = ({unit, txnData, type, renderItem, processData}) => {
         item?.bolt11 + item?.txid + index + item.tx
       }
       renderItem={({item}) => {
-        return renderItem(item, unit);
+        return renderItem(item);
       }}
     />
   );

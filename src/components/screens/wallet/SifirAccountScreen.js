@@ -144,6 +144,7 @@ class SifirAccountScreen extends React.Component {
       accountIconOnPress,
       accountHeaderText,
       accountTransactionHeaderText,
+      accountActionSendLabel = C.STR_SEND,
       btcUnit,
       chartData = null,
       settingModalProps = {};
@@ -165,6 +166,7 @@ class SifirAccountScreen extends React.Component {
           showWithdraw: true,
         };
         btcUnit = C.STR_MSAT;
+        accountActionSendLabel = 'Pay Invoice';
         break;
       case C.STR_WASABI_WALLET_TYPE:
         ({
@@ -177,7 +179,9 @@ class SifirAccountScreen extends React.Component {
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
-        chartData = txnData?.unspentCoins;
+        // only show chart when more than one unspentcoin
+        chartData =
+          txnData?.unspentCoins?.length > 1 ? txnData.unspentCoins : null;
         settingModalProps = {autoSpendToWallet: true};
         break;
       default:
@@ -276,6 +280,7 @@ class SifirAccountScreen extends React.Component {
                 // For now only watching wallets cant send
                 type === C.STR_WATCH_WALLET_TYPE ? null : this.handleSendBtn
               }
+              sendActionButtonLabel={accountActionSendLabel}
             />
           </View>
           <View style={styles.extraSpace} onLayout={this.onExtraSpaceLayout} />
