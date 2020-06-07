@@ -8,6 +8,7 @@ const initialState = {
   loaded: false,
   unspentCoinsList: [],
   txnsList: [],
+  spendResult: [],
 };
 
 const wasabiWallet = createReducer(initialState)({
@@ -53,6 +54,28 @@ const wasabiWallet = createReducer(initialState)({
     txnsList,
   }),
   [types.WASABI_WALLET_GET_TXNS + REJECTED]: (state, {payload: {error}}) => ({
+    ...state,
+    error,
+    loading: false,
+    loaded: false,
+  }),
+  [types.WASABI_WALLET_SPEND + PENDING]: state => ({
+    ...state,
+    error: null,
+    loading: true,
+    loaded: false,
+  }),
+  [types.WASABI_WALLET_SPEND + FULFILLED]: (
+    state,
+    {payload: {spendResult}},
+  ) => ({
+    ...state,
+    loading: false,
+    loaded: true,
+    error: null,
+    spendResult,
+  }),
+  [types.WASABI_WALLET_SPEND + REJECTED]: (state, {payload: {error}}) => ({
     ...state,
     error,
     loading: false,

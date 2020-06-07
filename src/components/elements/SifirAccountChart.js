@@ -121,6 +121,7 @@ const SifirAccountChart = props => {
     const anonSetValue = scaleX.invert(x);
     // const cumSumBalanceValue = scaleY.invert(y);
     // find first anonset pair in acending array where value < array
+    // FIXME HERE TRELLO TICKET is why bug is breaing ?
     const [, cumSumBalanceValue] = series.find(
       ([anonset]) => anonSetValue <= anonset,
     );

@@ -15,8 +15,8 @@ const validatedTokenHash = tokenHash => {
   }
 };
 
+const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
 const isValidLnNodeId = node => {
-  const nodeRegx = new RegExp(/^([A-Za-z0-9]{66})/);
   return nodeRegx.test(node);
 };
 

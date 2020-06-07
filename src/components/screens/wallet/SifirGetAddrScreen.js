@@ -38,8 +38,11 @@ class SifirGetAddrScreen extends Component {
         scannedQRdata: data,
         showModal: false,
       },
+      // FIXME this nonsense can be replaced by useEffect on scannedQrData
+      // Also removes need for handle continue button repeat of code, just sett the qrdata
+      //
       () => {
-        if (type === C.STR_LN_WITHDRAW) {
+        if (type !== C.STR_LN_WALLET_TYPE) {
           this.handleAddressScanned();
         } else {
           this.handleBoltScanned();

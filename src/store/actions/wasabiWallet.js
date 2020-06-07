@@ -75,6 +75,7 @@ const spend = ({
     });
     dispatch({
       type: types.WASABI_WALLET_SPEND + FULFILLED,
+      payload: {spendResult},
     });
     return spendResult;
   } catch (err) {
