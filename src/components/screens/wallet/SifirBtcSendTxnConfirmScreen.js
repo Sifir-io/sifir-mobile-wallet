@@ -115,7 +115,6 @@ class SifirBtcSendTxnConfirmScreen extends Component {
       case C.STR_WASABI_WALLET_TYPE:
         ({loading: isLoading, error: hasError} = this.props.wasabiWallet);
         break;
-
       default:
         ({loading: isLoading, error: hasError} = this.props.btcWallet);
         break;

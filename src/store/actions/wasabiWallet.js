@@ -73,6 +73,11 @@ const spend = ({
       private: privateOnly,
       minanonset,
     });
+    if (spendResult?.result === 'error') {
+      throw new Error(
+        spendResult?.message || 'Error while attempting Wasabi spend',
+      );
+    }
     dispatch({
       type: types.WASABI_WALLET_SPEND + FULFILLED,
       payload: {spendResult},
