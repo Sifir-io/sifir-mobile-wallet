@@ -15,7 +15,9 @@ import {getUnspentCoins, getTxns as wasabiGetTxns} from '@actions/wasabiWallet';
 import SifirAccountHeader from '@elements/SifirAccountHeader';
 import SifirAccountChart from '@elements/SifirAccountChart';
 import SifirAccountActions from '@elements/SifirAccountActions';
-import SifirAccountHistory, {sheetHeight} from '@elements/SifirAccountHistory';
+import SifirAccountHistoryTabs, {
+  sheetHeight,
+} from '@structures/SifirAccountHistoryTabs';
 import SifirSettingModal from '@elements/SifirSettingModal';
 import {ErrorScreen} from '@screens/error';
 import debounce from '../../../helpers/debounce';
@@ -286,10 +288,39 @@ class SifirAccountScreen extends React.Component {
           <View style={styles.extraSpace} onLayout={this.onExtraSpaceLayout} />
         </View>
         {this.state.showAccountHistory && (
-          <SifirAccountHistory
+          <SifirAccountHistoryTabs
             loading={isLoading}
             loaded={isLoaded}
             type={type}
+            filterMap={[
+              {
+                title: 'Recieved',
+                cb: (data, param) =>
+                  data.transactions.filter(txn => {
+                    return txn.amount > 0;
+                  }),
+              },
+              {
+                title: 'Sent',
+                cb: (data, parma) =>
+                  data.transactions.filter(txn => {
+                    return txn.amount < 0;
+                  }),
+              },
+            ]}
+            dataMap={[
+              // FIXME key strings
+              {
+                key: C.STR_WASABI_WALLET_TYPE,
+                title: 'Transactions',
+                data: wasabiGetTxns,
+              },
+              {
+                key: C.STR_UNSPENT_COINS,
+                title: 'Unspent Coins',
+                data: getUnspentCoins,
+              },
+            ]}
             txnData={txnData}
             btcUnit={btcUnit}
             headerText={accountTransactionHeaderText}

@@ -1,7 +1,12 @@
+/* @DEPRECATED 
+ * contents moved to sifirtransacotins
+ * */
 import React, {useState} from 'react';
 import {StyleSheet, FlatList} from 'react-native';
 
-const SifirTxnList = ({txnData, type, renderItem, processData}) => {
+// FIXME txnData , processDAta ??
+// I think this gets moved one level up to SifirTransactions , onFilter can set the data it will render after each filter returns
+const SifirTxnList = ({txnData, renderItem, processData}) => {
   const [txnDataCached, setTxnDataCached] = useState([]);
   // FIXME proper array compare
   if (txnData.length !== txnDataCached.length) {

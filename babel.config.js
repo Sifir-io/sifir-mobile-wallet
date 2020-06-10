@@ -17,6 +17,7 @@ module.exports = {
           '@helpers': './src/helpers',
           '@types': './src/store/types',
           '@screens': './src/components/screens',
+          '@structures': './src/components/structures',
         },
       },
     ],

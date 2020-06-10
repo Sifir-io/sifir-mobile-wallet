@@ -105,6 +105,11 @@ const getLnNodeInfo = label => async dispatch => {
 const getLnWalletDetails = ({label}) => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
+    // FIXME
+    // const init = dispatch(initSifirClient());
+    // and make sifirClient call not blocking so we can dispatch what's in the DB and then do the update
+    // with a LN_WALLET_DETAILS + UPDATE event ?
+    //
     await dispatch(initSifirClient());
     const {
       funds: {channels, outputs},
