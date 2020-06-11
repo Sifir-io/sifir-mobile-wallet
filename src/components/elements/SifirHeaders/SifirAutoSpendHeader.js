@@ -8,47 +8,55 @@ import {
   TextInput,
 } from 'react-native';
 import {AppStyle, svg} from '@common';
+import SifirSwitch from '@elements/SifirSwitch';
+import AnimatedOverlay from '@elements/AnimatedOverlay';
 
 const {Back} = svg;
 
-const SifirSwitch = ({containerStyle, headerText, setSwitchOn, isSwitchOn}) => {
+const SifirAutoSpendHeader = ({
+  headerText,
+  setSwitchOn,
+  isSwitchOn,
+  showOverlay,
+}) => {
   const onBackPress = () => {};
 
   return (
-    <View style={[containerStyle, {backgroundColor: AppStyle.backgroundColor}]}>
-      <View style={[styles.titleContainer]}>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          style={{marginStart: 12, flex: 0.5}}
-          onPress={onBackPress}>
-          <Back />
-        </TouchableOpacity>
-        <Text style={styles.title}>{headerText}</Text>
-        <SifirSwitch
-          style={{paddingTop: 20}}
-          isActive={isSwitchOn}
-          setSwitchOn={active => setSwitchOn(active)}
-        />
-      </View>
+    <View style={styles.titleContainer}>
+      {showOverlay && <AnimatedOverlay />}
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={{marginStart: 12, flex: 0.5}}
+        onPress={onBackPress}>
+        <Back />
+      </TouchableOpacity>
+
+      <Text style={styles.title} numberOfLines={1}>
+        {headerText}
+      </Text>
+      <SifirSwitch
+        isActive={isSwitchOn}
+        setSwitchOn={active => setSwitchOn(active)}
+      />
     </View>
   );
 };
 
-export default SifirSwitch;
+export default SifirAutoSpendHeader;
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    paddingTop: 10,
   },
   title: {
-    flex: 10,
-    marginStart: 12,
+    marginLeft: 12,
     fontSize: 20,
     color: '#00EDE7',
     fontWeight: 'bold',
     fontFamily: AppStyle.mainFont,
+    width: '60%',
   },
   menuItem: {},
   activeMenuItem: {
