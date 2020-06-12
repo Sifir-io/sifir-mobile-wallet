@@ -9,6 +9,8 @@ const initialState = {
   funds: [],
   peers: [],
   nodeInfo: [],
+  pays: [],
+  invoices: [],
 };
 
 const lnWallet = createReducer(initialState)({
@@ -56,8 +58,13 @@ const lnWallet = createReducer(initialState)({
     loading: true,
     loaded: false,
   }),
-  [types.LN_WALLET_DETAILS + FULFILLED]: state => ({
+  [types.LN_WALLET_DETAILS + FULFILLED]: (
+    state,
+    {payload: {pays, invoices}},
+  ) => ({
     ...state,
+    pays,
+    invoices,
     loading: false,
     loaded: true,
     error: null,

@@ -177,6 +177,7 @@ const getLnWalletDetails = ({label}) => async dispatch => {
     }
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
+      payload: {pays, invoices},
     });
     return {
       balance,

@@ -147,6 +147,8 @@ class SifirAccountScreen extends React.Component {
       accountActionSendLabel = C.STR_SEND,
       btcUnit,
       chartData = null,
+      dataMap,
+      filterMap,
       settingModalProps = {};
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
@@ -167,6 +169,26 @@ class SifirAccountScreen extends React.Component {
         };
         btcUnit = C.STR_MSAT;
         accountActionSendLabel = 'Pay Invoice';
+        dataMap = [
+          // FIXME key strings
+          {
+            key: C.STR_LN_WALLET_TYPE,
+            title: 'Invoices & Payments',
+            data: [
+              ...this.props.lnWallet.invoices,
+              ...this.props.lnWallet.pays,
+            ].sort(
+              (a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp,
+            ),
+          },
+          // FIXME funds, channels
+          //{
+          //  key: C.STR_UNSPENT_COINS,
+          //  title: 'Unspent Coins',
+          //  data: this.props.wasabiWallet.unspentCoinsList?.unspentcoins,
+          //},
+        ];
+        // FIXME filterMap for pays, invoices, paid, pending erc..
         break;
       case C.STR_WASABI_WALLET_TYPE:
         ({
@@ -201,6 +223,35 @@ class SifirAccountScreen extends React.Component {
             },
           ],
         };
+        filterMap = [
+          {
+            title: 'Recieved',
+            cb: (data, param) =>
+              data.filter(txn => {
+                return txn.amount > 0;
+              }),
+          },
+          {
+            title: 'Sent',
+            cb: (data, parma) =>
+              data.filter(txn => {
+                return txn.amount < 0;
+              }),
+          },
+        ];
+        dataMap = [
+          // FIXME key strings
+          {
+            key: C.STR_WASABI_WALLET_TYPE,
+            title: 'Transactions',
+            data: this.props.wasabiWallet.txnsList?.transactions,
+          },
+          {
+            key: C.STR_UNSPENT_COINS,
+            title: 'Unspent Coins',
+            data: this.props.wasabiWallet.unspentCoinsList?.unspentcoins,
+          },
+        ];
         break;
       default:
         ({
@@ -213,6 +264,29 @@ class SifirAccountScreen extends React.Component {
         accountIconOnPress = () => {};
         accountTransactionHeaderText = C.STR_TRANSACTIONS;
         btcUnit = C.STR_BTC;
+        filterMap = [
+          {
+            title: 'Recieved',
+            cb: (data, param) =>
+              data.filter(txn => {
+                return txn.amount > 0;
+              }),
+          },
+          {
+            title: 'Sent',
+            cb: (data, parma) =>
+              data.filter(txn => {
+                return txn.amount < 0;
+              }),
+          },
+        ];
+        dataMap = [
+          {
+            key: type,
+            title: 'Transactions',
+            data: this.props.btcWallet.txnData,
+          },
+        ];
     }
 
     if (hasError) {
@@ -308,35 +382,8 @@ class SifirAccountScreen extends React.Component {
             loading={isLoading}
             loaded={isLoaded}
             type={type}
-            filterMap={[
-              {
-                title: 'Recieved',
-                cb: (data, param) =>
-                  data.filter(txn => {
-                    return txn.amount > 0;
-                  }),
-              },
-              {
-                title: 'Sent',
-                cb: (data, parma) =>
-                  data.filter(txn => {
-                    return txn.amount < 0;
-                  }),
-              },
-            ]}
-            dataMap={[
-              // FIXME key strings
-              {
-                key: C.STR_WASABI_WALLET_TYPE,
-                title: 'Transactions',
-                data: this.props.wasabiWallet.txnsList?.transactions,
-              },
-              {
-                key: C.STR_UNSPENT_COINS,
-                title: 'Unspent Coins',
-                data: this.props.wasabiWallet.unspentCoinsList?.unspentcoins,
-              },
-            ]}
+            filterMap={filterMap}
+            dataMap={dataMap}
             txnData={txnData}
             btcUnit={btcUnit}
             headerText={accountTransactionHeaderText}
