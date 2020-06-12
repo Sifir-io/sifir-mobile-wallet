@@ -131,6 +131,11 @@ export const C = {
   STR_Segwit_Compatible: 'Segwit Compatible (P2SH)',
   STR_Bech32: 'Segwit Native (Bech32)',
   STR_Wallet_balance: 'Wallet Balance',
+  STR_Min_Anonset: 'Min Anonset',
+  STR_Anonim_Level: 'Anonimity Level',
+  STR_Set_Min_Anonset: 'Set Minimum Anonset',
+  STR_Select_Account:
+    'Select one account to which the Wasabi wallet will autosend funds to.',
   // --- ERRORS --
   STR_ERROR_app: 'App Error',
   STR_ERROR: 'Error',

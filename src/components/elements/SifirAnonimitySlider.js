@@ -6,7 +6,7 @@ import LinearGradient from 'react-native-linear-gradient';
 const height = 60;
 const width = C.SCREEN_WIDTH;
 
-const AnimatedSlider = ({
+const SifirAnonimitySlider = ({
   minX,
   maxX,
   SV,
@@ -61,14 +61,14 @@ const AnimatedSlider = ({
       </View>
       <View style={styles.sliderLabelContainer}>
         <Text style={styles.sliderLabel}>{minX}</Text>
-        <Text style={styles.sliderLabel}>Anonimity Level</Text>
+        <Text style={styles.sliderLabel}>{C.STR_Anonim_Level}</Text>
         <Text style={styles.sliderLabel}>{maxX}</Text>
       </View>
     </>
   );
 };
 
-export default AnimatedSlider;
+export default SifirAnonimitySlider;
 const styles = StyleSheet.create({
   root: {
     height,

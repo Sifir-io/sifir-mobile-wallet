@@ -10,17 +10,19 @@ import {
   Animated,
 } from 'react-native';
 import SifirAutoSpendHeader from '@elements/SifirHeaders/SifirAutoSpendHeader';
-import AnimatedSlider from '@elements/AnimatedSlider';
+import SifirAnonimitySlider from '@elements/SifirAnonimitySlider';
 import {AppStyle, C, Images} from '@common';
-import SifirCard from '../../elements/SifirCard';
-import AnimatedOverlay from '../../elements/AnimatedOverlay';
+import SifirCard from '@elements/SifirCard';
+import SifirAnimatedOverlay from '@elements/SifirAnimatedOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import Androw from 'react-native-androw';
 import {scaleLinear} from 'd3-scale';
 import {log} from '@io/events';
 import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
-import debounce from '../../../helpers/debounce';
+import debounce from '@helpers/debounce';
+import makeUnspentCoinsChartData from '@helpers/makeUnspentCoinsChartData';
+import SifirAutoSpendWalletCard from '@elements/SifirAutoSpendWalletCard';
 
 const d3 = {
   shape,
@@ -124,35 +126,6 @@ const SifirWasabiAutoSpendScreen = props => {
     setListItemPositions({...listItemPositions, [id]: {width, height, x, y}});
   };
 
-  const makeUnspentCoinsChartData = chartData => {
-    const data = chartData.reduce((g, t) => {
-      g[Math.floor(t.anonymitySet)] =
-        (g[Math.floor(t.anonymitySet)] || 0) + t.amount;
-      return g;
-    }, {});
-    const sortedAnonsetTotalPairs = Object.entries(data).sort(
-      ([anonset1], [anonset2]) => anonset1 - anonset2,
-    );
-    if (sortedAnonsetTotalPairs.length < 2) {
-      sortedAnonsetTotalPairs.unshift(sortedAnonsetTotalPairs[0]);
-    }
-    const chartStats = sortedAnonsetTotalPairs.reduce(
-      (stats, [anonset, total], i) => {
-        const cumTotal = sortedAnonsetTotalPairs
-          .slice(i)
-          .reduce((totalToIndex, [, t1]) => totalToIndex + t1, 0);
-        stats.series.push([Number(anonset), cumTotal]);
-        stats.maxY = Math.max(cumTotal, stats.maxY);
-        stats.maxX = Math.max(anonset, stats.maxX);
-        stats.minY = Math.min(cumTotal, stats.minY);
-        stats.minX = Math.min(anonset, stats.minX);
-        return stats;
-      },
-      {series: [], minX: 99999, maxX: null, minY: null, maxY: null},
-    );
-    return chartStats;
-  };
-
   const plotData = sampleData.unspentcoins;
 
   useEffect(() => {
@@ -238,7 +211,7 @@ const SifirWasabiAutoSpendScreen = props => {
       <View
         onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         <SifirAutoSpendHeader
-          headerText="Set Minimum Anonset"
+          headerText={C.STR_Set_Min_Anonset}
           handleBackPress={() => navigation.goBack()}
           isSwitchOn={isSwitchOn}
           setSwitchOn={handleSwitch}
@@ -248,7 +221,7 @@ const SifirWasabiAutoSpendScreen = props => {
       <Text
         style={styles.description}
         onLayout={event => setTopTextPosition(event.nativeEvent.layout.y)}>
-        Select one account to which the Wasabi wallet will autosend funds to.
+        {C.STR_Select_Account}
       </Text>
       <View style={styles.seperator} />
       <ScrollView
@@ -257,41 +230,25 @@ const SifirWasabiAutoSpendScreen = props => {
           setListContainerPosition(event.nativeEvent.layout.y)
         }>
         {listItems.map(item => {
-          const {id, leftIcon, heading, annonset} = item;
           return (
-            <TouchableOpacity
-              onPress={() => setSelectedWallet(item)}
-              onLayout={event => onLayoutListItem(event, id)}>
-              <SifirCard
-                style={[
-                  styles.cardContainer,
-                  {
-                    borderColor:
-                      selectedWallet?.id === id
-                        ? AppStyle.mainColor
-                        : '#19282f',
-                  },
-                ]}>
-                <Image source={leftIcon} style={styles.leftIcon} />
-                <Text style={styles.listHeading}>{heading}</Text>
-                <View style={styles.rightContainer}>
-                  <Text style={styles.anonset}>{annonset}</Text>
-                  <Text style={styles.anonsetLabel}>Min Anonset</Text>
-                </View>
-              </SifirCard>
-            </TouchableOpacity>
+            <SifirAutoSpendWalletCard
+              item={item}
+              onLayoutListItem={onLayoutListItem}
+              setSelectedWallet={setSelectedWallet}
+              selectedWallet={selectedWallet}
+            />
           );
         })}
       </ScrollView>
       {!isSwitchOn && (
-        <AnimatedOverlay
+        <SifirAnimatedOverlay
           style={{
             top: headerHeight,
           }}
         />
       )}
       {selectedWallet?.id && (
-        <AnimatedOverlay
+        <SifirAnimatedOverlay
           style={{top: headerHeight}}
           onTouchEnd={() => setSelectedWallet({})}
         />
@@ -313,7 +270,7 @@ const SifirWasabiAutoSpendScreen = props => {
           <Text style={styles.listHeading}>{selectedWallet?.heading}</Text>
           <View style={styles.rightContainer}>
             <Text style={styles.anonset}>{selectedWallet?.annonset}</Text>
-            <Text style={styles.anonsetLabel}>Min Anonset</Text>
+            <Text style={styles.anonsetLabel}>{C.STR_Min_Anonset}</Text>
           </View>
         </SifirCard>
       )}
@@ -327,14 +284,14 @@ const SifirWasabiAutoSpendScreen = props => {
               marginTop: 0,
             },
           ]}>
-          Select one account to which the Wasabi wallet will autosend funds to.
+          {C.STR_Select_Account}
         </Text>
       )}
       {selectedWallet?.id && (
         <Androw style={styles.shadow}>
           <View style={styles.stickyContainer}>
             <View>
-              <AnimatedSlider
+              <SifirAnonimitySlider
                 SV={SV}
                 lineLength={lineLength}
                 slider={slider}
@@ -346,7 +303,7 @@ const SifirWasabiAutoSpendScreen = props => {
               />
             </View>
             <TouchableOpacity style={styles.confirmBtn}>
-              <Text style={styles.confirmLabel}>CONFIRM</Text>
+              <Text style={styles.confirmLabel}>{C.STR_CONFIRM}</Text>
             </TouchableOpacity>
           </View>
         </Androw>
@@ -420,7 +377,6 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: -10},
     shadowOpacity: 0.4,
     shadowRadius: 5,
-    height: '30%',
     backgroundColor: '#091110',
     position: 'absolute',
     bottom: 0,
