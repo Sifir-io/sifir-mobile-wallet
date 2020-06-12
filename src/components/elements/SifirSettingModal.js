@@ -91,40 +91,6 @@ class SifirSettingModal extends Component {
               ))}
             </View>
           )}
-          {this.state.curMenu === 2 && (
-            <View style={styles.timeView}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={styles.clockImgView}>
-                  <Image source={Images.icon_clock} style={styles.clockImg} />
-                  <Text style={styles.setFeeTxt}>{'Autospend wallet'}</Text>
-                </View>
-              </View>
-              <View style={{width: '100%'}}>
-                <Slider
-                  step={1}
-                  animationType="spring"
-                  minimumValue={1}
-                  maximumValue={90}
-                  value={40}
-                  thumbTintColor="#5595a8"
-                  onValueChange={value => this.setState({value})}
-                  minimumTrackTintColor="#25b6fa"
-                  maximumTrackTintColor="#412160"
-                  thumbStyle={styles.thumb}
-                  trackStyle={{
-                    height: 10,
-                    borderRadius: 5,
-                  }}
-                />
-              </View>
-              <View style={styles.waitView}>
-                <Text style={{fontSize: 20}}>{'Autospend Anonset:'}</Text>
-                <Text style={{fontSize: 20, color: 'blue'}}>
-                  {this.state.value}
-                </Text>
-              </View>
-            </View>
-          )}
           {this.state.curMenu === 1 && (
             <View style={styles.timeView}>
               <View style={{flexDirection: 'row'}}>
@@ -165,15 +131,6 @@ class SifirSettingModal extends Component {
                   label={C.STR_Manage_Fund}
                   onPress={() => {
                     this.setState({curMenu: 1});
-                  }}
-                />
-              )}
-              {this.props.autoSpendToWallet && (
-                <MenuListItem
-                  icon={Images.icon_clock}
-                  label={'Set minimum Anonset'}
-                  onPress={() => {
-                    this.setState({curMenu: 2});
                   }}
                 />
               )}

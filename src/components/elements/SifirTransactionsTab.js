@@ -51,23 +51,21 @@ const SifirTransactionsTab = props => {
   //};
   // fetch data on init
   useEffect(() => {
-    fetchTabData();
+    console.log('transaction tab fetching', txnData);
+    setTabData(txnData);
   }, [txnData]);
   // auto Filter on new data refresh
   useEffect(() => {
-    if (filterMap?.length) {
+    console.log('Filter use effect', tabData, appliedFilter);
+    if (!tabData?.length || !filterMap?.length) {
       return;
     }
-    if (appliedFilter === null) {
-      return;
-    }
-    handleOnFilter(filterMap.find(({title}) => title === appliedFilter));
+    const {cb, title} = filterMap.find(
+      ({title: mapFilterTitle}) => mapFilterTitle === appliedFilter,
+    ) || {cb: null, title: null};
+    handleOnFilter({cb, title});
   }, [tabData]);
-  const fetchTabData = async () => {
-    const dataForTab = typeof data === 'function' ? await txnData() : txnData;
-    setTabData(dataForTab);
-    setFilteredData(dataForTab);
-  };
+
   const handleOnFilter = ({cb, title}) => {
     setAppliedFilter(title);
     // TODO
@@ -78,21 +76,19 @@ const SifirTransactionsTab = props => {
     const filterMapData = cb(tabData);
     setFilteredData(filterMapData);
   };
-  const SifirFilteredTxns = useMemo(
-    () => (
-      <FlatList
-        data={filteredData}
-        extraData={filteredData}
-        keyExtractor={(item, index) =>
-          item?.bolt11 + item?.txid + index + item.tx
-        }
-        renderItem={({item}) => {
-          return renderItem(item);
-        }}
-      />
-    ),
-    [filteredData],
-  );
+  //const SifirFilteredTxns = useMemo(
+  //  txns => (
+  //    <FlatList
+  //      data={txns}
+  //      extraData={txns}
+  //      keyExtractor={(item, index) =>
+  //        item?.bolt11 + item?.txid + index + item.tx
+  //      }
+  //      renderItem={renderItem}
+  //    />
+  //  ),
+  //  [filteredData],
+  //);
   return (
     <View style={styles.container}>
       {!!filterMap?.length && (
@@ -125,7 +121,14 @@ const SifirTransactionsTab = props => {
           ))}
         </View>
       )}
-      <SifirFilteredTxns />
+      <FlatList
+        data={filteredData}
+        extraData={filteredData}
+        keyExtractor={(item, index) =>
+          item?.bolt11 + item?.txid + index + item.tx
+        }
+        renderItem={renderItem}
+      />
     </View>
   );
 };

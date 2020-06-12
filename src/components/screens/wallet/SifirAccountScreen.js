@@ -59,16 +59,14 @@ class SifirAccountScreen extends React.Component {
         break;
       case C.STR_WASABI_WALLET_TYPE:
         // TODO move loading txns to tab change
-        const [
-          {unspentcoins: unspentCoins},
-          {transactions},
-        ] = await Promise.all([
+        const [{unspentcoins: unspentCoins}] = await Promise.all([
           this.props.getUnspentCoins(),
           this.props.wasabiGetTxns(),
         ]);
         const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
+        // FIXME kill this duplication of state , just use the store value
         this.setState({
-          txnData: {unspentCoins, transactions},
+          txnData: {unspentCoins},
           showAccountHistory: txnDataExists ? true : false,
         });
         if (!this.state.showAccountHistory) {
@@ -177,14 +175,32 @@ class SifirAccountScreen extends React.Component {
           error: hasError,
         } = this.props.wasabiWallet);
         accountIcon = Images.icon_wasabi;
-        accountIconOnPress = toggleSettingsModal.bind(this);
+        accountIconOnPress = () => {
+          // TODO load configs
+          toggleSettingsModal.bind(this);
+        };
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
         btcUnit = C.STR_SAT;
         // only show chart when more than one unspentcoin
         chartData =
           txnData?.unspentCoins?.length > 1 ? txnData.unspentCoins : null;
-        settingModalProps = {autoSpendToWallet: true};
+        settingModalProps = {
+          isLoading,
+          menuItems: [
+            {
+              label: `Auto mixing service ${/* FIXME getProps */ true}`,
+              onPress: () => {
+                toggleSettingsModal();
+                navigate('WalletSelectMenu', {
+                  onBackPress: () => {
+                    navigate.pop();
+                  },
+                });
+              },
+            },
+          ],
+        };
         break;
       default:
         ({
@@ -296,14 +312,14 @@ class SifirAccountScreen extends React.Component {
               {
                 title: 'Recieved',
                 cb: (data, param) =>
-                  data.transactions.filter(txn => {
+                  data.filter(txn => {
                     return txn.amount > 0;
                   }),
               },
               {
                 title: 'Sent',
                 cb: (data, parma) =>
-                  data.transactions.filter(txn => {
+                  data.filter(txn => {
                     return txn.amount < 0;
                   }),
               },
@@ -313,12 +329,12 @@ class SifirAccountScreen extends React.Component {
               {
                 key: C.STR_WASABI_WALLET_TYPE,
                 title: 'Transactions',
-                data: wasabiGetTxns,
+                data: this.props.wasabiWallet.txnsList?.transactions,
               },
               {
                 key: C.STR_UNSPENT_COINS,
                 title: 'Unspent Coins',
-                data: getUnspentCoins,
+                data: this.props.wasabiWallet.unspentCoinsList?.unspentcoins,
               },
             ]}
             txnData={txnData}

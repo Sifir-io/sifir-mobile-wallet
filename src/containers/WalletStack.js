@@ -11,6 +11,7 @@ import {
   SifirBtcReceiveTxnScreen,
   SifirBtcTxnConfirmedScreen,
   SifirAddWalletScreen,
+  SifirWasabiAutoSpendScreen,
 } from '@screens/wallet/index';
 import {LNChannelRoute, LNPayInvoiceRoute} from './LnStack';
 
@@ -33,7 +34,6 @@ export default function WalletTab() {
         component={SifirAccountsListScreen}
       />
       <WalletStack.Screen name="AddWallet" component={SifirAddWalletScreen} />
-
       <WalletStack.Screen name="Account" component={SifirAccountScreen} />
       <WalletStack.Screen name="GetAddress" component={SifirGetAddrScreen} />
       <WalletStack.Screen
@@ -52,11 +52,15 @@ export default function WalletTab() {
         name="BtcTxnConfirmed"
         component={SifirBtcTxnConfirmedScreen}
       />
-
       <WalletStack.Screen name="LNChannelRoute" component={LNChannelRoute} />
       <WalletStack.Screen
         name="LNPayInvoiceRoute"
         component={LNPayInvoiceRoute}
+      />
+      {/* FIXME namin */}
+      <WalletStack.Screen
+        name="WalletSelectMenu"
+        component={SifirWasabiAutoSpendScreen}
       />
     </WalletStack.Navigator>
   );

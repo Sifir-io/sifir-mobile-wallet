@@ -50,7 +50,7 @@ const SifirWasabiAutoSpendScreen = props => {
   const [listContainerPosition, setListContainerPosition] = useState(0);
   const [topTextPosition, setTopTextPosition] = useState(0);
   const [SVoffset, setSVoffset] = useState(0);
-  const {navigation} = props;
+  const {onBackPress} = props;
   useEffect(() => {
     StatusBar.setBackgroundColor(AppStyle.backgroundColor);
   }, []);
@@ -72,8 +72,8 @@ const SifirWasabiAutoSpendScreen = props => {
       <View
         onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         <SifirAutoSpendHeader
-          headerText="Set Minimum Anonset"
-          handleBackPress={() => navigation.goBack()}
+          headerText="Enable Mixing As A Service"
+          handleBackPress={onBackPress}
           isSwitchOn={isSwitchOn}
           setSwitchOn={handleSwitch}
           showOverlay={!isSwitchOn || selectedWallet?.id}
@@ -82,7 +82,7 @@ const SifirWasabiAutoSpendScreen = props => {
       <Text
         style={styles.description}
         onLayout={event => setTopTextPosition(event.nativeEvent.layout.y)}>
-        Select one account to which the Wasabi wallet will autosend funds to.
+        Select a wallet to have your mixed coins auto sent to
       </Text>
       <View style={styles.seperator} />
       <ScrollView

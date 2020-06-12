@@ -49,35 +49,44 @@ const SifirAccountHistoryTabs = ({
   bottomExtraSpace,
 }) => {
   const [index, setIndex] = useState(0);
-  const [tabData, setTabData] = useState(null);
+  // const [tabData, setTabData] = useState(null);
   //useEffect(() => {
   //  setTabData(txnData);
   //}, [txnData]);
 
-  const onTabIndexChange = async ({}) => {
-    setIndex(index);
-  };
+  const onTabIndexChange = tabIndex => setIndex(tabIndex);
   const TransctionTabFactory = ({title, key, data}) => {
     let renderItem;
     switch (key) {
       case C.STR_WASABI_WALLET_TYPE:
-        renderItem = txn => <SifirWasabiTxnEntry txn={txn} unit={btcUnit} />;
+        renderItem = ({item: txn}) => (
+          <SifirWasabiTxnEntry txn={txn} unit={btcUnit} />
+        );
         break;
       case C.STR_UNSPENT_COINS:
         // FIXME rename to UTXO ?
-        renderItem = txn => <SifirUnspentCoinEntry utxo={txn} unit={btcUnit} />;
+        renderItem = ({item: txn}) => (
+          <SifirUnspentCoinEntry utxo={txn} unit={btcUnit} />
+        );
         break;
       case C.STR_LN_WALLET_TYPE:
-        renderItem = txn => <SifirInvEntry inv={txn} unit={btcUnit} />;
+        renderItem = ({item: txn}) => (
+          <SifirInvEntry inv={txn} unit={btcUnit} />
+        );
         break;
       case C.STR_SPEND_WALLET_TYPE:
-        renderItem = txn => <SifirTxnEntry txn={txn} unit={btcUnit} />;
+        renderItem = ({item: txn}) => (
+          <SifirTxnEntry txn={txn} unit={btcUnit} />
+        );
         break;
       case C.STR_WATCH_WALLET_TYPE:
-        renderItem = txn => <SifirTxnEntry txn={txn} unit={btcUnit} />;
+        renderItem = ({item: txn}) => (
+          <SifirTxnEntry txn={txn} unit={btcUnit} />
+        );
         break;
     }
-    return (
+    // console.log('traaaaaaaaafaaa', title, key, data, renderItem);
+    return param => (
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{flexGrow: 1}}>
@@ -90,17 +99,15 @@ const SifirAccountHistoryTabs = ({
       </ScrollView>
     );
   };
-  const renderScene = useMemo(
-    () =>
-      SceneMap(
-        dataMap.reduce((sceneDict, {key, title, data}) => {
-          // FIXME useMemo on scene or on TranstabFac
-          sceneDict[key] = TransctionTabFactory({key, title, data});
-          return sceneDict;
-        }, {}),
-      ),
-    [tabData],
-  );
+  const renderScene = useMemo(() => {
+    return SceneMap(
+      dataMap.reduce((sceneDict, {key, title, data}) => {
+        // FIXME useMemo on scene or on TranstabFac
+        sceneDict[key] = TransctionTabFactory({key, title, data});
+        return sceneDict;
+      }, {}),
+    );
+  }, [dataMap]);
   return (
     <BottomSheet
       snapPoints={[
