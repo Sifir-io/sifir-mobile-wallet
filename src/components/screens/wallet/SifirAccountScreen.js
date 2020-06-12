@@ -177,7 +177,7 @@ class SifirAccountScreen extends React.Component {
         accountIcon = Images.icon_wasabi;
         accountIconOnPress = () => {
           // TODO load configs
-          toggleSettingsModal.bind(this);
+          toggleSettingsModal.apply(this);
         };
         accountHeaderText = C.STR_Wasabi_Header + anonset;
         accountTransactionHeaderText = C.STR_ALL_TRANSACTIONS;
@@ -191,7 +191,7 @@ class SifirAccountScreen extends React.Component {
             {
               label: `Auto mixing service ${/* FIXME getProps */ true}`,
               onPress: () => {
-                toggleSettingsModal();
+                toggleSettingsModal.apply(this);
                 navigate('WalletSelectMenu', {
                   onBackPress: () => {
                     navigate.pop();

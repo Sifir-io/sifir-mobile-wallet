@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {AppStyle, svg} from '@common';
 import SifirSwitch from '@elements/SifirSwitch';
-import AnimatedOverlay from '@elements/AnimatedOverlay';
+import SifirAnimatedOverlay from '@elements/SifirAnimatedOverlay';
 
 const {Back} = svg;
 
@@ -23,7 +23,7 @@ const SifirAutoSpendHeader = ({
 
   return (
     <View style={styles.titleContainer}>
-      {showOverlay && <AnimatedOverlay />}
+      {showOverlay && <SifirAnimatedOverlay />}
       <TouchableOpacity
         activeOpacity={0.9}
         style={{marginStart: 12, flex: 0.5}}
