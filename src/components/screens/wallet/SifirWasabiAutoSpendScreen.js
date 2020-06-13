@@ -32,43 +32,41 @@ const slider = React.createRef();
 const label = React.createRef();
 const SV = React.createRef();
 const x = new Animated.Value(0);
-const verticalPadding = 5;
 const width = C.SCREEN_WIDTH - 20;
-const height = 70;
 const cursor = React.createRef();
 
-const listItems = [
-  {
-    id: 1,
-    leftIcon: Images.icon_light,
-    heading: 'Gasshans Wallet',
-    annonset: 0,
-  },
-  {
-    id: 2,
-    leftIcon: Images.icon_light,
-    heading: 'Online Shopping',
-    annonset: 25,
-  },
-  {
-    id: 3,
-    leftIcon: Images.icon_btcBtn,
-    heading: 'Wallet B',
-    annonset: 40,
-  },
-  {
-    id: 4,
-    leftIcon: Images.icon_light,
-    heading: 'pOOP',
-    annonset: 0,
-  },
-  {
-    id: 4,
-    leftIcon: Images.icon_light,
-    heading: 'Gasshans Wallet',
-    annonset: 0,
-  },
-];
+//const listItems = [
+//  {
+//    id: 1,
+//    leftIcon: Images.icon_light,
+//    heading: 'Gasshans Wallet',
+//    annonset: 0,
+//  },
+//  {
+//    id: 2,
+//    leftIcon: Images.icon_light,
+//    heading: 'Online Shopping',
+//    annonset: 25,
+//  },
+//  {
+//    id: 3,
+//    leftIcon: Images.icon_btcBtn,
+//    heading: 'Wallet B',
+//    annonset: 40,
+//  },
+//  {
+//    id: 4,
+//    leftIcon: Images.icon_light,
+//    heading: 'pOOP',
+//    annonset: 0,
+//  },
+//  {
+//    id: 4,
+//    leftIcon: Images.icon_light,
+//    heading: 'Gasshans Wallet',
+//    annonset: 0,
+//  },
+//];
 
 const SifirWasabiAutoSpendScreen = props => {
   const [isSwitchOn, setSwitchOn] = useState(null);
@@ -78,12 +76,20 @@ const SifirWasabiAutoSpendScreen = props => {
   const [listContainerPosition, setListContainerPosition] = useState(0);
   const [topTextPosition, setTopTextPosition] = useState(0);
   const [SVoffset, setSVoffset] = useState(0);
-  const {onBackPress, minX = 2, maxX = 120} = props;
+  const {minX = 2, maxX = 120} = props;
+  // FIXME get configs?
+  const {onBackPress, walletList} = props.route.params;
   const [anonset, setanonset] = useState(0);
-
+  console.log('got wallet list', walletList);
   useEffect(() => {
     StatusBar.setBackgroundColor(AppStyle.backgroundColor);
   }, []);
+
+  useEffect(() => {
+    if (selectedWallet?.label) {
+      _init();
+    }
+  }, [selectedWallet]);
 
   const handleSwitch = value => {
     if (!value) {
@@ -97,23 +103,14 @@ const SifirWasabiAutoSpendScreen = props => {
     setListItemPositions({...listItemPositions, [id]: {width, height, x, y}});
   };
 
-  useEffect(() => {
-    if (selectedWallet?.id) {
-      _init();
-    }
-  }, [selectedWallet]);
-
   const {scaleX, properties, lineLength} = useMemo(() => {
     const scaleX = scaleLinear()
       .domain([minX, maxX])
       .range([20, width - 20]);
-    const scaleY = scaleLinear()
-      .domain([0, 0])
-      .range([height - verticalPadding, verticalPadding]);
     const line = d3.shape
       .line()
       .x(anonset => scaleX(Number(anonset)))
-      .y(() => scaleY(0))
+      .y(() => 0)
       .curve(d3.shape.curveStepBefore)([minX, maxX]);
     const p = path.svgPathProperties(line);
     return {
@@ -152,8 +149,8 @@ const SifirWasabiAutoSpendScreen = props => {
     slider?.current.setNativeProps({
       left: left - 10,
     });
-    const anonSetValue = scaleX.invert(x);
-    const text = `${Math.floor(anonSetValue)}`;
+    const anonSetValue = Math.floor(scaleX.invert(x));
+    const text = `${anonSetValue}`;
     label?.current?.setNativeProps({
       text,
       left: left + 3.5,
@@ -168,11 +165,11 @@ const SifirWasabiAutoSpendScreen = props => {
       <View
         onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         <SifirAutoSpendHeader
-          handleBackPress={onBackPress}
+          onBackPress={onBackPress}
           headerText={C.STR_Set_Min_Anonset}
           isSwitchOn={isSwitchOn}
           setSwitchOn={handleSwitch}
-          showOverlay={!isSwitchOn || selectedWallet?.id}
+          showOverlay={!isSwitchOn || selectedWallet?.label}
         />
       </View>
       <Text
@@ -186,7 +183,7 @@ const SifirWasabiAutoSpendScreen = props => {
         onLayout={event =>
           setListContainerPosition(event.nativeEvent.layout.y)
         }>
-        {listItems.map(item => {
+        {walletList.map(item => {
           return (
             <SifirAutoSpendWalletCard
               item={item}
@@ -204,13 +201,13 @@ const SifirWasabiAutoSpendScreen = props => {
           }}
         />
       )}
-      {selectedWallet?.id && (
+      {selectedWallet?.label && (
         <SifirAnimatedOverlay
           style={{top: headerHeight}}
           onTouchEnd={() => setSelectedWallet({})}
         />
       )}
-      {selectedWallet?.id && (
+      {selectedWallet?.label && (
         <SifirCard
           style={[
             styles.cardContainer,
@@ -218,20 +215,22 @@ const SifirWasabiAutoSpendScreen = props => {
               borderColor: AppStyle.mainColor,
               position: 'absolute',
               top:
-                listItemPositions[(selectedWallet?.id)].y +
+                listItemPositions[(selectedWallet?.label)].y +
                 listContainerPosition -
                 SVoffset,
             },
           ]}>
-          <Image source={selectedWallet?.leftIcon} style={styles.leftIcon} />
-          <Text style={styles.listHeading}>{selectedWallet?.heading}</Text>
+          <Image source={selectedWallet?.iconURL} style={styles.leftIcon} />
+          <Text style={styles.listHeading}>{`${selectedWallet?.label} ${
+            selectedWallet.desc
+          }`}</Text>
           <View style={styles.rightContainer}>
             <Text style={styles.anonset}>{selectedWallet?.annonset}</Text>
             <Text style={styles.anonsetLabel}>{C.STR_Min_Anonset}</Text>
           </View>
         </SifirCard>
       )}
-      {selectedWallet?.id && (
+      {selectedWallet?.label && (
         <Text
           style={[
             styles.description,
@@ -244,7 +243,7 @@ const SifirWasabiAutoSpendScreen = props => {
           {C.STR_Select_Account}
         </Text>
       )}
-      {selectedWallet?.id && (
+      {selectedWallet?.label && (
         <Androw style={styles.shadow}>
           <View style={styles.stickyContainer}>
             <View>

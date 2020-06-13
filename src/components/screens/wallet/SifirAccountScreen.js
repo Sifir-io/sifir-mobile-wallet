@@ -227,8 +227,13 @@ class SifirAccountScreen extends React.Component {
                 toggleSettingsModal.apply(this);
                 navigate('WalletSelectMenu', {
                   onBackPress: () => {
-                    navigate.pop();
+                    this.props.navigation.pop();
                   },
+                  walletList: this.props.btcWallet.btcWalletList?.filter(
+                    ({type: walletType}) =>
+                      // TODO ln wallet either add to CN or filter out here
+                      walletType !== C.STR_WASABI_WALLET_TYPE,
+                  ),
                 });
               },
             },

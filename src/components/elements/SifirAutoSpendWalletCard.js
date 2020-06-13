@@ -9,24 +9,25 @@ const SifirAutoSpendWalletCard = ({
   onLayoutListItem,
   selectedWallet,
 }) => {
-  const {id, leftIcon, heading, annonset} = item;
+  const {label, desc, iconURL, meta} = item;
+  // const {id, leftIcon, heading, annonset} = item;
 
   return (
     <TouchableOpacity
       onPress={() => setSelectedWallet(item)}
-      onLayout={event => onLayoutListItem(event, id)}>
+      onLayout={event => onLayoutListItem(event, label)}>
       <SifirCard
         style={[
           styles.cardContainer,
           {
             borderColor:
-              selectedWallet?.id === id ? AppStyle.mainColor : '#19282f',
+              selectedWallet?.label === label ? AppStyle.mainColor : '#19282f',
           },
         ]}>
-        <Image source={leftIcon} style={styles.leftIcon} />
-        <Text style={styles.listHeading}>{heading}</Text>
+        <Image source={iconURL} style={styles.leftIcon} />
+        <Text style={styles.listHeading}>{`${label} - ${desc}`}</Text>
         <View style={styles.rightContainer}>
-          <Text style={styles.anonset}>{annonset}</Text>
+          <Text style={styles.anonset}>{0}</Text>
           <Text style={styles.anonsetLabel}>{C.STR_Min_Anonset}</Text>
         </View>
       </SifirCard>

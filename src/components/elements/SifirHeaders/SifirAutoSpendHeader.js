@@ -18,9 +18,8 @@ const SifirAutoSpendHeader = ({
   setSwitchOn,
   isSwitchOn,
   showOverlay,
+  onBackPress,
 }) => {
-  const onBackPress = () => {};
-
   return (
     <View style={styles.titleContainer}>
       {showOverlay && <SifirAnimatedOverlay />}
