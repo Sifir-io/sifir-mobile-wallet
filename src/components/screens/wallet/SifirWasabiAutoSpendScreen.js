@@ -17,11 +17,11 @@ import SifirAnimatedOverlay from '@elements/SifirAnimatedOverlay';
 import {ScrollView} from 'react-native-gesture-handler';
 import Androw from 'react-native-androw';
 import {scaleLinear} from 'd3-scale';
-import {log} from '@io/events';
+import {log, error} from '@io/events';
 import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
 import debounce from '@helpers/debounce';
-import makeUnspentCoinsChartData from '@helpers/makeUnspentCoinsChartData';
+// import makeUnspentCoinsChartData from '@helpers/makeUnspentCoinsChartData';
 import SifirAutoSpendWalletCard from '@elements/SifirAutoSpendWalletCard';
 
 const d3 = {
@@ -70,41 +70,6 @@ const listItems = [
   },
 ];
 
-const sampleData = {
-  instanceId: null,
-  unspentcoins: [
-    {
-      txid: '1473967d81f9032ea8421bf6fa45688ae7772246ff4a37c0892f75ab7bb36e99',
-      index: 1,
-      amount: 10872,
-      anonymitySet: 42,
-      confirmed: true,
-      label: '',
-      keyPath: "84'/0'/0'/1/13420",
-      address: 'tb1qul3w3n9p87a683z759l5tsllpkazlskz7wmdwm',
-    },
-    {
-      txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-      index: 1,
-      amount: 10872,
-      anonymitySet: 3,
-      confirmed: true,
-      label: '',
-      keyPath: "84'/0'/0'/1/13420",
-      address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-    },
-    {
-      txid: '1473967d81f9032ea8421bf6fa4dasdasdasdasdasd92f75ab7bb36e99',
-      index: 1,
-      amount: 10872,
-      anonymitySet: 3,
-      confirmed: true,
-      label: '',
-      keyPath: "84'/0'/0'/1/13420",
-      address: 'tb1qul3w3n9asdsadasdadasdzlskz7wmdwm',
-    },
-  ],
-};
 const SifirWasabiAutoSpendScreen = props => {
   const [isSwitchOn, setSwitchOn] = useState(null);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -113,7 +78,7 @@ const SifirWasabiAutoSpendScreen = props => {
   const [listContainerPosition, setListContainerPosition] = useState(0);
   const [topTextPosition, setTopTextPosition] = useState(0);
   const [SVoffset, setSVoffset] = useState(0);
-  const {onBackPress} = props;
+  const {onBackPress, minX = 2, maxX = 120} = props;
   const [anonset, setanonset] = useState(0);
 
   useEffect(() => {
@@ -132,46 +97,38 @@ const SifirWasabiAutoSpendScreen = props => {
     setListItemPositions({...listItemPositions, [id]: {width, height, x, y}});
   };
 
-  const plotData = sampleData.unspentcoins;
-
   useEffect(() => {
     if (selectedWallet?.id) {
       _init();
     }
   }, [selectedWallet]);
 
-  const {series, minX, maxX, minY, maxY} = useMemo(
-    () => makeUnspentCoinsChartData(plotData),
-    [plotData],
-  );
-
-  const {scaleX, scaleY, line, properties, lineLength} = useMemo(() => {
+  const {scaleX, line, properties, lineLength} = useMemo(() => {
     const scaleX = scaleLinear()
       .domain([minX, maxX])
       .range([20, width - 20]);
     const scaleY = scaleLinear()
-      .domain([minY, maxY])
+      .domain([0, 0])
       .range([height - verticalPadding, verticalPadding]);
     const line = d3.shape
       .line()
-      .x(([anonset]) => scaleX(Number(anonset)))
-      .y(([, balance]) => scaleY(balance))
-      .curve(d3.shape.curveStepBefore)(series);
+      .x(anonset => scaleX(Number(anonset)))
+      .y(() => scaleY(0))
+      .curve(d3.shape.curveStepBefore)([minX, maxX]);
     const p = path.svgPathProperties(line);
     return {
       scaleX,
-      scaleY,
+      // scaleY,
       line,
       properties: p,
       lineLength: p.getTotalLength(),
     };
-  }, [series]);
+  }, [minX, maxX]);
 
   const _init = () => {
     try {
       x.addListener(({value}) => moveCursor(value));
-      log('Chart data lineLength', lineLength);
-      let {x: X, y} = properties.getPointAtLength(lineLength);
+      let {x: X} = properties.getPointAtLength(lineLength);
       let left = X - 10;
       cursor?.current?.setNativeProps({
         left,
@@ -179,17 +136,17 @@ const SifirWasabiAutoSpendScreen = props => {
       slider?.current.setNativeProps({
         left: left - 10,
       });
-      moveCursor(0);
+      moveCursor(100);
     } catch (err) {
-      console.error(err);
+      error(err);
     }
   };
 
   const handleChartSlider = data =>
-    debounce(({anonset, value}) => setanonset(Math.floor(anonset)), 1);
+    debounce(({anonset}) => setanonset(Math.floor(anonset)), 13);
 
   const moveCursor = value => {
-    let {x, y} = properties.getPointAtLength(lineLength - value);
+    let {x} = properties.getPointAtLength(lineLength - value);
     let left = x - +10;
     cursor?.current?.setNativeProps({
       left,
@@ -198,9 +155,6 @@ const SifirWasabiAutoSpendScreen = props => {
       left: left - 10,
     });
     const anonSetValue = scaleX.invert(x);
-    const [, cumSumBalanceValue] = series.find(
-      ([anonset]) => anonSetValue <= anonset,
-    );
     const text = `${Math.floor(anonSetValue)}`;
     label?.current?.setNativeProps({
       text,
@@ -208,7 +162,6 @@ const SifirWasabiAutoSpendScreen = props => {
     });
     handleChartSlider({
       anonset: anonSetValue,
-      value: cumSumBalanceValue,
     });
   };
 
