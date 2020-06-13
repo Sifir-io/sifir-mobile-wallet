@@ -174,12 +174,13 @@ class SifirAccountScreen extends React.Component {
           {
             key: C.STR_LN_WALLET_TYPE,
             title: 'Invoices & Payments',
-            data: [
-              ...this.props.lnWallet.invoices,
-              ...this.props.lnWallet.pays,
-            ].sort(
-              (a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp,
-            ),
+            data: [...this.props.lnWallet.invoices, ...this.props.lnWallet.pays]
+              .filter(txn => {
+                return txn && txn?.decodedBolt11?.timestamp > 1;
+              })
+              .sort(
+                (a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp,
+              ),
           },
           // FIXME funds, channels
           //{
@@ -189,6 +190,16 @@ class SifirAccountScreen extends React.Component {
           //},
         ];
         // FIXME filterMap for pays, invoices, paid, pending erc..
+        filterMap = [
+          {
+            title: 'Invoices',
+            cb: (data, param) => data.filter(txn => txn.type === 'invoice'),
+          },
+          {
+            title: 'Payments',
+            cb: (data, param) => data.filter(txn => txn.type === 'pay'),
+          },
+        ];
         break;
       case C.STR_WASABI_WALLET_TYPE:
         ({

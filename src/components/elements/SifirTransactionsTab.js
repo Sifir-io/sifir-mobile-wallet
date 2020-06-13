@@ -16,7 +16,7 @@ import {Images, AppStyle, C} from '@common/index';
 import moment from 'moment';
 const SifirTransactionsTab = props => {
   const [showContextMenu, setShowContextMenu] = useState(false);
-  const {headerText, filterMap, txnData, renderItem} = props;
+  const {headerText, filterMap = [], txnData, renderItem} = props;
   const [tabData, setTabData] = useState([]);
   const [appliedFilter, setAppliedFilter] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
@@ -51,12 +51,10 @@ const SifirTransactionsTab = props => {
   //};
   // fetch data on init
   useEffect(() => {
-    console.log('transaction tab fetching', txnData);
     setTabData(txnData);
   }, [txnData]);
   // auto Filter on new data refresh
   useEffect(() => {
-    console.log('Filter use effect', tabData, appliedFilter);
     if (!tabData?.length || !filterMap?.length) {
       return;
     }

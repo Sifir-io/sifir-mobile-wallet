@@ -154,7 +154,8 @@ const getLnWalletDetails = ({label}) => async dispatch => {
               // log('cached bolt', payload);
             } else {
               // decode and insert it
-              const decodedBolt11 = bolt11Lib.decode(inv.bolt11);
+              const [x, y] = inv.bolt11.split(':');
+              const decodedBolt11 = bolt11Lib.decode(x || y);
               payload = {
                 decodedBolt11,
                 bolt11: inv.bolt11,
@@ -177,7 +178,7 @@ const getLnWalletDetails = ({label}) => async dispatch => {
     }
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
-      payload: {pays, invoices},
+      payload: {pays: processedPays, invoices: processedInvoices},
     });
     return {
       balance,

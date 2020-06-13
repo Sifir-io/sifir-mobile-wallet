@@ -103,7 +103,7 @@ const SifirWasabiAutoSpendScreen = props => {
     }
   }, [selectedWallet]);
 
-  const {scaleX, line, properties, lineLength} = useMemo(() => {
+  const {scaleX, properties, lineLength} = useMemo(() => {
     const scaleX = scaleLinear()
       .domain([minX, maxX])
       .range([20, width - 20]);
@@ -118,8 +118,6 @@ const SifirWasabiAutoSpendScreen = props => {
     const p = path.svgPathProperties(line);
     return {
       scaleX,
-      // scaleY,
-      line,
       properties: p,
       lineLength: p.getTotalLength(),
     };

@@ -85,7 +85,6 @@ const SifirAccountHistoryTabs = ({
         );
         break;
     }
-    // console.log('traaaaaaaaafaaa', title, key, data, renderItem);
     return param => (
       <ScrollView
         showsVerticalScrollIndicator={false}
