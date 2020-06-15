@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useCallback, useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState} from 'react';
 import {View, Image, StyleSheet, Text, ActivityIndicator} from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 import SifirTransactionsTab from '@elements/SifirTransactionsTab';
@@ -101,7 +101,6 @@ const SifirAccountHistoryTabs = ({
   const renderScene = useMemo(() => {
     return SceneMap(
       dataMap.reduce((sceneDict, {key, title, data}) => {
-        // FIXME useMemo on scene or on TranstabFac
         sceneDict[key] = TransctionTabFactory({key, title, data});
         return sceneDict;
       }, {}),

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {connect} from 'react-redux';
 import {Images, AppStyle, C} from '@common/index';
@@ -21,6 +22,7 @@ import SifirAccountHistoryTabs, {
 import SifirSettingModal from '@elements/SifirSettingModal';
 import {ErrorScreen} from '@screens/error';
 import debounce from '../../../helpers/debounce';
+// FIXME change this to functions with effects before we deploy
 class SifirAccountScreen extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -63,17 +65,17 @@ class SifirAccountScreen extends React.Component {
           this.props.getUnspentCoins(),
           this.props.wasabiGetTxns(),
         ]);
-        const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
+        // const txnDataExists = this.state.txnData?.unspentCoins ? true : false;
         // FIXME kill this duplication of state , just use the store value
         this.setState({
           txnData: {unspentCoins},
-          showAccountHistory: txnDataExists ? true : false,
+          showAccountHistory: true,
         });
-        if (!this.state.showAccountHistory) {
-          setTimeout(() => {
-            this.setState({showAccountHistory: true});
-          }, 100);
-        }
+        //if (!this.state.showAccountHistory) {
+        //  setTimeout(() => {
+        //    this.setState({showAccountHistory: true});
+        //  }, 100);
+        //}
         break;
     }
   }
@@ -174,22 +176,22 @@ class SifirAccountScreen extends React.Component {
           {
             key: C.STR_LN_WALLET_TYPE,
             title: 'Invoices & Payments',
-            data: [...this.props.lnWallet.invoices, ...this.props.lnWallet.pays]
-              .filter(txn => {
-                return txn && txn?.decodedBolt11?.timestamp > 1;
-              })
+            data: [
+              ...(this.props.lnWallet?.invoices || []),
+              ...(this.props.lnWallet?.pays || []),
+            ]
+              .filter(txn => txn && txn?.decodedBolt11?.timestamp > 1)
               .sort(
                 (a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp,
               ),
           },
-          // FIXME funds, channels
+          // TODO funds, channels
           //{
           //  key: C.STR_UNSPENT_COINS,
           //  title: 'Unspent Coins',
           //  data: this.props.wasabiWallet.unspentCoinsList?.unspentcoins,
           //},
         ];
-        // FIXME filterMap for pays, invoices, paid, pending erc..
         filterMap = [
           {
             title: 'Invoices',
@@ -210,6 +212,7 @@ class SifirAccountScreen extends React.Component {
         accountIcon = Images.icon_wasabi;
         accountIconOnPress = () => {
           // TODO load configs
+          // Should this be part of init payload form SifirClient ?
           toggleSettingsModal.apply(this);
         };
         accountHeaderText = C.STR_Wasabi_Header + anonset;
@@ -222,16 +225,27 @@ class SifirAccountScreen extends React.Component {
           isLoading,
           menuItems: [
             {
-              label: `Auto mixing service ${/* FIXME getProps */ true}`,
+              label: 'Auto Send: Disabled',
               onPress: () => {
                 toggleSettingsModal.apply(this);
                 navigate('WalletSelectMenu', {
                   onBackPress: () => {
                     this.props.navigation.pop();
                   },
+                  onConfirm: ({selectedWallet, anonset: autoSpendAnonset}) => {
+                    console.log('confirmed', selectedWallet, autoSpendAnonset);
+                    Alert.alert(
+                      `Auto Mixing Service Enabled`,
+                      `Coins reaching An anonymity set of ${autoSpendAnonset} will be automagically sent to your wallet: ${
+                        selectedWallet.label
+                      } - ${selectedWallet.desc}.`,
+                    );
+                    // FIXME do config update call
+                    this.props.navigation.pop();
+                  },
+                  // FIXME map to add anonset autospend cfg for wallet ?
                   walletList: this.props.btcWallet.btcWalletList?.filter(
                     ({type: walletType}) =>
-                      // TODO ln wallet either add to CN or filter out here
                       walletType !== C.STR_WASABI_WALLET_TYPE,
                   ),
                 });
@@ -242,17 +256,11 @@ class SifirAccountScreen extends React.Component {
         filterMap = [
           {
             title: 'Recieved',
-            cb: (data, param) =>
-              data.filter(txn => {
-                return txn.amount > 0;
-              }),
+            cb: (data, param) => data.filter(txn => txn.amount > 0),
           },
           {
             title: 'Sent',
-            cb: (data, parma) =>
-              data.filter(txn => {
-                return txn.amount < 0;
-              }),
+            cb: (data, param) => data.filter(txn => txn.amount < 0),
           },
         ];
         dataMap = [

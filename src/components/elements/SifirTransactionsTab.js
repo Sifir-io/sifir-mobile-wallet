@@ -74,19 +74,19 @@ const SifirTransactionsTab = props => {
     const filterMapData = cb(tabData);
     setFilteredData(filterMapData);
   };
-  //const SifirFilteredTxns = useMemo(
-  //  txns => (
-  //    <FlatList
-  //      data={txns}
-  //      extraData={txns}
-  //      keyExtractor={(item, index) =>
-  //        item?.bolt11 + item?.txid + index + item.tx
-  //      }
-  //      renderItem={renderItem}
-  //    />
-  //  ),
-  //  [filteredData],
-  //);
+  const SifirFilteredTxns = useMemo(
+    () => (
+      <FlatList
+        data={filteredData}
+        extraData={filteredData}
+        keyExtractor={(item, index) =>
+          item?.bolt11 + item?.txid + index + item.tx
+        }
+        renderItem={renderItem}
+      />
+    ),
+    [filteredData],
+  );
   return (
     <View style={styles.container}>
       {!!filterMap?.length && (
@@ -119,14 +119,7 @@ const SifirTransactionsTab = props => {
           ))}
         </View>
       )}
-      <FlatList
-        data={filteredData}
-        extraData={filteredData}
-        keyExtractor={(item, index) =>
-          item?.bolt11 + item?.txid + index + item.tx
-        }
-        renderItem={renderItem}
-      />
+      {SifirFilteredTxns}
     </View>
   );
 };

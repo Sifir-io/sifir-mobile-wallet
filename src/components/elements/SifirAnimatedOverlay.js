@@ -1,13 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useRef, useEffect} from 'react';
+import React, {useRef, useEffect, useLayoutEffect} from 'react';
 import {Animated, Text, View, StyleSheet} from 'react-native';
 
-export default ({style = {}, children, ...rest}) => {
+export default ({style = {}, effectDeps = [], children, ...rest}) => {
   const fadeAnim = new Animated.Value(0.2);
-  useEffect(() => {
+  useLayoutEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 0.8,
       duration: 150,
+      userNativeDriver: true,
     }).start();
   }, []);
   return (

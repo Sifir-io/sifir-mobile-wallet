@@ -25,14 +25,15 @@ const SifirAutoSpendHeader = ({
       {showOverlay && <SifirAnimatedOverlay />}
       <TouchableOpacity
         activeOpacity={0.9}
-        style={{marginStart: 12, flex: 0.5}}
+        style={{marginStart: 12, flex: 0.2}}
         onPress={onBackPress}>
         <Back />
       </TouchableOpacity>
-
-      <Text style={styles.title} numberOfLines={1}>
-        {headerText}
-      </Text>
+      <TouchableOpacity onPress={onBackPress} style={{flex: 0.7}}>
+        <Text style={styles.title} numberOfLines={1}>
+          {headerText}
+        </Text>
+      </TouchableOpacity>
       <SifirSwitch
         isActive={isSwitchOn}
         setSwitchOn={active => setSwitchOn(active)}
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   title: {
-    marginLeft: 12,
+    // marginLeft: 12,
     fontSize: 20,
     color: '#00EDE7',
     fontWeight: 'bold',

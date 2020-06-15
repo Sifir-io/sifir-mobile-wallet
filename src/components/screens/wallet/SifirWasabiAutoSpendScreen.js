@@ -35,39 +35,6 @@ const x = new Animated.Value(0);
 const width = C.SCREEN_WIDTH - 20;
 const cursor = React.createRef();
 
-//const listItems = [
-//  {
-//    id: 1,
-//    leftIcon: Images.icon_light,
-//    heading: 'Gasshans Wallet',
-//    annonset: 0,
-//  },
-//  {
-//    id: 2,
-//    leftIcon: Images.icon_light,
-//    heading: 'Online Shopping',
-//    annonset: 25,
-//  },
-//  {
-//    id: 3,
-//    leftIcon: Images.icon_btcBtn,
-//    heading: 'Wallet B',
-//    annonset: 40,
-//  },
-//  {
-//    id: 4,
-//    leftIcon: Images.icon_light,
-//    heading: 'pOOP',
-//    annonset: 0,
-//  },
-//  {
-//    id: 4,
-//    leftIcon: Images.icon_light,
-//    heading: 'Gasshans Wallet',
-//    annonset: 0,
-//  },
-//];
-
 const SifirWasabiAutoSpendScreen = props => {
   const [isSwitchOn, setSwitchOn] = useState(null);
   const [headerHeight, setHeaderHeight] = useState(0);
@@ -78,9 +45,8 @@ const SifirWasabiAutoSpendScreen = props => {
   const [SVoffset, setSVoffset] = useState(0);
   const {minX = 2, maxX = 120} = props;
   // FIXME get configs?
-  const {onBackPress, walletList} = props.route.params;
-  const [anonset, setanonset] = useState(0);
-  console.log('got wallet list', walletList);
+  const {onBackPress, onConfirm, walletList} = props.route.params;
+  const [anonset, setAnonset] = useState(0);
   useEffect(() => {
     StatusBar.setBackgroundColor(AppStyle.backgroundColor);
   }, []);
@@ -98,9 +64,13 @@ const SifirWasabiAutoSpendScreen = props => {
     setSwitchOn(value);
   };
 
-  const onLayoutListItem = (event, id) => {
-    const {width, height, x, y} = event.nativeEvent.layout;
-    setListItemPositions({...listItemPositions, [id]: {width, height, x, y}});
+  const onLayoutListItem = (event, itemLabel) => {
+    const {width: itemWidth, height, x: itemX, y} = event.nativeEvent.layout;
+    // atomic setState
+    setListItemPositions(prevState => ({
+      ...prevState,
+      [itemLabel]: {width: itemWidth, height, x: itemX, y},
+    }));
   };
 
   const {scaleX, properties, lineLength} = useMemo(() => {
@@ -131,14 +101,12 @@ const SifirWasabiAutoSpendScreen = props => {
       slider?.current.setNativeProps({
         left: left - 10,
       });
-      moveCursor(100);
+      moveCursor(lineLength / 2);
     } catch (err) {
       error(err);
     }
   };
-
-  const handleChartSlider = data =>
-    debounce(({anonset}) => setanonset(Math.floor(anonset)), 13);
+  let anonSetValue;
 
   const moveCursor = value => {
     let {x} = properties.getPointAtLength(lineLength - value);
@@ -149,24 +117,77 @@ const SifirWasabiAutoSpendScreen = props => {
     slider?.current.setNativeProps({
       left: left - 10,
     });
-    const anonSetValue = Math.floor(scaleX.invert(x));
+    anonSetValue = Math.floor(scaleX.invert(x));
     const text = `${anonSetValue}`;
     label?.current?.setNativeProps({
       text,
       left: left + 3.5,
     });
-    handleChartSlider({
-      anonset: anonSetValue,
-    });
+    // setAnonset(anonSetValue);
   };
 
+  const WalletList = useMemo(
+    () =>
+      walletList.map(item => {
+        return (
+          <SifirAutoSpendWalletCard
+            item={item}
+            onLayoutListItem={onLayoutListItem.bind(this)}
+            setSelectedWallet={setSelectedWallet.bind(this)}
+            selectedWallet={selectedWallet}
+          />
+        );
+      }),
+    [walletList, selectedWallet],
+  );
+
+  const WalletAnonSlider = useMemo(() => {
+    return (
+      <Androw style={styles.shadow}>
+        <View style={styles.stickyContainer}>
+          <View>
+            <SifirAnonimitySlider
+              SV={SV}
+              lineLength={lineLength}
+              slider={slider}
+              label={label}
+              x={x}
+              cursor={cursor}
+              minX={minX}
+              maxX={maxX}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.confirmBtn}
+            onPress={() => onConfirm({selectedWallet, anonset: anonSetValue})}>
+            <Text style={styles.confirmLabel}>{C.STR_CONFIRM}</Text>
+          </TouchableOpacity>
+        </View>
+      </Androw>
+    );
+  }, [minX, maxX, selectedWallet, label]);
+
+  const DarkOverLay = useMemo(
+    () => (
+      <SifirAnimatedOverlay
+        style={{
+          top: headerHeight,
+        }}
+        onTouchEnd={
+          selectedWallet?.label ? () => setSelectedWallet({}) : undefined
+        }
+        effectDeps={[isSwitchOn, selectedWallet]}
+      />
+    ),
+    [headerHeight, selectedWallet, isSwitchOn],
+  );
   return (
     <View style={styles.container}>
       <View
         onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         <SifirAutoSpendHeader
           onBackPress={onBackPress}
-          headerText={C.STR_Set_Min_Anonset}
+          headerText={'Auto Send'}
           isSwitchOn={isSwitchOn}
           setSwitchOn={handleSwitch}
           showOverlay={!isSwitchOn || selectedWallet?.label}
@@ -183,30 +204,9 @@ const SifirWasabiAutoSpendScreen = props => {
         onLayout={event =>
           setListContainerPosition(event.nativeEvent.layout.y)
         }>
-        {walletList.map(item => {
-          return (
-            <SifirAutoSpendWalletCard
-              item={item}
-              onLayoutListItem={onLayoutListItem}
-              setSelectedWallet={setSelectedWallet}
-              selectedWallet={selectedWallet}
-            />
-          );
-        })}
+        {WalletList}
       </ScrollView>
-      {!isSwitchOn && (
-        <SifirAnimatedOverlay
-          style={{
-            top: headerHeight,
-          }}
-        />
-      )}
-      {selectedWallet?.label && (
-        <SifirAnimatedOverlay
-          style={{top: headerHeight}}
-          onTouchEnd={() => setSelectedWallet({})}
-        />
-      )}
+      {(!isSwitchOn || selectedWallet?.label) && DarkOverLay}
       {selectedWallet?.label && (
         <SifirCard
           style={[
@@ -243,27 +243,7 @@ const SifirWasabiAutoSpendScreen = props => {
           {C.STR_Select_Account}
         </Text>
       )}
-      {selectedWallet?.label && (
-        <Androw style={styles.shadow}>
-          <View style={styles.stickyContainer}>
-            <View>
-              <SifirAnonimitySlider
-                SV={SV}
-                lineLength={lineLength}
-                slider={slider}
-                label={label}
-                x={x}
-                cursor={cursor}
-                minX={minX}
-                maxX={maxX}
-              />
-            </View>
-            <TouchableOpacity style={styles.confirmBtn}>
-              <Text style={styles.confirmLabel}>{C.STR_CONFIRM}</Text>
-            </TouchableOpacity>
-          </View>
-        </Androw>
-      )}
+      {selectedWallet?.label && WalletAnonSlider}
     </View>
   );
 };
