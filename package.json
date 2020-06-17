@@ -65,7 +65,7 @@
     "reanimated-bottom-sheet": "^1.0.0-alpha.20",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
-    "sifir-js-sdk": "git+https://git@github.com/Sifir-io/sifir-js-sdk.git#feature/register-key",
+    "sifir-js-sdk": "git+https://git@github.com/Sifir-io/sifir-js-sdk.git#master",
     "svg-path-properties": "^1.0.4",
     "uuid": "^3.4.0",
     "vm-browserify": "^1.1.2"

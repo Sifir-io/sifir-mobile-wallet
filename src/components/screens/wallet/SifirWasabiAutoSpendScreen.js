@@ -43,12 +43,30 @@ const SifirWasabiAutoSpendScreen = props => {
   const [listContainerPosition, setListContainerPosition] = useState(0);
   const [topTextPosition, setTopTextPosition] = useState(0);
   const [SVoffset, setSVoffset] = useState(0);
-  const {minX = 2, maxX = 120} = props;
-  // FIXME get configs?
-  const {onBackPress, onConfirm, walletList} = props.route.params;
-  const [anonset, setAnonset] = useState(0);
+  const {
+    minX = 2,
+    maxX = 120,
+    autoSpendWallet = null,
+    autoSpendWalletMinAnonset = 0,
+  } = props;
+  const {onBackPress, onConfirm, walletList, currentCfg} = props.route.params;
   useEffect(() => {
     StatusBar.setBackgroundColor(AppStyle.backgroundColor);
+    if (!currentCfg?.length) {
+      return;
+    }
+    const autoSpendWalletObj = walletList.find(
+      ({label: l}) => l === autoSpendWallet,
+    );
+    if (!autoSpendWalletObj) {
+      error('Selected auto spend wallet is not part of walletList ignoring');
+      return;
+    }
+    setSwitchOn(true);
+    setSelectedWallet({
+      ...autoSpendWalletObj,
+      annonset: autoSpendWalletMinAnonset,
+    });
   }, []);
 
   useEffect(() => {
