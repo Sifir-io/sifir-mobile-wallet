@@ -7,13 +7,7 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-// import SifirTxnList from '@elements/SifirTxnList';
-//import SifirInvEntry from '@elements/TxnListItems/SifirInvEntry';
-//import SifirTxnEntry from '@elements/TxnListItems/SifirTxnEntry';
-//import SifirUnspentCoinEntry from '@elements/TxnListItems/SifirUnspentCoinEntry';
-//import SifirWasabiTxnEntry from '@elements/TxnListItems/SifirWasabiTxnEntry';
 import {Images, AppStyle, C} from '@common/index';
-import moment from 'moment';
 const SifirTransactionsTab = props => {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const {headerText, filterMap = [], txnData, renderItem} = props;
@@ -21,34 +15,6 @@ const SifirTransactionsTab = props => {
   const [appliedFilter, setAppliedFilter] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
 
-  // FIXME move this one level up OR action ?
-  // This should all be part of action to standarize wallet into having the sam
-  // timestamp
-  // id
-  // type
-  // if we standarize data at the action leve, then this componenet can take ownership of sorting
-  // We can pretty much move all SifirTxnList into here as a memo
-  //const processData = async (data, start = 0, length = 20) => {
-  //  const dataForTab = typeof data === 'function' ? await data() : data;
-  //  switch (type) {
-  //    case C.STR_WASABI_WALLET_TYPE:
-  //      return [...(dataForTab?.transactions || [])]
-  //        .sort((a, b) => moment(b.datetime).diff(moment(a.datetime)))
-  //        .slice(start, length);
-  //    case C.STR_UNSPENT_COINS:
-  //      return [...(dataForTab?.unspentCoins || [])].slice(start, length);
-  //    case C.STR_LN_WALLET_TYPE:
-  //      /// FIXME now that we store and cache this, can we just have the DB bring us back the sorted result ?
-  //      return [...(dataForTab?.invoices || []), ...(dataForTab?.pays || [])]
-  //        .filter(txn => txn && txn?.decodedBolt11?.timestamp > 1)
-  //        .sort((a, b) => b.decodedBolt11.timestamp - a.decodedBolt11.timestamp)
-  //        .slice(start, length);
-  //    case C.STR_SPEND_WALLET_TYPE:
-  //      return dataForTab;
-  //    case C.STR_WATCH_WALLET_TYPE:
-  //      return dataForTab;
-  //  }
-  //};
   // fetch data on init
   useEffect(() => {
     setTabData(txnData);

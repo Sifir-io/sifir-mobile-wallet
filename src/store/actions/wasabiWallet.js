@@ -3,6 +3,7 @@ import {FULFILLED, PENDING, REJECTED} from '@utils/constants';
 import {wasabiClient as _wasabi} from '@io/wasabiClient';
 import {C} from '@common/index';
 import {getTransportFromToken} from '@io/transports';
+import moment from 'moment';
 import {log, error} from '@io/events';
 let wasabiClient;
 
@@ -123,7 +124,11 @@ const getTxns = ({
     });
     dispatch({
       type: types.WASABI_WALLET_GET_TXNS + FULFILLED,
-      payload: {txnsList},
+      payload: {
+        txnsList: txnsList.sort((a, b) =>
+          moment(b.datetime).diff(moment(a.datetime)),
+        ),
+      },
     });
     return txnsList;
   } catch (err) {
