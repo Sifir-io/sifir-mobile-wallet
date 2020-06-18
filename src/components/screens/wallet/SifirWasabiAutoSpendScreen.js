@@ -203,7 +203,9 @@ const SifirWasabiAutoSpendScreen = props => {
       <View
         onLayout={event => setHeaderHeight(event.nativeEvent.layout.height)}>
         <SifirAutoSpendHeader
-          onBackPress={onBackPress}
+          onBackPress={() => {
+            onBackPress({isSwitchOn, selectedWallet, anonSetValue});
+          }}
           headerText={'Auto Send'}
           isSwitchOn={isSwitchOn}
           setSwitchOn={handleSwitch}
@@ -224,6 +226,7 @@ const SifirWasabiAutoSpendScreen = props => {
         {WalletList}
       </ScrollView>
       {(!isSwitchOn || selectedWallet?.label) && DarkOverLay}
+      {/* TODO this should reus SifirAutoSpendCard */}
       {selectedWallet?.label && listItemPositions[selectedWallet.label] && (
         <SifirCard
           style={[

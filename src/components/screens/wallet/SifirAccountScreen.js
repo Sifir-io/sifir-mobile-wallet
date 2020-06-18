@@ -205,11 +205,35 @@ const SifirAccountScreen = props => {
             // isLoading: props.wasabiWallet.loading,
             menuItems: [
               {
-                label: 'Auto Send: Disabled',
+                label: `Auto Send: ${
+                  dataLoaded?.autoSpendWallet
+                    ? dataLoaded.autoSpendWallet +
+                      '(' +
+                      dataLoaded?.autoSpendWalletMinAnonset +
+                      ')'
+                    : 'Disabled'
+                }`,
                 onPress: () => {
                   toggleSettingsModal.apply(this);
                   navigate('WalletSelectMenu', {
-                    onBackPress: () => {
+                    onBackPress: async ({
+                      isSwitchOn,
+                      selectedWallet,
+                      anonSetValue,
+                    }) => {
+                      // if user toggled autospend off when it was on, then dispatch
+                      if (!isSwitchOn && dataLoaded.autoSpendWallet) {
+                        await props.setWasabiAutoSpendWalletAndAnonset({
+                          label: null,
+                        });
+                        Alert.alert(
+                          `Auto Send Disabled`,
+                          `Auto spend has been disabled, coins will no longer be sent to your ${
+                            dataLoaded.autoSpendWallet
+                          } wallet`,
+                        );
+                        _loadWalletFromProps();
+                      }
                       navigation.pop();
                       toggleSettingsModal();
                     },
@@ -217,11 +241,6 @@ const SifirAccountScreen = props => {
                       selectedWallet,
                       anonset: autoSpendAnonset,
                     }) => {
-                      console.log(
-                        'confirmed',
-                        selectedWallet,
-                        autoSpendAnonset,
-                      );
                       await props.setWasabiAutoSpendWalletAndAnonset({
                         label: selectedWallet.label,
                         anonset: autoSpendAnonset,
@@ -233,6 +252,7 @@ const SifirAccountScreen = props => {
                         } - ${selectedWallet.desc}.`,
                       );
                       navigation.pop();
+                      _loadWalletFromProps();
                       toggleSettingsModal();
                     },
                     walletList: props.btcWallet.btcWalletList?.filter(

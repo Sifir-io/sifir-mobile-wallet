@@ -68,12 +68,12 @@ const setWasabiAutoSpendWalletAndAnonset = ({
   label = undefined,
   anonset = undefined,
 }) => async (dispatch, getState) => {
-  if (label) {
+  if (label !== undefined) {
     let value;
     // some translations to do here
     switch (label) {
       case C.STR_SPEND_WALLET_LABEL:
-        value = '_spending';
+        value = '_spender';
         break;
       case null:
         value = '_disabled';
