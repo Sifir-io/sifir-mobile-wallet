@@ -49,11 +49,6 @@ const SifirAccountHistoryTabs = ({
   bottomExtraSpace,
 }) => {
   const [index, setIndex] = useState(0);
-  // const [tabData, setTabData] = useState(null);
-  //useEffect(() => {
-  //  setTabData(txnData);
-  //}, [txnData]);
-
   const onTabIndexChange = tabIndex => setIndex(tabIndex);
   const TransctionTabFactory = ({title, key, data}) => {
     let renderItem;

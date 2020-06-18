@@ -77,7 +77,7 @@ const getBtcWalletList = () => async dispatch => {
 
     // Add spending wallet
     btcWalletList.push({
-      label: 'Spending',
+      label: C.STR_SPEND_WALLET_LABEL,
       desc: C.STR_WALLET,
       type: C.STR_SPEND_WALLET_TYPE,
       iconURL: Images.icon_btcBtn,
@@ -91,7 +91,7 @@ const getBtcWalletList = () => async dispatch => {
     });
 
     btcWalletList.push({
-      label: 'Wasabi',
+      label: C.STR_WASABI_WALLET_LABEL,
       desc: C.STR_WALLET,
       type: C.STR_WASABI_WALLET_TYPE,
       iconURL: Images.icon_wasabi,

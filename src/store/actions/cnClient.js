@@ -44,8 +44,8 @@ const getWasabiAutoSpendWallet = () => async (dispatch, getState) => {
   const {value: spendingWalletLabel} = prop;
   // some translations to do here
   switch (spendingWalletLabel) {
-    case '_spending':
-      return C.STR_SPEND_WALLET_TYPE;
+    case '_spender':
+      return C.STR_SPEND_WALLET_LABEL;
     case '_disabled':
       return null;
     default:
@@ -72,7 +72,7 @@ const setWasabiAutoSpendWalletAndAnonset = ({
     let value;
     // some translations to do here
     switch (label) {
-      case C.STR_SPEND_WALLET_TYPE:
+      case C.STR_SPEND_WALLET_LABEL:
         value = '_spending';
         break;
       case null:
@@ -82,10 +82,12 @@ const setWasabiAutoSpendWalletAndAnonset = ({
         value = label;
         break;
     }
-    dispatch(setConfigProp(properties.CN_AUTOSPEND_WALLET_LABEL, value));
+    await dispatch(setConfigProp(properties.CN_AUTOSPEND_WALLET_LABEL, value));
   }
   if (anonset) {
-    dispatch(setConfigProp(properties.CN_AUTOSPEND_ANONSET_LEVEL, anonset));
+    await dispatch(
+      setConfigProp(properties.CN_AUTOSPEND_ANONSET_LEVEL, anonset),
+    );
   }
 };
 const getConfigProps = () => async dispatch => {
@@ -106,11 +108,13 @@ const getConfigProps = () => async dispatch => {
     });
   }
 };
-const setConfigProp = ({property, value}) => async dispatch => {
+const setConfigProp = (property, value) => async dispatch => {
   dispatch({type: types.CN_CLIENT_SET_CFG_PROPS + PENDING});
   try {
     await dispatch(initCnClient());
+    console.log('sending', property, value);
     const result = await cnClient.setConfigProp(property, value);
+    console.log('sending result', result);
     dispatch({
       type: types.CN_CLIENT_SET_CFG_PROPS + FULFILLED,
     });

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useCallback, useEffect, useMemo} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
   View,
@@ -31,7 +31,8 @@ import debounce from '../../../helpers/debounce';
 
 const SifirAccountScreen = props => {
   const [balance, setBalance] = useState(0);
-  const [txnData, setTxnData] = useState([]);
+  const [dataLoaded, setDataLoaded] = useState(null);
+  const [chartLoaded, setChartLoaded] = useState(true);
   const [isVisibleSettingsModal, setIsVisibleSettingsModal] = useState(false);
   const [anonset, setAnonset] = useState(0);
   const [bottomExtraSpace, setBottomExtraSpace] = useState(sheetHeight);
@@ -41,12 +42,13 @@ const SifirAccountScreen = props => {
   const {navigate} = navigation;
 
   const _loadWalletFromProps = async () => {
+    setDataLoaded(null);
     const {label, type} = walletInfo;
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
         let {balance, txnData} = await props.getLnWalletDetails({label});
         setBalance(balance);
-        setTxnData(txnData);
+        setDataLoaded({});
         setShowAccountHistory(true);
         break;
       case C.STR_SPEND_WALLET_TYPE:
@@ -59,16 +61,24 @@ const SifirAccountScreen = props => {
           type,
         });
         setBalance(walletBalance);
-        setTxnData(walletTxnData);
+        setDataLoaded({});
         setShowAccountHistory(true);
         break;
       case C.STR_WASABI_WALLET_TYPE:
         // TODO move loading txns to tab change
-        const [{unspentcoins: unspentCoins}] = await Promise.all([
+        const [
+          ,
+          ,
+          autoSpendWallet,
+          autoSpendWalletMinAnonset,
+        ] = await Promise.all([
           props.getUnspentCoins(),
           props.wasabiGetTxns(),
+          props.getWasabiAutoSpendWallet(),
+          props.getWasabiAutoSpendMinAnonset(),
         ]);
-        setTxnData({unspentCoins});
+        console.log('load', autoSpendWalletMinAnonset, autoSpendWallet);
+        setDataLoaded({autoSpendWallet, autoSpendWalletMinAnonset});
         setShowAccountHistory(true);
         //if (!state.showAccountHistory) {
         //  setTimeout(() => {
@@ -115,6 +125,7 @@ const SifirAccountScreen = props => {
     debounce(({anonset, value}) => {
       setAnonset(Math.floor(anonset));
       setBalance(value);
+      setChartLoaded(true);
     }, 1);
   const onExtraSpaceLayout = event => {
     const {height} = event.nativeEvent.layout;
@@ -122,40 +133,33 @@ const SifirAccountScreen = props => {
   };
 
   const {label, type} = walletInfo;
+
+  // Account stuff that depends on data load, IE Function only changes on Walletinfo change but runs every update
+  // const walletDataCb = useCallback(() => {
   const {
-    isLoading,
-    isLoaded,
-    hasError,
-    accountIcon,
-    accountIconOnPress,
-    accountHeaderText,
-    accountTransactionHeaderText,
-    accountActionSendLabel = C.STR_SEND,
-    btcUnit,
+    isLoading = true,
+    isLoaded = false,
+    hasError = null,
+    dataMap = [],
+    filterMap = [],
     chartData = null,
-    dataMap,
-    filterMap,
     settingModalProps = {},
   } = useMemo(() => {
-    console.log('USEMEM');
+    if (!dataLoaded) {
+      return {};
+    }
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
         return {
           isLoading: props.lnWallet.loading,
           isLoaded: props.lnWallet.loaded,
           hasError: props.lnWallet.error,
-          accountIcon: Images.icon_light,
-          accountIconOnPress: toggleSettingsModal.bind(this),
-          accountHeaderText: C.STR_Balance_Channels_n_Outputs,
-          accountTransactionHeaderText: C.STR_INVOICES_AND_PAYS,
           settingModalProps: {
             toolTipStyle: false,
             showOpenChannel: true,
             showTopUp: true,
             showWithdraw: true,
           },
-          btcUnit: C.STR_MSAT,
-          accountActionSendLabel: 'Pay Invoice',
           dataMap: [
             // FIXME key strings
             {
@@ -191,20 +195,14 @@ const SifirAccountScreen = props => {
         };
       case C.STR_WASABI_WALLET_TYPE:
         return {
-          isLoading: props.wasabiWallet.loading,
-          isLoaded: props.wasabiWallet.loaded,
+          isLoading: props.wasabiWallet.loading && !chartLoaded,
+          isLoaded: props.wasabiWallet.loaded && chartLoaded,
           hasError: props.wasabiWallet.error,
-          accountIcon: Images.icon_wasabi,
-          accountIconOnPress: toggleSettingsModal.bind(this),
-
-          accountHeaderText: C.STR_Wasabi_Header + anonset,
-          accountTransactionHeaderText: C.STR_ALL_TRANSACTIONS,
-          btcUnit: C.STR_SAT,
-          // only show chart when more than one unspentcoin
-          chartData:
-            txnData?.unspentCoins?.length > 1 ? txnData.unspentCoins : null,
+          chartData: props.wasabiWallet.unspentCoinsList?.unspentcoins?.length
+            ? props.wasabiWallet.unspentCoinsList.unspentcoins
+            : null,
           settingModalProps: {
-            isLoading,
+            // isLoading: props.wasabiWallet.loading,
             menuItems: [
               {
                 label: 'Auto Send: Disabled',
@@ -229,7 +227,7 @@ const SifirAccountScreen = props => {
                         anonset: autoSpendAnonset,
                       });
                       Alert.alert(
-                        `Auto Send To Wallet: ${props.getWasabiAutoSpendWallet()}`,
+                        `Auto Send To Wallet: ${selectedWallet.label}`,
                         `Coins reaching An anonymity set of ${autoSpendAnonset} will be automagically sent to your wallet: ${
                           selectedWallet.label
                         } - ${selectedWallet.desc}.`,
@@ -241,9 +239,9 @@ const SifirAccountScreen = props => {
                       ({type: walletType}) =>
                         walletType !== C.STR_WASABI_WALLET_TYPE,
                     ),
-                    // FIXME this is a promise
-                    autoSpendWallet: props.getWasabiAutoSpendWallet(),
-                    autoSpendWalletMinAnonset: props.getWasabiAutoSpendMinAnonset(),
+                    autoSpendWallet: dataLoaded?.autoSpendWallet,
+                    autoSpendWalletMinAnonset:
+                      dataLoaded?.autoSpendWalletMinAnonset,
                   });
                 },
               },
@@ -278,11 +276,6 @@ const SifirAccountScreen = props => {
           isLoading: props.btcWallet.loading,
           isLoaded: props.btcWallet.loaded,
           hasError: props.btcWallet.error,
-          accountHeaderText: C.STR_Cur_Balance,
-          accountIcon: Images.icon_bitcoin,
-          accountIconOnPress: () => {},
-          accountTransactionHeaderText: C.STR_TRANSACTIONS,
-          btcUnit: C.STR_BTC,
           filterMap: [
             {
               title: 'Recieved',
@@ -308,7 +301,45 @@ const SifirAccountScreen = props => {
           ],
         };
     }
-  }, [txnData, balance, walletInfo]);
+  }, [dataLoaded]);
+  // Aâccount data that is more static, IE values only need to be re-evaluated on walletInfo change
+  const {
+    accountIcon,
+    accountIconOnPress,
+    accountHeaderText,
+    accountTransactionHeaderText,
+    accountActionSendLabel = C.STR_SEND,
+    btcUnit,
+  } = useMemo(() => {
+    switch (type) {
+      case C.STR_LN_WALLET_TYPE:
+        return {
+          accountIcon: Images.icon_light,
+          accountIconOnPress: toggleSettingsModal.bind(this),
+          accountHeaderText: C.STR_Balance_Channels_n_Outputs,
+          accountTransactionHeaderText: C.STR_INVOICES_AND_PAYS,
+          btcUnit: C.STR_MSAT,
+          accountActionSendLabel: 'Pay Invoice',
+        };
+      case C.STR_WASABI_WALLET_TYPE:
+        return {
+          accountIcon: Images.icon_wasabi,
+          accountIconOnPress: toggleSettingsModal.bind(this),
+          accountHeaderText: C.STR_Wasabi_Header + anonset,
+          accountTransactionHeaderText: C.STR_ALL_TRANSACTIONS,
+          btcUnit: C.STR_SAT,
+          // only show chart when more than one unspentcoin
+        };
+      default:
+        return {
+          accountHeaderText: C.STR_Cur_Balance,
+          accountIcon: Images.icon_bitcoin,
+          accountIconOnPress: () => {},
+          accountTransactionHeaderText: C.STR_TRANSACTIONS,
+          btcUnit: C.STR_BTC,
+        };
+    }
+  }, [walletInfo]);
   if (hasError) {
     return (
       <ErrorScreen
@@ -402,7 +433,6 @@ const SifirAccountScreen = props => {
           type={type}
           filterMap={filterMap}
           dataMap={dataMap}
-          txnData={txnData}
           btcUnit={btcUnit}
           headerText={accountTransactionHeaderText}
           bottomExtraSpace={bottomExtraSpace}

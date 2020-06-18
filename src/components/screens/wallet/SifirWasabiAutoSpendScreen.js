@@ -43,18 +43,17 @@ const SifirWasabiAutoSpendScreen = props => {
   const [listContainerPosition, setListContainerPosition] = useState(0);
   const [topTextPosition, setTopTextPosition] = useState(0);
   const [SVoffset, setSVoffset] = useState(0);
+  const {minX = 2, maxX = 120} = props;
   const {
-    minX = 2,
-    maxX = 120,
-    autoSpendWallet = null,
-    autoSpendWalletMinAnonset = 0,
-  } = props;
-  const {onBackPress, onConfirm, walletList, currentCfg} = props.route.params;
+    onBackPress,
+    onConfirm,
+    walletList,
+    autoSpendWalletMinAnonset,
+    autoSpendWallet,
+  } = props.route.params;
   useEffect(() => {
     StatusBar.setBackgroundColor(AppStyle.backgroundColor);
-    if (!currentCfg?.length) {
-      return;
-    }
+    console.log('auto spend scree', autoSpendWalletMinAnonset, autoSpendWallet);
     const autoSpendWalletObj = walletList.find(
       ({label: l}) => l === autoSpendWallet,
     );
@@ -62,11 +61,11 @@ const SifirWasabiAutoSpendScreen = props => {
       error('Selected auto spend wallet is not part of walletList ignoring');
       return;
     }
-    setSwitchOn(true);
     setSelectedWallet({
       ...autoSpendWalletObj,
       annonset: autoSpendWalletMinAnonset,
     });
+    setSwitchOn(true);
   }, []);
 
   useEffect(() => {
@@ -225,7 +224,7 @@ const SifirWasabiAutoSpendScreen = props => {
         {WalletList}
       </ScrollView>
       {(!isSwitchOn || selectedWallet?.label) && DarkOverLay}
-      {selectedWallet?.label && (
+      {selectedWallet?.label && listItemPositions[selectedWallet.label] && (
         <SifirCard
           style={[
             styles.cardContainer,
@@ -233,7 +232,7 @@ const SifirWasabiAutoSpendScreen = props => {
               borderColor: AppStyle.mainColor,
               position: 'absolute',
               top:
-                listItemPositions[(selectedWallet?.label)].y +
+                listItemPositions[selectedWallet.label].y +
                 listContainerPosition -
                 SVoffset,
             },
