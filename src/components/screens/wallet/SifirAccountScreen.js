@@ -171,7 +171,20 @@ const SifirAccountScreen = props => {
                     b.decodedBolt11.timestamp - a.decodedBolt11.timestamp,
                 ),
             },
-            // TODO funds, channels
+            {
+              key: C.STR_UNSPENT_COINS,
+              title: 'Unspent Outputs',
+              data: (props.lnWallet?.outputs || []).map(
+                ({txid, value, address, status, blockheight}) => ({
+                  amount: value,
+                  confirmed: status === 'confirmed',
+                  label: address,
+                  anonsetLabel: 'Block',
+                  anonymitySet: blockheight,
+                  txid,
+                }),
+              ),
+            },
           ],
           filterMap: [
             {

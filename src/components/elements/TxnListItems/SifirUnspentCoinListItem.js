@@ -5,6 +5,7 @@ import {Images, AppStyle, C} from '@common/index';
 
 const UnspentCoinListItem = ({
   amount,
+  anonsetLabel = 'AnonimitySet',
   anonSet,
   label,
   txid,
@@ -20,10 +21,10 @@ const UnspentCoinListItem = ({
         <View style={styles.timeStrContainer}>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.unspentAmount}>
-              <SifirBTCAmount amount={amount} unit={'SATS'} />
+              <SifirBTCAmount amount={amount} unit={unit} />
             </Text>
             <Text style={styles.annonSet}>
-              {'  '} AnonimitySet: {anonSet}
+              {'  '} {anonsetLabel}: {anonSet}
             </Text>
           </View>
           <Text style={styles.label}>{label}</Text>

@@ -4,12 +4,21 @@ import {Images} from '@common/index';
 
 const SifirUnspentCoinEntry = ({utxo, unit}) => {
   try {
-    const {amount, address, confirmed, label, anonymitySet, txid} = utxo;
+    const {
+      amount,
+      address,
+      confirmed,
+      label,
+      anonymitySet,
+      txid,
+      anonsetLabel = 'AnonimitySet',
+    } = utxo;
     // TODO add multiSelect list and use following icon
     const imgURL = confirmed ? Images.icon_confirmed : Images.icon_unconfirmed;
     return (
       <UnspentCoinListItem
         amount={amount}
+        anonsetLabel={anonsetLabel}
         anonSet={anonymitySet}
         label={label}
         txid={txid}

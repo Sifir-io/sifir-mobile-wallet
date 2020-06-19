@@ -178,7 +178,12 @@ const getLnWalletDetails = ({label}) => async dispatch => {
     }
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
-      payload: {pays: processedPays, invoices: processedInvoices},
+      payload: {
+        outputs,
+        channels,
+        pays: processedPays,
+        invoices: processedInvoices,
+      },
     });
     return {
       balance,
@@ -209,7 +214,7 @@ const getFunds = () => async dispatch => {
     const balance = inChannelBalance + outputBalance;
     dispatch({
       type: types.LN_WALLET_GET_FUNDS + FULFILLED,
-      payload: {balance},
+      payload: {balance, outputs, channels},
     });
   } catch (err) {
     error(err);
