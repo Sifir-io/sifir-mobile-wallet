@@ -24,6 +24,7 @@ export const C = {
   STR_TRANSACTIONS: 'Transactions',
   STR_ALL_TRANSACTIONS: 'All Transactions',
   STR_SEND: 'SEND',
+  STR_BACK: 'BACK',
   STR_Send: 'Send',
   STR_TxID: 'TxID',
   STR_ChannelID: 'Channel ID',

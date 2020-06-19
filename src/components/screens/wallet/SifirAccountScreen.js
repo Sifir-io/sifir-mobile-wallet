@@ -118,14 +118,12 @@ const SifirAccountScreen = props => {
 
   const handleChartSlider = useCallback(
     debounce(({anonset, value}) => {
-      console.log('anonset', value, anonset);
       setAnonset(Math.floor(anonset));
       setBalance(value);
       setChartLoaded(true);
     }, 1),
     [],
   );
-  console.log('hadasd', handleChartSlider);
   const onExtraSpaceLayout = event => {
     const {height} = event.nativeEvent.layout;
     setBottomExtraSpace(height);

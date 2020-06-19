@@ -1,4 +1,4 @@
-import React, {Component, useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Image,
@@ -8,6 +8,7 @@ import {
   FlatList,
   ActivityIndicator,
   TextInput,
+  Clipboard,
 } from 'react-native';
 import {connect} from 'react-redux';
 import Overlay from 'react-native-modal-overlay';
@@ -51,9 +52,20 @@ const SifirBtcReceiveTxnScreen = props => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [qrCodeURI, setQrCodeURI] = useState(null);
+  const [refresh, setRefresh] = useState(0);
+  const [addressMessage, setAddressMessage] = useState(null);
+  const prevRefreshValue = useRef();
+
   useEffect(() => {
     loadWalletAddress();
   }, [labelInputDone, addrType]);
+  useEffect(() => {
+    console.log('adddd', refresh, prevRefreshValue.current);
+    if (refresh > 0 && refresh > prevRefreshValue.current) {
+      loadWalletAddress({loadNew: true});
+    }
+    prevRefreshValue.current = refresh;
+  }, [refresh]);
 
   const onClose = () => {
     setShowAddressTypeSelector(false);
@@ -108,27 +120,38 @@ const SifirBtcReceiveTxnScreen = props => {
       return;
     }
     let walletAddress;
+    let addressError;
     setLoading(true);
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
-        walletAddress = await props.getNewLnAddress();
+        walletAddress = props.getNewLnAddress();
+        addressError = props.lnWallet.error;
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        ({address: walletAddress} = await props.getNewWasabiAddress({
-          label: labelInput,
-        }));
+        walletAddress = props
+          .getNewWasabiAddress({
+            label: labelInput,
+          })
+          .then(({address}) => address);
+        addressError = props.wasabiWallet.error;
         break;
       default:
-        walletAddress = await props.getWalletAddress({
+        walletAddress = props.getWalletAddress({
           label,
           type,
           addrType: addrType?.value,
         });
+        addressError = props.btcWallet.error;
         break;
     }
-    if (walletAddress?.length) {
-      setAddress(walletAddress);
+    const addressText = await walletAddress;
+    log('assa', addressText, addressError);
+    if (addressText?.length) {
+      setAddress(addressText);
       setLoaded(true);
+    } else {
+      setError(addressError);
+      setLoaded(false);
     }
     setLoading(false);
   };
@@ -141,10 +164,10 @@ const SifirBtcReceiveTxnScreen = props => {
           {
             // FIXME error handling
             text: C.STR_TRY_AGAIN,
-            onPress: () => _bootStrap(),
+            onPress: () => setError(null),
           },
           {
-            text: C.GO_BACK,
+            text: C.STR_GO_BACK,
             onPress: () => props.navigation.navigate('Account', {label, type}),
           },
         ]}
@@ -245,7 +268,7 @@ const SifirBtcReceiveTxnScreen = props => {
         </View>
       )}
 
-      {!!address && showQRCode && (
+      {!loading && !!address && showQRCode && (
         <>
           <View style={styles.qrCodeView}>
             <SifirQRCode
@@ -256,11 +279,28 @@ const SifirBtcReceiveTxnScreen = props => {
               fgColor="#000000"
             />
           </View>
-          <Text style={styles.addrTxt}>{address}</Text>
+          <TouchableOpacity
+            onPress={async () => {
+              await Clipboard.setString(address);
+              setAddressMessage('Address Copied to Clipboard!');
+              setTimeout(() => setAddressMessage(null), 1500);
+            }}
+            onLongPress={() => setRefresh(refresh + 1)}>
+            <Text style={styles.addrTxt}>{address}</Text>
+          </TouchableOpacity>
+          {addressMessage?.length && (
+            <View>
+              <Text style={styles.addMsgTxt}>{addressMessage}</Text>
+            </View>
+          )}
           {labelInputDone && (
             <>
               <View style={[styles.space_around]}>
-                <Text style={styles.addrTxt}>{`Label: ${labelInput}`}</Text>
+                <Text
+                  style={[
+                    styles.addrTxt,
+                    {marginTop: 5},
+                  ]}>{`Label: ${labelInput}`}</Text>
                 <TouchableOpacity
                   onPress={() => {
                     if (labelInputDone) {
@@ -273,7 +313,7 @@ const SifirBtcReceiveTxnScreen = props => {
                   }}>
                   <Image
                     source={Images.icon_failure}
-                    style={styles.burger_icon}
+                    style={[styles.burger_icon, {marginLeft: 10}]}
                   />
                 </TouchableOpacity>
               </View>
@@ -281,7 +321,7 @@ const SifirBtcReceiveTxnScreen = props => {
           )}
         </>
       )}
-      {!!address && (
+      {!loading && !!address && (
         <>
           {enableAddressWatchSelection === true && (
             <View style={styles.watchAddrView}>
@@ -402,6 +442,7 @@ const SifirBtcReceiveTxnScreen = props => {
                 }}
                 onPressOut={() => {
                   setAddrType(item);
+                  setRefresh(refresh + 1);
                   hideModal();
                 }}>
                 <Text style={styles.item}>{item.title}</Text>
@@ -606,6 +647,12 @@ const styles = StyleSheet.create({
     marginTop: 40 * C.vh,
     backgroundColor: 'transparent',
   },
+  addMsgTxt: {
+    fontFamily: AppStyle.mainFont,
+    fontSize: 12,
+    marginTop: 5,
+    color: AppStyle.grayColor,
+  },
   addrTxt: {
     fontFamily: AppStyle.mainFontBold,
     fontSize: 16,
@@ -644,6 +691,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-around',
     marginLeft: 10,
+    marginTop: 10,
   },
   burger_icon: {width: 25, height: 20},
 });
