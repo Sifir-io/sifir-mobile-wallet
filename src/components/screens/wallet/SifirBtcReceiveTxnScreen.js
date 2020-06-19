@@ -59,8 +59,8 @@ const SifirBtcReceiveTxnScreen = props => {
   useEffect(() => {
     loadWalletAddress();
   }, [labelInputDone, addrType]);
+  // load new address
   useEffect(() => {
-    console.log('adddd', refresh, prevRefreshValue.current);
     if (refresh > 0 && refresh > prevRefreshValue.current) {
       loadWalletAddress({loadNew: true});
     }
@@ -115,7 +115,6 @@ const SifirBtcReceiveTxnScreen = props => {
     if (hasAllReqs !== true) {
       return;
     }
-    // FIXME add gesture to swipe left to load new
     if (!!address?.length && !loadNew) {
       return;
     }
@@ -162,7 +161,6 @@ const SifirBtcReceiveTxnScreen = props => {
         desc={C.STR_ERROR_generating_address}
         actions={[
           {
-            // FIXME error handling
             text: C.STR_TRY_AGAIN,
             onPress: () => setError(null),
           },
