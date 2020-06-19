@@ -59,7 +59,7 @@ const SifirAccountHistoryTabs = ({
         );
         break;
       case C.STR_UNSPENT_COINS:
-        // FIXME rename to UTXO ?
+        // TODO rename to UTXO ?
         renderItem = ({item: txn}) => (
           <SifirUnspentCoinEntry utxo={txn} unit={btcUnit} />
         );

@@ -46,17 +46,14 @@ const SifirAccountScreen = props => {
     const {label, type} = walletInfo;
     switch (type) {
       case C.STR_LN_WALLET_TYPE:
-        let {balance, txnData} = await props.getLnWalletDetails({label});
-        setBalance(balance);
+        let {balance: lnBalance} = await props.getLnWalletDetails({label});
+        setBalance(lnBalance);
         setDataLoaded({});
         setShowAccountHistory(true);
         break;
       case C.STR_SPEND_WALLET_TYPE:
       case C.STR_WATCH_WALLET_TYPE:
-        let {
-          balance: walletBalance,
-          txnData: walletTxnData,
-        } = await props.getWalletDetails({
+        let {balance: walletBalance} = await props.getWalletDetails({
           label,
           type,
         });
@@ -65,7 +62,6 @@ const SifirAccountScreen = props => {
         setShowAccountHistory(true);
         break;
       case C.STR_WASABI_WALLET_TYPE:
-        // TODO move loading txns to tab change
         const [
           ,
           ,
@@ -77,7 +73,6 @@ const SifirAccountScreen = props => {
           props.getWasabiAutoSpendWallet(),
           props.getWasabiAutoSpendMinAnonset(),
         ]);
-        console.log('load', autoSpendWalletMinAnonset, autoSpendWallet);
         setDataLoaded({autoSpendWallet, autoSpendWalletMinAnonset});
         setShowAccountHistory(true);
         //if (!state.showAccountHistory) {
@@ -121,12 +116,16 @@ const SifirAccountScreen = props => {
     }
   };
 
-  const handleChartSlider = data =>
+  const handleChartSlider = useCallback(
     debounce(({anonset, value}) => {
+      console.log('anonset', value, anonset);
       setAnonset(Math.floor(anonset));
       setBalance(value);
       setChartLoaded(true);
-    }, 1);
+    }, 1),
+    [],
+  );
+  console.log('hadasd', handleChartSlider);
   const onExtraSpaceLayout = event => {
     const {height} = event.nativeEvent.layout;
     setBottomExtraSpace(height);
@@ -161,7 +160,6 @@ const SifirAccountScreen = props => {
             showWithdraw: true,
           },
           dataMap: [
-            // FIXME key strings
             {
               key: C.STR_LN_WALLET_TYPE,
               title: 'Invoices & Payments',
@@ -176,11 +174,6 @@ const SifirAccountScreen = props => {
                 ),
             },
             // TODO funds, channels
-            //{
-            //  key: C.STR_UNSPENT_COINS,
-            //  title: 'Unspent Coins',
-            //  data: props.wasabiWallet.unspentCoinsList?.unspentcoins,
-            //},
           ],
           filterMap: [
             {
@@ -195,7 +188,9 @@ const SifirAccountScreen = props => {
         };
       case C.STR_WASABI_WALLET_TYPE:
         return {
-          isLoading: props.wasabiWallet.loading && !chartLoaded,
+          isLoading:
+            props.cyphernode.loading ||
+            (props.wasabiWallet.loading && !chartLoaded),
           isLoaded: props.wasabiWallet.loaded && chartLoaded,
           hasError: props.wasabiWallet.error,
           chartData: props.wasabiWallet.unspentCoinsList?.unspentcoins?.length
@@ -235,7 +230,7 @@ const SifirAccountScreen = props => {
                         _loadWalletFromProps();
                       }
                       navigation.pop();
-                      toggleSettingsModal();
+                      setIsVisibleSettingsModal(false);
                     },
                     onConfirm: async ({
                       selectedWallet,
@@ -245,6 +240,7 @@ const SifirAccountScreen = props => {
                         label: selectedWallet.label,
                         anonset: autoSpendAnonset,
                       });
+                      _loadWalletFromProps();
                       Alert.alert(
                         `Auto Send To Wallet: ${selectedWallet.label}`,
                         `Coins reaching An anonymity set of ${autoSpendAnonset} will be automagically sent to your wallet: ${
@@ -252,8 +248,7 @@ const SifirAccountScreen = props => {
                         } - ${selectedWallet.desc}.`,
                       );
                       navigation.pop();
-                      _loadWalletFromProps();
-                      toggleSettingsModal();
+                      setIsVisibleSettingsModal(false);
                     },
                     walletList: props.btcWallet.btcWalletList?.filter(
                       ({type: walletType}) =>
@@ -278,11 +273,11 @@ const SifirAccountScreen = props => {
             },
           ],
           dataMap: [
-            // FIXME key strings
             {
               key: C.STR_WASABI_WALLET_TYPE,
               title: 'Transactions',
-              data: props.wasabiWallet.txnsList?.transactions,
+              // TODO can we make this an FN call rather than data ? So we can call it later
+              data: props.wasabiWallet.txnsList,
             },
             {
               key: C.STR_UNSPENT_COINS,
@@ -359,7 +354,7 @@ const SifirAccountScreen = props => {
           btcUnit: C.STR_BTC,
         };
     }
-  }, [walletInfo]);
+  }, [walletInfo, anonset]);
   if (hasError) {
     return (
       <ErrorScreen
@@ -425,7 +420,7 @@ const SifirAccountScreen = props => {
           {!!chartData && (
             <SifirAccountChart
               chartData={chartData}
-              handleChartSlider={handleChartSlider()}
+              handleChartSlider={handleChartSlider}
             />
           )}
           <SifirAccountActions
@@ -442,9 +437,13 @@ const SifirAccountScreen = props => {
               type === C.STR_WATCH_WALLET_TYPE ? null : handleSendBtn
             }
             sendActionButtonLabel={accountActionSendLabel}
+            isDisabled={isLoading}
           />
         </View>
-        <View style={styles.extraSpace} onLayout={onExtraSpaceLayout} />
+        {/* TODO fix this hack to  Calculate initial snap position to HistoryTabs - Load it when nochartdata or when chart and is loaded */}
+        {(!chartData || (!!chartData && chartLoaded)) && (
+          <View style={styles.extraSpace} onLayout={onExtraSpaceLayout} />
+        )}
       </View>
       {showAccountHistory && (
         <SifirAccountHistoryTabs

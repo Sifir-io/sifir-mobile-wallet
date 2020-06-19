@@ -13,12 +13,14 @@ const SifirAccountActions = ({
   sendActionButtonLabel,
   handleReceiveButton,
   handleSendBtn,
+  isDisabled = false,
 }) => {
   const [btnStatus, setButtonStatus] = useState(0);
   return (
     <View style={styles.btnAreaView}>
       {!!handleSendBtn && (
         <TouchableWithoutFeedback
+          disabled={isDisabled}
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(1)}
           onPressOut={() => {
@@ -28,7 +30,9 @@ const SifirAccountActions = ({
           <View
             style={[
               styles.txnBtnView,
-              btnStatus === 1 ? {backgroundColor: 'black', opacity: 0.7} : {},
+              btnStatus === 1 || isDisabled
+                ? {backgroundColor: 'black', opacity: 0.7}
+                : {},
             ]}>
             <Text style={{color: 'white', fontSize: 15}}>
               {sendActionButtonLabel}
@@ -42,6 +46,7 @@ const SifirAccountActions = ({
       )}
       {!!handleReceiveButton && (
         <TouchableWithoutFeedback
+          disabled={isDisabled}
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(2)}
           onPressOut={() => {
@@ -52,7 +57,9 @@ const SifirAccountActions = ({
             style={[
               styles.txnBtnView,
               styles.leftTxnBtnView,
-              btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
+              btnStatus === 2 || isDisabled
+                ? {backgroundColor: 'black', opacity: 0.7}
+                : {},
             ]}>
             <Text style={[{color: 'white', fontSize: 15}]}>
               {C.STR_RECEIVE}

@@ -74,9 +74,16 @@ const spend = ({
       private: privateOnly,
       minanonset,
     });
-    if (spendResult?.result === 'error') {
+    if (
+      spendResult?.result === 'error' ||
+      spendResult?.error ||
+      // sometimes spend timesout on CN bridge side, so make sure we actaully got the spend
+      !spendResult?.result === 'success'
+    ) {
       throw new Error(
-        spendResult?.message || 'Error while attempting Wasabi spend',
+        spendResult?.message ||
+          spendResult?.error?.message ||
+          'Error while attempting Wasabi spend (probably timedout)',
       );
     }
     dispatch({
@@ -125,7 +132,7 @@ const getTxns = ({
     dispatch({
       type: types.WASABI_WALLET_GET_TXNS + FULFILLED,
       payload: {
-        txnsList: txnsList.sort((a, b) =>
+        txnsList: txnsList?.transactions.sort((a, b) =>
           moment(b.datetime).diff(moment(a.datetime)),
         ),
       },

@@ -56,7 +56,7 @@ const getLnNodesList = () => async dispatch => {
   await dispatch(initLnClient());
   const lnNodes = await lnStore.getLnNodes();
   if (!lnNodes?.length) {
-    // FIXME cold boot hack
+    // TODO cold boot hack
     // mainly to stay backward compatible with old archittecture
     // Either go to observable or fix this shit
     const nodeInfo = await lnClient.getNodeInfo();
@@ -105,7 +105,7 @@ const getLnNodeInfo = label => async dispatch => {
 const getLnWalletDetails = ({label}) => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
-    // FIXME
+    // TODO
     // const init = dispatch(initSifirClient());
     // and make sifirClient call not blocking so we can dispatch what's in the DB and then do the update
     // with a LN_WALLET_DETAILS + UPDATE event ?

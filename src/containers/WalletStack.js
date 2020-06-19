@@ -57,7 +57,6 @@ export default function WalletTab() {
         name="LNPayInvoiceRoute"
         component={LNPayInvoiceRoute}
       />
-      {/* FIXME namin */}
       <WalletStack.Screen
         name="WalletSelectMenu"
         component={SifirWasabiAutoSpendScreen}

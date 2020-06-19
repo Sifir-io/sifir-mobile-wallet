@@ -8,6 +8,7 @@ import {
   StatusBar,
   Image,
   Animated,
+  ActivityIndicator,
 } from 'react-native';
 import SifirAutoSpendHeader from '@elements/SifirHeaders/SifirAutoSpendHeader';
 import SifirAnonimitySlider from '@elements/SifirAnonimitySlider';
@@ -20,9 +21,8 @@ import {scaleLinear} from 'd3-scale';
 import {log, error} from '@io/events';
 import * as path from 'svg-path-properties';
 import * as shape from 'd3-shape';
-import debounce from '@helpers/debounce';
-// import makeUnspentCoinsChartData from '@helpers/makeUnspentCoinsChartData';
 import SifirAutoSpendWalletCard from '@elements/SifirAutoSpendWalletCard';
+import {useSelector} from 'react-redux';
 
 const d3 = {
   shape,
@@ -44,16 +44,19 @@ const SifirWasabiAutoSpendScreen = props => {
   const [topTextPosition, setTopTextPosition] = useState(0);
   const [SVoffset, setSVoffset] = useState(0);
   const {minX = 2, maxX = 120} = props;
+  // FIXME this is an antipattern, isLoading should be purely ppassed here but because of memo in AccounScreen we use this hack. Fix this on next iteration.
+  const defaultLoading = useSelector(({cyphernode}) => cyphernode.loading);
+
   const {
     onBackPress,
     onConfirm,
     walletList,
     autoSpendWalletMinAnonset,
     autoSpendWallet,
+    isLoading = defaultLoading,
   } = props.route.params;
   useEffect(() => {
     StatusBar.setBackgroundColor(AppStyle.backgroundColor);
-    console.log('auto spend scree', autoSpendWalletMinAnonset, autoSpendWallet);
     const autoSpendWalletObj = walletList.find(
       ({label: l}) => l === autoSpendWallet,
     );
@@ -118,6 +121,7 @@ const SifirWasabiAutoSpendScreen = props => {
       slider?.current.setNativeProps({
         left: left - 10,
       });
+      // TODO intial cursor position to match passed min anon
       moveCursor(lineLength / 2);
     } catch (err) {
       error(err);
@@ -174,15 +178,23 @@ const SifirWasabiAutoSpendScreen = props => {
               maxX={maxX}
             />
           </View>
-          <TouchableOpacity
-            style={styles.confirmBtn}
-            onPress={() => onConfirm({selectedWallet, anonset: anonSetValue})}>
-            <Text style={styles.confirmLabel}>{C.STR_CONFIRM}</Text>
-          </TouchableOpacity>
+          {isLoading && (
+            <ActivityIndicator size="large" color={AppStyle.mainColor} />
+          )}
+          {!isLoading && (
+            <TouchableOpacity
+              disabled={isLoading}
+              style={styles.confirmBtn}
+              onPress={() =>
+                onConfirm({selectedWallet, anonset: anonSetValue})
+              }>
+              <Text style={styles.confirmLabel}>{C.STR_CONFIRM}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Androw>
     );
-  }, [minX, maxX, selectedWallet, label]);
+  }, [minX, maxX, selectedWallet, label, isLoading]);
 
   const DarkOverLay = useMemo(
     () => (
