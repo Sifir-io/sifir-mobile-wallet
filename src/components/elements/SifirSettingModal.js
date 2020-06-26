@@ -45,8 +45,6 @@ const MenuListItem = ({label, icon, onPress, hideTopBorder = false}) => {
 class SifirSettingModal extends Component {
   state = {curMenu: 0, value: 0.6};
 
-  // FIXME
-  // Replace legacy shit with menuItems[] based rendering`
   render() {
     const {
       navigation,

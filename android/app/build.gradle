@@ -200,6 +200,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-svg')
     // Add v8-android - prebuilt libv8android.so into APK 
     implementation 'org.chromium:v8-android:+'
     implementation project(':react-native-randombytes')

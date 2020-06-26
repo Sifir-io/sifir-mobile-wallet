@@ -22,7 +22,6 @@ export default class SifirWalletButton extends Component {
       pageURL,
     } = this.props.walletInfo;
     const {isClicked} = this.state;
-
     return (
       <View
         onTouchStart={() => {
@@ -41,6 +40,7 @@ export default class SifirWalletButton extends Component {
             height={height}>
             <Image
               style={styles.cardImgStyle}
+              resizeMode="contain"
               source={isClicked === false ? iconURL : iconClickedURL}
             />
             <Text

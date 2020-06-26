@@ -1,0 +1,1 @@
+export wasabiClient from './clientFactory';

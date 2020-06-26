@@ -32,7 +32,7 @@ class UnlockORGenKeys extends Component {
   state = {
     scannedToken: this.props.route.params.scannedToken,
     encAuthInfo: this.props.route.params.encAuthInfo || null,
-    passphrase: '',
+    passphrase: 'oooooo', //TODO HAMZA reset before PR
     retryablePairingError: '',
   };
 

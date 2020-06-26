@@ -6,6 +6,7 @@ import SifirAccountScreen from './SifirAccountScreen';
 import SifirBtcReceiveTxnScreen from './SifirBtcReceiveTxnScreen';
 import SifirBtcTxnConfirmedScreen from './SifirBtcTxnConfirmedScreen';
 import SifirAddWalletScreen from './SifirAddWalletScreen';
+import SifirWasabiAutoSpendScreen from './SifirWasabiAutoSpendScreen';
 export {
   SifirGetAddrScreen,
   SifirBtcSendTxnInputAmountScreen,
@@ -15,4 +16,5 @@ export {
   SifirBtcReceiveTxnScreen,
   SifirBtcTxnConfirmedScreen,
   SifirAddWalletScreen,
+  SifirWasabiAutoSpendScreen,
 };

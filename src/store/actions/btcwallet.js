@@ -48,13 +48,13 @@ const getBtcWalletList = () => async dispatch => {
   dispatch({type: types.BTC_WALLET_LIST_DATA_SHOW + PENDING});
 
   let btcWalletList = [
-    {
-      label: 'ADD',
-      desc: C.STR_WALLET,
-      iconURL: Images.icon_add,
-      iconClickedURL: Images.icon_add_clicked,
-      pageURL: 'AddWallet',
-    },
+    //  {
+    //    label: 'ADD',
+    //    desc: C.STR_WALLET,
+    //    iconURL: Images.icon_add,
+    //    iconClickedURL: Images.icon_add_clicked,
+    //    pageURL: 'AddWallet',
+    //  },
   ];
 
   try {
@@ -69,17 +69,38 @@ const getBtcWalletList = () => async dispatch => {
         iconURL: Images.icon_btcBtn,
         iconClickedURL: Images.icon_btcBtn_clicked,
         pageURL: 'Account',
+        meta: {
+          enableAddressTypeSelection: false,
+        },
       }),
     );
 
     // Add spending wallet
     btcWalletList.push({
-      label: 'Spending',
+      label: C.STR_SPEND_WALLET_LABEL,
       desc: C.STR_WALLET,
       type: C.STR_SPEND_WALLET_TYPE,
       iconURL: Images.icon_btcBtn,
       iconClickedURL: Images.icon_btcBtn_clicked,
+      backIcon: Images.icon_btc_cir,
       pageURL: 'Account',
+      meta: {
+        enableAddressTypeSelection: true,
+        showAddressTypeSelector: true,
+      },
+    });
+
+    btcWalletList.push({
+      label: C.STR_WASABI_WALLET_LABEL,
+      desc: C.STR_WALLET,
+      type: C.STR_WASABI_WALLET_TYPE,
+      iconURL: Images.icon_wasabi,
+      iconClickedURL: Images.icon_wasabi_clicked,
+      backIcon: Images.icon_wasabi,
+      pageURL: 'Account',
+      meta: {
+        enableAddressLabelInput: true,
+      },
     });
 
     dispatch({
@@ -97,7 +118,6 @@ const getBtcWalletList = () => async dispatch => {
 
 const getWalletDetails = ({label, type}) => async dispatch => {
   dispatch({type: types.BTC_WALLET_DETAILS + PENDING});
-
   let balance = 0,
     txnData = [];
   try {
@@ -118,12 +138,13 @@ const getWalletDetails = ({label, type}) => async dispatch => {
       default:
         break;
     }
-    dispatch({
-      type: types.BTC_WALLET_DETAILS + FULFILLED,
-    });
     // TODO move this to component
     txnData.sort((a, b) => {
       return b.timereceived - a.timereceived;
+    });
+    dispatch({
+      type: types.BTC_WALLET_DETAILS + FULFILLED,
+      payload: {balance, txnData},
     });
     return {balance, txnData};
   } catch (err) {
@@ -138,7 +159,6 @@ const getWalletDetails = ({label, type}) => async dispatch => {
 const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
   dispatch({type: types.BTC_WALLET_ADDRESS + PENDING});
   let address = null;
-
   try {
     await dispatch(initBtcClient());
     switch (type) {
@@ -156,6 +176,7 @@ const getWalletAddress = ({label, type, addrType = null}) => async dispatch => {
       type: types.BTC_WALLET_ADDRESS + FULFILLED,
       payload: {address},
     });
+    return address;
   } catch (err) {
     error(err);
     dispatch({

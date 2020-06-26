@@ -11,6 +11,7 @@ import {connect} from 'react-redux';
 import SifirWalletButton from '@elements/SifirWalletButton';
 import {getBtcWalletList, getBlockChainInfo} from '@actions/btcwallet';
 import {getLnNodesList} from '@actions/lnWallet';
+import {getConfigProps} from '@actions/cnClient';
 import {Images, AppStyle, C} from '@common/index';
 import {ErrorScreen} from '@screens/error';
 import SifirSettingModal from '@elements/SifirSettingModal';
@@ -26,6 +27,8 @@ class SifirAccountsListScreen extends React.Component {
   _init = () => {
     this.props.getBtcWalletList();
     this.props.getLnNodesList();
+    // TODO walletlists should be a config prop when settings are moved there
+    this.props.getConfigProps();
   };
 
   componentDidMount() {
@@ -211,6 +214,7 @@ const mapDispatchToProps = {
   getBtcWalletList,
   getLnNodesList,
   getBlockChainInfo,
+  getConfigProps,
 };
 
 export default connect(

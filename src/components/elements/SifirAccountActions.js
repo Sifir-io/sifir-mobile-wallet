@@ -8,12 +8,19 @@ import {
 } from 'react-native';
 import {Images, AppStyle, C} from '@common/index';
 
-const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
+const SifirAccountActions = ({
+  type,
+  sendActionButtonLabel,
+  handleReceiveButton,
+  handleSendBtn,
+  isDisabled = false,
+}) => {
   const [btnStatus, setButtonStatus] = useState(0);
   return (
     <View style={styles.btnAreaView}>
       {!!handleSendBtn && (
         <TouchableWithoutFeedback
+          disabled={isDisabled}
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(1)}
           onPressOut={() => {
@@ -23,9 +30,13 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
           <View
             style={[
               styles.txnBtnView,
-              btnStatus === 1 ? {backgroundColor: 'black', opacity: 0.7} : {},
+              btnStatus === 1 || isDisabled
+                ? {backgroundColor: 'black', opacity: 0.7}
+                : {},
             ]}>
-            <Text style={{color: 'white', fontSize: 15}}>{C.STR_SEND}</Text>
+            <Text style={{color: 'white', fontSize: 15}}>
+              {sendActionButtonLabel}
+            </Text>
             <Image
               source={Images.icon_up_arrow}
               style={{width: 11, height: 11, marginLeft: 10}}
@@ -35,6 +46,7 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
       )}
       {!!handleReceiveButton && (
         <TouchableWithoutFeedback
+          disabled={isDisabled}
           style={{flex: 1}}
           onPressIn={() => setButtonStatus(2)}
           onPressOut={() => {
@@ -45,7 +57,9 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
             style={[
               styles.txnBtnView,
               styles.leftTxnBtnView,
-              btnStatus === 2 ? {backgroundColor: 'black', opacity: 0.7} : {},
+              btnStatus === 2 || isDisabled
+                ? {backgroundColor: 'black', opacity: 0.7}
+                : {},
             ]}>
             <Text style={[{color: 'white', fontSize: 15}]}>
               {C.STR_RECEIVE}
@@ -63,7 +77,6 @@ const SifirAccountActions = ({type, handleReceiveButton, handleSendBtn}) => {
 
 const styles = StyleSheet.create({
   btnAreaView: {
-    flex: 1,
     flexDirection: 'row',
     borderColor: AppStyle.mainColor,
     borderWidth: 1,

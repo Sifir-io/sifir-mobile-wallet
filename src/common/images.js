@@ -14,6 +14,7 @@ export default {
   icon_receive: require('./../assets/images/down_cir.png'),
   icon_chanel: require('./../assets/images/light_cir.png'),
   icon_up_arrow: require('./../assets/images/up_arrow.png'),
+  upArrow: require('./../assets/images/arrowupArrow.png'),
   icon_up_blue: require('./../assets/images/uparrow_blue.png'),
   icon_down_arrow: require('./../assets/images/down_arrow.png'),
   icon_btc_cir: require('./../assets/images/bitcoin_blue.png'),
@@ -61,4 +62,10 @@ export default {
   icon_chatSend: require('./../assets/images/chatSend.png'),
   icon_yellowTxn: require('./../assets/images/yellowTxn.png'),
   icon_thickGreenArrowTxn: require('./../assets/images/bold_arrow.png'),
+  filter_icon: require('./../assets/images/filter.png'),
+  icon_wasabi: require('./../assets/images/wasabiLogo.png'),
+  icon_wasabi_clicked: require('./../assets/images/wasabiLogo1.png'),
+  icon_confirmed: require('./../assets/images/confirmed.png'),
+  icon_unconfirmed: require('./../assets/images/unchecked.png'),
+  icon_bitcoinWhiteOutlined: require('./../assets/images/bitcoinWhiteOutlined.png'),
 };

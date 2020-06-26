@@ -7,4 +7,6 @@ export default {
   secondaryColor: '#4B53FF',
   errorColor: '#D0021B',
   orange: 'orange',
+  grayColor: '#ABA8A8',
+  tertiaryColor: '#122C3A',
 };

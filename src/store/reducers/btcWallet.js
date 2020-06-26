@@ -11,6 +11,8 @@ const initialState = {
   btcSendResult: null,
   feeSettingEnabled: false,
   chainInfo: null,
+  balance: null,
+  txnData: [],
 };
 
 const btcWallet = createReducer(initialState)({
@@ -75,9 +77,11 @@ const btcWallet = createReducer(initialState)({
   }),
   [types.BTC_WALLET_DETAILS + FULFILLED]: (
     state,
-    // {payload: {btcWalletDetails}},
+    {payload: {balance, txnData}},
   ) => ({
     ...state,
+    balance,
+    txnData,
     loading: false,
     loaded: true,
     error: null,

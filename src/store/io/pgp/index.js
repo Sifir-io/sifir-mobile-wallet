@@ -19,15 +19,17 @@ const initAndUnlockKeys = async ({privatekeyArmored, passphrase}) => {
   return {pubkeyArmored, fingerprint, hexkeyId};
 };
 
+// FIXME schema of return check interface
 /**
  * @param email
  * @param passphrase
- * @returns {Promise<{pubkeyArmored:string,fingerprint:string,hexkeyId:string}>}
+ * @returns {Promise<{privkeyArmored:string,pubkeyArmored:string,fingerprint:string,hexkeyId:string}>}
  */
 const makeNewPgpKey = async ({passphrase, email, user}) => {
   const key = await PgpBridge.genNewKey(passphrase, email, user);
   return key;
 };
+
 const signMessageWithArmoredKey = async ({msg, privKey, passphrase}) => {
   const {armoredSignature, message} = await PgpBridge.signMessageWithArmoredKey(
     msg,

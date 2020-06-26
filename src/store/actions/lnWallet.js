@@ -56,7 +56,7 @@ const getLnNodesList = () => async dispatch => {
   await dispatch(initLnClient());
   const lnNodes = await lnStore.getLnNodes();
   if (!lnNodes?.length) {
-    // FIXME cold boot hack
+    // TODO cold boot hack
     // mainly to stay backward compatible with old archittecture
     // Either go to observable or fix this shit
     const nodeInfo = await lnClient.getNodeInfo();
@@ -87,6 +87,7 @@ const getLnNodeInfo = label => async dispatch => {
     nodeInfo.label = nodeInfo.alias;
     nodeInfo.iconURL = Images.icon_light;
     nodeInfo.iconClickedURL = Images.icon_light_clicked;
+    nodeInfo.backIcon = Images.icon_bolt_cir;
     // nodeInfo.balance = balance;
     dispatch({
       type: types.LN_WALLET_NODEINFO + FULFILLED,
@@ -104,6 +105,11 @@ const getLnNodeInfo = label => async dispatch => {
 const getLnWalletDetails = ({label}) => async dispatch => {
   dispatch({type: types.LN_WALLET_DETAILS + PENDING});
   try {
+    // TODO
+    // const init = dispatch(initSifirClient());
+    // and make sifirClient call not blocking so we can dispatch what's in the DB and then do the update
+    // with a LN_WALLET_DETAILS + UPDATE event ?
+    //
     await dispatch(initSifirClient());
     const {
       funds: {channels, outputs},
@@ -145,10 +151,11 @@ const getLnWalletDetails = ({label}) => async dispatch => {
                 type: cachedBolt.type,
                 meta: cachedBolt.meta,
               };
-              log('cached bolt', payload);
+              // log('cached bolt', payload);
             } else {
               // decode and insert it
-              const decodedBolt11 = bolt11Lib.decode(inv.bolt11);
+              const [x, y] = inv.bolt11.split(':');
+              const decodedBolt11 = bolt11Lib.decode(x || y);
               payload = {
                 decodedBolt11,
                 bolt11: inv.bolt11,
@@ -171,6 +178,12 @@ const getLnWalletDetails = ({label}) => async dispatch => {
     }
     dispatch({
       type: types.LN_WALLET_DETAILS + FULFILLED,
+      payload: {
+        outputs,
+        channels,
+        pays: processedPays,
+        invoices: processedInvoices,
+      },
     });
     return {
       balance,
@@ -201,7 +214,7 @@ const getFunds = () => async dispatch => {
     const balance = inChannelBalance + outputBalance;
     dispatch({
       type: types.LN_WALLET_GET_FUNDS + FULFILLED,
-      payload: {balance},
+      payload: {balance, outputs, channels},
     });
   } catch (err) {
     error(err);
