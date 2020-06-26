@@ -272,7 +272,7 @@ const SifirWasabiAutoSpendScreen = props => {
               marginTop: 0,
             },
           ]}>
-          {C.STR_Select_Account}
+          {`${C.STR_Auto_mix_account_select} ${selectedWallet.label}`}
         </Text>
       )}
       {selectedWallet?.label && WalletAnonSlider}

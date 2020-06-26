@@ -137,6 +137,8 @@ export const C = {
   STR_Min_Anonset: 'Min Anonset',
   STR_Anonim_Level: 'Anonimity Level',
   STR_Set_Min_Anonset: 'Set Minimum Anonset',
+  STR_Auto_mix_account_select:
+    'Funds reaching the minimum anonset specified will be sent to',
   STR_Select_Account:
     'Select one account to which the Wasabi wallet will autosend funds to.',
   // --- ERRORS --

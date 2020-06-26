@@ -58,12 +58,15 @@ const SifirBtcReceiveTxnScreen = props => {
 
   useEffect(() => {
     loadWalletAddress();
-  }, [labelInputDone, addrType]);
+  }, []);
+  // }, [labelInputDone, addrType]);
   // load new address
   useEffect(() => {
+    let loadNew = false;
     if (refresh > 0 && refresh > prevRefreshValue.current) {
-      loadWalletAddress({loadNew: true});
+      loadNew = true;
     }
+    loadWalletAddress({loadNew});
     prevRefreshValue.current = refresh;
   }, [refresh]);
 
@@ -209,6 +212,7 @@ const SifirBtcReceiveTxnScreen = props => {
           )}
           {!labelInputDone && (
             <TouchableOpacity
+              disabled={labelInput?.length < 1}
               onPressOut={() => {
                 if (labelInputDone) {
                   setAddress(null);
@@ -216,6 +220,7 @@ const SifirBtcReceiveTxnScreen = props => {
                   setLabelInputDone(false);
                 } else {
                   setLabelInputDone(true);
+                  setRefresh(refresh + 1);
                 }
               }}
               style={styles.labelButtonCTA}>
@@ -301,13 +306,9 @@ const SifirBtcReceiveTxnScreen = props => {
                   ]}>{`Label: ${labelInput}`}</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    if (labelInputDone) {
-                      setAddress(null);
-                      setLabelInput('');
-                      setLabelInputDone(false);
-                    } else {
-                      setLabelInputDone(true);
-                    }
+                    setAddress(null);
+                    setLabelInput('');
+                    setLabelInputDone(false);
                   }}>
                   <Image
                     source={Images.icon_failure}
