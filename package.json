@@ -15,7 +15,7 @@
     "usb": "adb reverse tcp:8081 tcp:8081"
   },
   "dependencies": {
-    "@nozbe/watermelondb": "^0.16.0",
+    "@nozbe/watermelondb": "^0.16.2",
     "@nozbe/with-observables": "^1.0.5",
     "@react-native-community/async-storage": "^1.6.2",
     "@react-native-community/cli": "^3.1.0",
