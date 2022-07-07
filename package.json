@@ -31,7 +31,7 @@
     "browserify": "^16.5.0",
     "cyphernode-js-sdk-transports": "git+https://git@github.com/gabidi/cyphernode-js-sdk-transports.git#feature/rn",
     "d3-scale": "^3.2.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "node-libs-react-native": "^1.0.3",
     "react": "16.9.0",
     "react-native": "0.61.5",
